@@ -1,0 +1,45 @@
+/* #Buttons
+================================================== */
+
+/*vars*/
+@dt-btn-bg-color-darken: darken(@dt-btn-hover-bg-color, 5%);
+@dt-btn-bg-color-2-darken: darken(@dt-btn-hover-bg-color-2, 5%);
+.custom-mixin-bg (@customColor) when (iscolor(@customColor)) {
+	background: @customColor !important;
+}
+.custom-mixin-color (@customColor) when (iscolor(@customColor)) {
+	color: @customColor;
+	-webkit-text-fill-color: @customColor;
+}
+.custom-mixin-border-color (@customColor) when (iscolor(@customColor)) {
+	border-bottom-color: desaturate(darken(@customColor, 12%), 20%);
+}
+#@{unique-shortcode-class-name}:not(:hover) {
+		.custom-mixin-bg (@default-btn-bg);
+		.custom-mixin-color (@default-btn-color);
+		
+		& * {
+			.custom-mixin-color (@default-btn-color);
+		}
+		.btn-3d & {
+			.custom-mixin-border-color (@default-btn-bg);
+		}
+}
+#@{unique-shortcode-class-name} {
+		&:hover {
+			.custom-mixin-bg (@default-btn-bg-hover);
+			.custom-mixin-color (@default-btn-color-hover);
+
+			
+			& * {
+				.custom-mixin-color (@default-btn-color-hover);
+			}
+		}
+		
+		&:hover {
+			.btn-3d & {
+				.custom-mixin-border-color (@default-btn-bg-hover);
+			}
+		}
+}
+

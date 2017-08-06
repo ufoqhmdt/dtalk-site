@@ -1,0 +1,19 @@
+//Post content
+@post-content-overlap: 20px;
+.post-entry-content {
+	#page .@{unique-shortcode-class-name}.gradient-overlay-layout-list & {
+		background: @post-content-bg;
+		top: @post-content-overlap;
+		right: @post-content-overlap;
+		bottom: @post-content-overlap;
+		left: @post-content-overlap;
+
+	}
+}
+.post-head-wrapper,
+.post-entry-wrapper {
+	.@{unique-shortcode-class-name}.gradient-overlay-layout-list & {
+		right: @post-content-padding-right;
+		left: @post-content-padding-left;
+	}
+}

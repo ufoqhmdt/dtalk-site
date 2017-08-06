@@ -1,0 +1,57 @@
+ /* #Shortcode carousel
+================================================== */
+
+.custom-mixin-text-color (@customColor, @color-opacity:100%) when (iscolor(@customColor)) {
+	color: fade(@customColor, @color-opacity);
+}
+.custom-mixin-pagination-gap (@customSize) when (isnumber(@customSize)) {
+	margin-top: @customSize;
+}
+.custom-mixin-fade-bg (@customColor, @opacity:100%) when (iscolor(@customColor)) {
+	background: fade(@customColor, @opacity);
+}
+.woocommerce-product-details__short-description {
+	.@{unique-shortcode-class-name} & {
+		.custom-mixin-text-color (@post-content-color);
+	}
+}
+.star-rating,
+.star-rating:before { 
+	.@{unique-shortcode-class-name} & {
+		.custom-mixin-text-color (@post-title-color, 20%);
+	}
+}
+.entry-title,
+.entry-title *,
+.woocom-list-content .price,
+.woocom-list-content .price * {
+	.@{unique-shortcode-class-name} & {
+		.custom-mixin-text-color (@post-title-color);
+	}
+}
+.woocom-list-content .price del,
+.woocom-list-content .price del * {
+	.@{unique-shortcode-class-name} & {
+		.custom-mixin-text-color (@price-color);
+	}
+}
+.paginator {
+	.@{unique-shortcode-class-name} & {
+		.custom-mixin-pagination-gap (@shortcode-pagination-gap);
+	}
+}
+.paginator:not(.paginator-more-button) {
+	.@{unique-shortcode-class-name} & {
+		& a,
+		& a * {
+			color: @shortcode-filter-color;
+		}
+	}
+}
+.paginator:not(.paginator-more-button) a {
+	.@{unique-shortcode-class-name} & {
+		&:after {
+			.custom-mixin-fade-bg (@shortcode-filter-accent, 100%);
+		}
+	}
+}
