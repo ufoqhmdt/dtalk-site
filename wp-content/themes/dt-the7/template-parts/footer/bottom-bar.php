@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 							<?php
 							echo $copyrights;
 							if ( $credits ) {
-								echo '&nbsp;Dream-Theme &mdash; truly <a href="http://dream-theme.com" target="_blank">premium WordPress themes</a>';
+								echo '&nbsp;Dtalk';
 							}
 							?>
 
