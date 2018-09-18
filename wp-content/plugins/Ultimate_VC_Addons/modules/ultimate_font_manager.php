@@ -163,7 +163,7 @@ if(!class_exists('Ultimate_Google_Font_Manager'))
 
 				$font_call = str_replace( '||', '|', $font_call );
 
-				$link = 'https://fonts.googleapis.com/css?family='.$font_call;
+				$link = 'https://fonts.lug.ustc.edu.cn/css?family='.$font_call;
 
 				$font_api_call = $link.$subset_string;
 
@@ -625,7 +625,7 @@ if(!function_exists('enquque_ultimate_google_fonts'))
 							$font_call.= ':'.$font_variant;
 							$eq_name.= '-'.$font_variant;
 						}
-						$link = 'https://fonts.googleapis.com/css?family='.$font_call.$subset_call;
+						$link = 'https://fonts.lug.ustc.edu.cn/css?family='.$font_call.$subset_call;
 
 						if (!wp_script_is( 'ultimate-'.$eq_name, 'registered' ))
 						{
@@ -641,7 +641,7 @@ if(!function_exists('enquque_ultimate_google_fonts'))
 				else // font is without varients
 				{
 					$eq_name = $font_arr[0];
-					$link = 'https://fonts.googleapis.com/css?family='.$eq_name;
+					$link = 'https://fonts.lug.ustc.edu.cn/css?family='.$eq_name;
 
 					if($eq_name != '')
 					{
@@ -791,7 +791,7 @@ if(!function_exists('enquque_ultimate_google_fonts_optimzed'))
 				endif;
 			}
 
-			$link = 'https://fonts.googleapis.com/css?family=';
+			$link = 'https://fonts.lug.ustc.edu.cn/css?family=';
 			$main_count = count($main);
 			$mcount = 0;
 

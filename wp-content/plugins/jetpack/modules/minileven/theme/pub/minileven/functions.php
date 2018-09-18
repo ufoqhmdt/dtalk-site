@@ -111,7 +111,7 @@ function minileven_fonts() {
 			'family' => 'Open+Sans:200,200italic,300,300italic,400,400italic,600,600italic,700,700italic',
 			'subset' => $opensans_subsets,
 		);
-		wp_register_style( 'minileven-open-sans', add_query_arg( $opensans_query_args, "//fonts.googleapis.com/css" ), array(), null );
+		wp_register_style( 'minileven-open-sans', add_query_arg( $opensans_query_args, "//fonts.lug.ustc.edu.cn/css" ), array(), null );
 	}
 }
 add_action( 'init', 'minileven_fonts' );

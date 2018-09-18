@@ -170,14 +170,14 @@ function wp_default_scripts( &$scripts ) {
 	$scripts->add( 'wp-lists', "/wp-includes/js/wp-lists$suffix.js", array( 'wp-ajax-response', 'jquery-color' ), false, 1 );
 
 	// WordPress no longer uses or bundles Prototype or script.aculo.us. These are now pulled from an external source.
-	$scripts->add( 'prototype', 'https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js', array(), '1.7.1');
-	$scripts->add( 'scriptaculous-root', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js', array('prototype'), '1.9.0');
-	$scripts->add( 'scriptaculous-builder', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js', array('scriptaculous-root'), '1.9.0');
-	$scripts->add( 'scriptaculous-dragdrop', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js', array('scriptaculous-builder', 'scriptaculous-effects'), '1.9.0');
-	$scripts->add( 'scriptaculous-effects', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js', array('scriptaculous-root'), '1.9.0');
-	$scripts->add( 'scriptaculous-slider', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js', array('scriptaculous-effects'), '1.9.0');
-	$scripts->add( 'scriptaculous-sound', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js', array( 'scriptaculous-root' ), '1.9.0' );
-	$scripts->add( 'scriptaculous-controls', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js', array('scriptaculous-root'), '1.9.0');
+	$scripts->add( 'prototype', 'https://ajax.lug.ustc.edu.cn/ajax/libs/prototype/1.7.1.0/prototype.js', array(), '1.7.1');
+	$scripts->add( 'scriptaculous-root', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/scriptaculous.js', array('prototype'), '1.9.0');
+	$scripts->add( 'scriptaculous-builder', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/builder.js', array('scriptaculous-root'), '1.9.0');
+	$scripts->add( 'scriptaculous-dragdrop', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/dragdrop.js', array('scriptaculous-builder', 'scriptaculous-effects'), '1.9.0');
+	$scripts->add( 'scriptaculous-effects', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/effects.js', array('scriptaculous-root'), '1.9.0');
+	$scripts->add( 'scriptaculous-slider', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/slider.js', array('scriptaculous-effects'), '1.9.0');
+	$scripts->add( 'scriptaculous-sound', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/sound.js', array( 'scriptaculous-root' ), '1.9.0' );
+	$scripts->add( 'scriptaculous-controls', 'https://ajax.lug.ustc.edu.cn/ajax/libs/scriptaculous/1.9.0/controls.js', array('scriptaculous-root'), '1.9.0');
 	$scripts->add( 'scriptaculous', false, array('scriptaculous-dragdrop', 'scriptaculous-slider', 'scriptaculous-controls') );
 
 	// not used in core, replaced by Jcrop.js
@@ -825,7 +825,7 @@ function wp_default_styles( &$styles ) {
 		}
 
 		// Hotlink Open Sans, for now
-		$open_sans_font_url = "https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=$subsets";
+		$open_sans_font_url = "https://fonts.lug.ustc.edu.cn/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=$subsets";
 	}
 
 	// Register a stylesheet for the selected admin color scheme.

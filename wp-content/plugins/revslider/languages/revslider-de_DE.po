@@ -6086,7 +6086,7 @@ msgid ""
 "which will also work for chinese visitors)"
 msgstr ""
 "URL die anstelle von \n"
-"http://fonts.googleapis.com/css?family=  genutzt werden soll (Beispiel: http:"
+"http://fonts.lug.ustc.edu.cn/css?family=  genutzt werden soll (Beispiel: http:"
 "//fonts.useso.com/css?family= für Chinesische User)"
 
 #: ../admin/views/system/dialog-global-settings.php:161

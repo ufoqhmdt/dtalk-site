@@ -194,7 +194,7 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 		wp_register_script( 'wpb_json-js', vc_asset_url( 'lib/bower/json-js/json2.min.js' ), array(), WPB_VC_VERSION, true );
 		// used in post settings editor
 		wp_register_script( 'ace-editor', vc_asset_url( 'lib/bower/ace-builds/src-min-noconflict/ace.js' ), array( 'jquery' ), WPB_VC_VERSION, true );
-		wp_register_script( 'webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' ); // Google Web Font CDN
+		wp_register_script( 'webfont', '//ajax.lug.ustc.edu.cn/ajax/libs/webfont/1.4.7/webfont.js' ); // Google Web Font CDN
 
 		wp_localize_script( 'vc-backend-actions-js', 'i18nLocale', visual_composer()->getEditorsLocale() );
 	}

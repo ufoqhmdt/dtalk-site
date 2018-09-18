@@ -95,7 +95,7 @@ if ( !empty( $google_fonts_json->items ) ) {
 			$go_pricing['google-fonts'][] = array (
 				'name' => $google_font->family,
 				'value' => sprintf( '%1$s, %2$s', $google_font->family, $google_font->category),
-				'url' => sprintf( '//fonts.googleapis.com/css?family=%s', preg_replace('/\s/', '+', $google_font->family) )
+				'url' => sprintf( '//fonts.lug.ustc.edu.cn/css?family=%s', preg_replace('/\s/', '+', $google_font->family) )
 			);
 		
 		}

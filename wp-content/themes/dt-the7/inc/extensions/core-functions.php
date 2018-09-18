@@ -557,7 +557,7 @@ function dt_get_google_fonts( $font = '', $effect = '' ) {
 	}
 
 	?>
-	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=<?php echo str_replace( ' ', '+', $font ); ?>">
+	<link rel="stylesheet" type="text/css" href="//fonts.lug.ustc.edu.cn/css?family=<?php echo str_replace( ' ', '+', $font ); ?>">
 	<?php
 }
 
@@ -571,7 +571,7 @@ function dt_make_web_font_uri( $font ) {
 		return false;
 	}
 
-    return '//fonts.googleapis.com/css?family=' . str_replace( ' ', '+', $font );
+    return '//fonts.lug.ustc.edu.cn/css?family=' . str_replace( ' ', '+', $font );
 }
 
 /**

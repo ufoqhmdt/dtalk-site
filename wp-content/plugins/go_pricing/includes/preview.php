@@ -22,7 +22,7 @@ $instance = GW_GoPricing::instance();
 wp_head();
 ?>
 <style>
-@import url(//fonts.googleapis.com/css?family=Open+Sans:700,600,400);
+@import url(//fonts.lug.ustc.edu.cn/css?family=Open+Sans:700,600,400);
 @font-face {
     font-family: 'gopricing';
     src:

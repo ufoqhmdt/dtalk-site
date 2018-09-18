@@ -1371,8 +1371,8 @@ msgstr "Carattere Caricamento URL:"
 
 #: admin/views/global-settings.php:160
 #@ revslider
-msgid "Insert something in it and it will be used instead of http://fonts.googleapis.com/css?family= (For example: http://fonts.useso.com/css?family= which will also work for chinese visitors)"
-msgstr "Inserire qualcosa in esso e sarà usato al posto di http://fonts.googleapis.com/css?family= (per esempio: http://fonts.useso.com/css?family= che funziona anche per i visitatori cinesi )"
+msgid "Insert something in it and it will be used instead of http://fonts.lug.ustc.edu.cn/css?family= (For example: http://fonts.useso.com/css?family= which will also work for chinese visitors)"
+msgstr "Inserire qualcosa in esso e sarà usato al posto di http://fonts.lug.ustc.edu.cn/css?family= (per esempio: http://fonts.useso.com/css?family= che funziona anche per i visitatori cinesi )"
 
 #: admin/views/global-settings.php:167
 #@ revslider

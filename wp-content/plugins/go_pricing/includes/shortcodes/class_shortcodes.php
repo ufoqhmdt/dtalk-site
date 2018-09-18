@@ -167,7 +167,7 @@ class GW_GoPricing_Shortcodes {
 								$font_url_params = array();
 
 								/* Google Font */
-								if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+								if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 									$font_url_params[] = '400';
 									$font['url'] .= ':400,b,i';
 								}
@@ -654,7 +654,7 @@ class GW_GoPricing_Shortcodes {
 											$font_url_params = array();
 	
 											/* Google Font */
-											if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+											if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 												$font_url_params[] = '400';
 												if ( !empty( $col_data['title']['title']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 												if ( !empty( $col_data['title']['title']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -707,7 +707,7 @@ class GW_GoPricing_Shortcodes {
 											$font_url_params = array();
 	
 											/* Google Font */
-											if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+											if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 												$font_url_params[] = '400';
 												if ( !empty( $col_data['title']['subtitle']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 												if ( !empty( $col_data['title']['subtitle']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -762,7 +762,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $col_data['price']['price-style']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $col_data['price']['price-style']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -843,7 +843,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $col_data['price']['payment']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $col_data['price']['payment']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -1127,7 +1127,7 @@ class GW_GoPricing_Shortcodes {
 											$font_url_params = array();
 	
 											/* Google Font */
-											if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+											if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 												$font_url_params[] = '400';
 												if ( !empty( $ribbon_data['font-style']['bold'] ) ) $font_url_params[] = 'b';
 												if ( !empty( $ribbon_data['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -1756,7 +1756,7 @@ class GW_GoPricing_Shortcodes {
 										$font_url_params = array();
 
 										/* Google Font */
-										if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+										if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 											$font_url_params[] = '400';
 											if ( !empty( $body_row_data[$body_row_data['type']]['tooltip']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 											if ( !empty( $body_row_data[$body_row_data['type']]['tooltip']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -1863,7 +1863,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $body_row_data['html']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $body_row_data['html']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -1907,7 +1907,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $body_row_data['button']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $body_row_data['button']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -2294,7 +2294,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $footer_row_data['html']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $footer_row_data['html']['font-style']['italic'] ) ) $font_url_params[] = 'i';
@@ -2340,7 +2340,7 @@ class GW_GoPricing_Shortcodes {
 												$font_url_params = array();
 		
 												/* Google Font */
-												if ( preg_match( '/fonts.googleapis.com/', $font['url'] ) ) {
+												if ( preg_match( '/fonts.lug.ustc.edu.cn/', $font['url'] ) ) {
 													$font_url_params[] = '400';
 													if ( !empty( $footer_row_data['button']['font-style']['bold'] ) ) $font_url_params[] = 'b';
 													if ( !empty( $footer_row_data['button']['font-style']['italic'] ) ) $font_url_params[] = 'i';

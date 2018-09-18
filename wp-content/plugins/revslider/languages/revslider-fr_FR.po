@@ -1825,7 +1825,7 @@ msgstr ""
 
 #: ../admin/views/system/dialog-global-settings.php:154
 msgid ""
-"Insert something in it and it will be used instead of http://fonts.googleapis.com/css?"
+"Insert something in it and it will be used instead of http://fonts.lug.ustc.edu.cn/css?"
 "family= (For example: http://fonts.useso.com/css?family= which will also work for chinese "
 "visitors)"
 msgstr ""

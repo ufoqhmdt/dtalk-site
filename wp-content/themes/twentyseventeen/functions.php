@@ -278,7 +278,7 @@ function twentyseventeen_fonts_url() {
 			'subset' => urlencode( 'latin,latin-ext' ),
 		);
 
-		$fonts_url = add_query_arg( $query_args, 'https://fonts.googleapis.com/css' );
+		$fonts_url = add_query_arg( $query_args, 'https://fonts.lug.ustc.edu.cn/css' );
 	}
 
 	return esc_url_raw( $fonts_url );
@@ -296,7 +296,7 @@ function twentyseventeen_fonts_url() {
 function twentyseventeen_resource_hints( $urls, $relation_type ) {
 	if ( wp_style_is( 'twentyseventeen-fonts', 'queue' ) && 'preconnect' === $relation_type ) {
 		$urls[] = array(
-			'href' => 'https://fonts.gstatic.com',
+			'href' => 'https://fonts-gstatic.lug.ustc.edu.cn',
 			'crossorigin',
 		);
 	}

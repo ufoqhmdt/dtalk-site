@@ -217,7 +217,7 @@ class RevSliderAdmin extends RevSliderBaseAdmin{
 	
 	
 	public static function enqueue_styles(){
-		wp_enqueue_style('rs-open-sans', '//fonts.googleapis.com/css?family=Open+Sans:400,300,700,600,800');
+		wp_enqueue_style('rs-open-sans', '//fonts.lug.ustc.edu.cn/css?family=Open+Sans:400,300,700,600,800');
 		wp_enqueue_style('revslider-global-styles', RS_PLUGIN_URL . 'admin/assets/css/global.css', array(), GlobalsRevSlider::SLIDER_REVISION );
 	}
 

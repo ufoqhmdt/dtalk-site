@@ -123,7 +123,7 @@ class Jetpack_Comment_Likes {
 
 	public function load_styles_register_scripts() {
 		if ( ! wp_style_is( 'open-sans', 'registered' ) ) {
-			wp_register_style( 'open-sans', 'https://fonts.googleapis.com/css?family=Open+Sans', array(), JETPACK__VERSION );
+			wp_register_style( 'open-sans', 'https://fonts.lug.ustc.edu.cn/css?family=Open+Sans', array(), JETPACK__VERSION );
 		}
 		wp_enqueue_style( 'jetpack_likes', plugins_url( 'likes/style.css', __FILE__ ), array( 'open-sans' ), JETPACK__VERSION );
 		wp_enqueue_script( 'postmessage', plugins_url( '_inc/postmessage.js', JETPACK__PLUGIN_FILE ), array( 'jquery' ), JETPACK__VERSION, false );

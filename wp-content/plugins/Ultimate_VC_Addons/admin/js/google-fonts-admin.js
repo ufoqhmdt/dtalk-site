@@ -343,7 +343,7 @@ function convert_json_to_html(object)
 			} //end of subsets
 			html += '<div class="clear"></div>';
 		html += '</div>';
-		$gf('head').append('<link href="//fonts.googleapis.com/css?family='+font_call+'" type="text/css" media="all" rel="stylesheet"/>');
+		$gf('head').append('<link href="//fonts.lug.ustc.edu.cn/css?family='+font_call+'" type="text/css" media="all" rel="stylesheet"/>');
 	});
 	return html;
 }

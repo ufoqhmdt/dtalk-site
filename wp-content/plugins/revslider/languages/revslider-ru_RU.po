@@ -1962,7 +1962,7 @@ msgid ""
 "which will also work for chinese visitors)"
 msgstr ""
 "Это значения будет использовано вместо \n"
-"http://fonts.googleapis.com/css?family= ( Например: http://fonts.useso."
+"http://fonts.lug.ustc.edu.cn/css?family= ( Например: http://fonts.useso."
 "com/css?family= будет работать для китайских пользователей )"
 
 #: ../admin/views/system/dialog-global-settings.php:161

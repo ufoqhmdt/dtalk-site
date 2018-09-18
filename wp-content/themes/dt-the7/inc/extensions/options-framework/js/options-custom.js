@@ -520,7 +520,7 @@ jQuery(document).ready(function($) {
 				protocol = document.location.protocol;
 			}
 
-			var linkHref = protocol + '//fonts.googleapis.com/css?family=' + font_header;
+			var linkHref = protocol + '//fonts.lug.ustc.edu.cn/css?family=' + font_header;
 			var linkStyle = 'font-family: "' + font_style[0] + '", "' + dtPrevFont + '";' + italic + bold;
 
 			dtPrevFont = font_style[0];

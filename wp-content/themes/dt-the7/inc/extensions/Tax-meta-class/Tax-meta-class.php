@@ -1201,8 +1201,8 @@ class Tax_Meta_Class {
    * @access public
    */
   public function enqueue_jqueryui(){
-    wp_enqueue_style( 'tmc-jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/themes/'.apply_filters('tmc_jquery_ui_theme','smoothness').'/jquery-ui.css' );
-    wp_enqueue_script( 'tmc-jquery-ui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/jquery-ui.min.js', array( 'jquery' ) );
+    wp_enqueue_style( 'tmc-jquery-ui-css', 'http://ajax.lug.ustc.edu.cn/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/themes/'.apply_filters('tmc_jquery_ui_theme','smoothness').'/jquery-ui.css' );
+    wp_enqueue_script( 'tmc-jquery-ui', 'https://ajax.lug.ustc.edu.cn/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/jquery-ui.min.js', array( 'jquery' ) );
   }
   
   /**
