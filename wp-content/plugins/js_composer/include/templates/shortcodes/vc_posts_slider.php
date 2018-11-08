@@ -134,7 +134,7 @@ $my_query = new WP_Query( $query_args );
 
 $pretty_rel_random = ' data-rel="prettyPhoto[rel-' . get_the_ID() . '-' . rand() . ']"';
 if ( 'custom_link' === $link ) {
-	$custom_links = explode( ',', $custom_links );
+	$custom_links = explode( ',', vc_value_from_safe( $custom_links ) );
 }
 $teasers = '';
 $i = - 1;

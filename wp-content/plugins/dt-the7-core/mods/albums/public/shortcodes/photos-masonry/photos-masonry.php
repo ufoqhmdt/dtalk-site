@@ -19,16 +19,14 @@ if ( ! class_exists( 'DT_Shortcode_Photos_Masonry', false ) ) {
 			parent::setup( $atts, $content );
 
 			// vc inline dummy
-			if ( $this->vc_is_inline ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
+			if ( presscore_vc_is_inline() ) {
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-photos_masonry',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_photo_masonry_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Photos Masonry & Grid', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-photos_masonry',
-					'title' => _x( 'Photos masonry', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			return $this->shortcode_html();

@@ -26,8 +26,42 @@ class The7PT_Assets {
 	 * Enqueue scripts.
 	 */
 	public static function enqueue_scripts() {
-		wp_enqueue_script( 'the7pt', trailingslashit( get_template_directory_uri() ) . 'js/post-type.js', array(), wp_get_theme()->get( 'Version' ), true );
-		wp_enqueue_style( 'the7pt-static', trailingslashit( get_template_directory_uri() ) . 'css/post-type.css', array(), wp_get_theme()->get( 'Version' ) );
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$template_uri = The7PT()->plugin_url() . 'assets';
+
+		$register_styles = array(
+			'the7pt-static' => array(
+				'src' => "{$template_uri}/css/post-type{$suffix}.css",
+			),
+			'the7pt-photo-scroller'    => array(
+				'src'     => "{$template_uri}/css/photo-scroller{$suffix}.css",
+			),
+		);
+
+		foreach ( $register_styles as $name => $props ) {
+			$deps = isset( $props['deps'] ) ? $props['deps'] : array();
+			wp_register_style( $name, $props['src'], $deps, THE7_VERSION, 'all' );
+		}
+
+		$register_scripts = array(
+			'the7pt' => array(
+				'src'     => "{$template_uri}/js/post-type{$suffix}.js",
+				'deps'      => array( 'jquery' ),
+				'in_footer' => true,
+			),
+			'the7pt-photo-scroller'    => array(
+				'src'     => "{$template_uri}/js/photo-scroller{$suffix}.js",
+				'deps'      => array( 'jquery' ),
+				'in_footer' => true,
+			),
+		);
+
+		foreach ( $register_scripts as $name => $props ) {
+			wp_register_script( $name, $props['src'], $props['deps'], THE7_VERSION, $props['in_footer'] );
+		}
+
+		wp_enqueue_script( 'the7pt' );
+		wp_enqueue_style( 'the7pt-static' );
 	}
 
 	/**
@@ -39,12 +73,8 @@ class The7PT_Assets {
 	 */
 	public static function register_dynamic_stylesheet( $dynamic_stylesheets ) {
 		$dynamic_stylesheets['the7pt.less'] = array(
-			'path' => trailingslashit( get_template_directory() ) . 'css/post-type-dynamic.less',
-			'src' => trailingslashit( get_template_directory_uri() ) . 'css/post-type-dynamic.less',
-			'fallback_src' => false,
-			'deps' => array(),
-			'ver' => wp_get_theme()->get( 'Version' ),
-			'media' => 'all'
+			'path' => The7pt()->plugin_path() . 'assets/css/dynamic/post-type-dynamic.less',
+			'src' => 'post-type-dynamic.less',
 		);
 
 		return $dynamic_stylesheets;

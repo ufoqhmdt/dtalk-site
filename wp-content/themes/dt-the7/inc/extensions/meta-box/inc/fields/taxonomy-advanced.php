@@ -1,11 +1,11 @@
 <?php
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
-require_once RWMB_FIELDS_DIR . 'taxonomy.php';
+require_once THE7_RWMB_FIELDS_DIR . 'taxonomy.php';
 
-if ( ! class_exists( 'RWMB_Taxonomy_Advanced_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Taxonomy_Advanced_Field' ) )
 {
-	class RWMB_Taxonomy_Advanced_Field extends RWMB_Taxonomy_Field
+	class THE7_RWMB_Taxonomy_Advanced_Field extends THE7_RWMB_Taxonomy_Field
 	{
 		/**
 		 * Get meta values to save

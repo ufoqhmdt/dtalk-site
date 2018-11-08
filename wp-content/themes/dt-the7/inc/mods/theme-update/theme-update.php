@@ -13,7 +13,12 @@ if ( ! class_exists( 'Presscore_Modules_ThemeUpdateModule', false ) ) :
 		const PAGE_ID = 'the7-dashboard';
 
 		public static function execute() {
-			add_filter( 'pre_set_site_transient_update_themes', array( __CLASS__, 'pre_set_site_transient_update_themes' ) );
+			if ( ! ( defined( 'THE7_PREVENT_THEME_UPDATE' ) && THE7_PREVENT_THEME_UPDATE ) ) {
+				add_filter( 'pre_set_site_transient_update_themes', array(
+					__CLASS__,
+					'pre_set_site_transient_update_themes'
+				) );
+			}
 
 			// Backup lang files.
 			add_filter( 'upgrader_pre_install', array( __CLASS__, 'backup_lang_files' ), 10, 2 );
@@ -22,6 +27,20 @@ if ( ! class_exists( 'Presscore_Modules_ThemeUpdateModule', false ) ) :
 			add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
 			add_action( 'admin_notices', array( __CLASS__, 'registration_admin_notice' ), 1 );
 			add_filter( 'pre_update_site_option_the7_purchase_code', array( __CLASS__, 'check_for_empty_code' ), 10, 2 );
+
+			if ( ! class_exists( 'The7_Install', false ) ) {
+				include dirname( __FILE__ ) . '/class-the7-install.php';
+			}
+
+			The7_Install::init();
+
+			if ( ! class_exists( 'The7_Registration_Warning', false ) ) {
+				include dirname( __FILE__ ) . '/class-the7-registration-warning.php';
+			}
+
+			add_action( 'admin_notices', array( 'The7_Registration_Warning', 'add_admin_notices' ) );
+			add_action( 'the7_after_theme_deactivation', array( 'The7_Registration_Warning', 'dismiss_admin_notices' ) );
+			add_action( 'the7_after_theme_registration', array( 'The7_Registration_Warning', 'setup_registration_warning' ) );
 		}
 
 		/**
@@ -86,6 +105,8 @@ if ( ! class_exists( 'Presscore_Modules_ThemeUpdateModule', false ) ) :
 			if ( class_exists( 'Presscore_Modules_TGMPAModule' ) ) {
 				Presscore_Modules_TGMPAModule::delete_plugins_list_cache();
 			}
+
+			do_action( 'the7_after_theme_registration', $the7_remote_api_response );
 
 			return $code;
 		}
@@ -239,23 +260,12 @@ if ( ! class_exists( 'Presscore_Modules_ThemeUpdateModule', false ) ) :
 			return $res;
 		}
 
-		/**
-		 * Print 'register' / 'de register' buttons.
-		 */
-		public static function print_submit_buttons() {
-			if ( presscore_theme_is_activated() ) {
-				echo '<input type="submit" class="button button-primary" name="deregister_theme" value="' . esc_attr( __( 'De-register Theme', 'the7mk2' ) ) . '" />';
-			} else {
-				echo '<input type="submit" class="button button-primary" name="register_theme" value="' . esc_attr( __( 'Register Theme', 'the7mk2' ) ) . '" />';
-			}
-		}
-
 		public static function registration_admin_notice() {
 			if ( presscore_theme_is_activated() ) {
 				return;
 			}
 
-			include 'registration-admin-notice-view.php';
+			include( dirname( __FILE__ ) . '/views/html-notice-registration.php' );
 		}
 	}
 
@@ -267,28 +277,6 @@ if ( ! function_exists( 'presscore_theme_update_get_changelog_url' ) ) :
 
 	function presscore_theme_update_get_changelog_url() {
 		return 'http://the7.io/changelog/';
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_theme_update_get_install_plugins_link' ) ) :
-
-	/**
-	 * This function will return tgm admin page link if $show is true. By default return empty string.
-	 *
-	 * @since 3.1.3
-	 * @param  boolean $show
-	 * @return string
-	 */
-	function presscore_theme_update_get_install_plugins_link( $show = false ) {
-		global $tgmpa;
-		$link_html = '';
-		if ( $tgmpa && ! $tgmpa->is_tgmpa_complete() ) {
-			/* translators: Link on the Theme Update options page */
-			$link_html = sprintf( __( '<a href="%s">Install/update recommended plugins</a>', 'the7mk2' ), esc_url( add_query_arg( 'page', $tgmpa->menu, admin_url( $tgmpa->parent_slug ) ) ) );
-			$link_html .= '&nbsp;&nbsp;&nbsp;';
-		}
-		return $link_html;
 	}
 
 endif;

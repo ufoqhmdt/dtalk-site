@@ -19,6 +19,7 @@ add_action( 'presscore_before_main_container', 'dt_woocommerce_cart_progress', 1
 
 add_filter( 'body_class', 'dt_woocommerce_body_class' );
 add_filter( 'presscore_hide_share_buttons', 'dt_woocommerce_hide_share_on_plugin_pages' );
+add_filter( 'presscore_before_post_masonry-filter_taxonomy', 'dt_woocommerce_proper_taxonomy_for_masonry_wrap_classes', 10, 2 );
 
 /**
  * Loop.
@@ -45,7 +46,7 @@ add_action( 'dt_wc_loop_end', 'presscore_wc_remove_masonry_lazy_load_attrs' );
 
 // change products add to cart text
 add_filter( 'woocommerce_product_add_to_cart_text', 'dt_woocommerce_filter_product_add_to_cart_text', 10, 2 );
-add_filter( 'wc_add_to_cart_params', 'dt_woocommerce_filter_frontend_scripts_data' );
+add_filter( 'woocommerce_get_script_data', 'dt_woocommerce_filter_frontend_scripts_data', 10, 2 );
 
 /**
  * Related products.
@@ -60,6 +61,16 @@ remove_action( 'woocommerce_before_subcategory', 'woocommerce_template_loop_cate
 remove_action( 'woocommerce_shop_loop_subcategory_title', 'woocommerce_template_loop_category_title', 10 );
 remove_action( 'woocommerce_after_subcategory', 'woocommerce_template_loop_category_link_close', 10 );
 add_action( 'woocommerce_shop_loop_subcategory_title', 'dt_woocommerce_template_loop_category_title', 10 );
+
+/**
+ * Archives.
+ */
+add_action( 'woocommerce_archive_description', 'dt_woocommerce_add_shortcodes_inline_css_fix', 5 );
+
+/**
+ * Search.
+ */
+add_action( 'pre_get_posts', 'dt_woocommerce_exclude_out_of_stock_products_from_search' );
 
 /**
  * Single product.
@@ -93,4 +104,6 @@ add_action( 'woocommerce_after_cart_form', 'woocommerce_cross_sell_display', 1 )
 /**
  * Notices.
  */
-add_action( 'presscore_before_loop', 'wc_print_notices', 10 );
+if ( ! is_admin() ) {
+	add_action( 'presscore_before_loop', 'wc_print_notices', 10 );
+}

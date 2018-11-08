@@ -52,9 +52,4 @@ $config = presscore_config();
 	}
 	?>
 
-	<?php
-	// TODO: Uncomment on production.
-	// echo presscore_post_edit_link();
-	?>
-
 </div>

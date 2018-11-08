@@ -7,38 +7,36 @@
  * handled by a callback to presscore_comment() which is
  * located in the inc/template-hooks.php file.
  *
- * @package presscore
- * @since presscore 0.1
+ * @package The7
+ * @since 1.0.0
  */
-?>
 
-<?php
-	// File Security Check
-	if ( ! defined( 'ABSPATH' ) ) { exit; }
+// File Security Check
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-	/*
-	 * If the current post is protected by a password and
-	 * the visitor has not yet entered the password we will
-	 * return early without loading the comments.
-	 */
-	if ( post_password_required() || ( !comments_open() && 0 == get_comments_number() ) ) {
-		return;
-	}
+/*
+ * If the current post is protected by a password and
+ * the visitor has not yet entered the password we will
+ * return early without loading the comments.
+ */
+if ( post_password_required() || ( !comments_open() && 0 == get_comments_number() ) ) {
+    return;
+}
 ?>
 
 	<div id="comments" class="comments-area">
 	<?php // You can start editing here -- including this comment! ?>
 
 	<?php if ( have_comments() ) : ?>
-		<h3><?php printf( _nx( '1 Comment', '%1$s Comments', get_comments_number(), 'comments title', 'the7mk2' ), number_format_i18n( get_comments_number() ) ); ?></h3>
+		<h3><?php printf( _nx( '1 Comment', '%1$s Comments', get_comments_number(), 'comments title', 'the7mk2' ), number_format_i18n( get_comments_number() ) ) ?></h3>
 
 		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
 		<nav role="navigation" id="comment-nav-above" class="site-navigation comment-navigation">
-			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the7mk2' ); ?></h1>
-			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'the7mk2' ) ); ?></div>
-			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'the7mk2' ) ); ?></div>
+			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the7mk2' ) ?></h1>
+			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'the7mk2' ) ) ?></div>
+			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'the7mk2' ) ) ?></div>
 		</nav><!-- #comment-nav-before .site-navigation .comment-navigation -->
-		<?php endif; // check for comment navigation ?>
+		<?php endif // check for comment navigation ?>
 
 		<ol class="comment-list">
 			<?php
@@ -54,25 +52,26 @@
 
 		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
 		<nav role="navigation" id="comment-nav-below" class="site-navigation comment-navigation">
-			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the7mk2' ); ?></h1>
-			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'the7mk2' ) ); ?></div>
-			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'the7mk2' ) ); ?></div>
+			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the7mk2' ) ?></h1>
+			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'the7mk2' ) ) ?></div>
+			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'the7mk2' ) ) ?></div>
 		</nav><!-- #comment-nav-below .site-navigation .comment-navigation -->
-		<?php endif; // check for comment navigation ?>
+		<?php endif // check for comment navigation ?>
 
-	<?php endif; // have_comments() ?>
+	<?php endif // have_comments() ?>
 
 	<?php
 		// If comments are closed and there are comments, let's leave a little note, shall we?
 		if ( ! comments_open() && '0' != get_comments_number() && post_type_supports( get_post_type(), 'comments' ) ) :
 	?>
-		<p class="nocomments"><?php _e( 'Comments are closed.', 'the7mk2' ); ?></p>
-	<?php endif; ?>
+		<p class="nocomments"><?php _e( 'Comments are closed.', 'the7mk2' ) ?></p>
+	<?php endif ?>
 	<?php
 	$commenter = wp_get_current_commenter();
 	$req = get_option( 'require_name_email' );
 	$aria_req = ( $req ? " aria-required='true'" : '' );
 	$required_text = sprintf( ' ' . __('Required fields are marked %s', 'the7mk2'), '<span class="required">*</span>' );
+	$consent  = empty( $commenter['comment_author_email'] ) ? '' : ' checked="checked"';
 
 	$comment_form_args = array(
 
@@ -82,7 +81,10 @@
 
 			'email' => '<span class="comment-form-email"><label class="assistive-text" for="email">' . __( 'Email &#42;', 'the7mk2' ) . '</label><input id="email" name="email" type="text" placeholder="' . __( 'Email&#42;', 'the7mk2' ) . '" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' /></span>',
 
-			'url' => '<span class="comment-form-url"><label class="assistive-text" for="url">' . __( 'Website', 'the7mk2' ) . '</label><input id="url" name="url" type="text" placeholder="' . __( 'Website', 'the7mk2' ) . '" value="' . esc_attr( $commenter['comment_author_url'] ) . '" size="30" /></span></div>'
+			'url' => '<span class="comment-form-url"><label class="assistive-text" for="url">' . __( 'Website', 'the7mk2' ) . '</label><input id="url" name="url" type="text" placeholder="' . __( 'Website', 'the7mk2' ) . '" value="' . esc_attr( $commenter['comment_author_url'] ) . '" size="30" /></span></div>',
+
+			'cookies' => '<p class="comment-form-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . ' />' .
+			             '<label for="wp-comment-cookies-consent">' . __( 'Save my name, email, and website in this browser for the next time I comment.', 'the7mk2' ) . '</label></p>',
 
 			)
 		),
@@ -98,6 +100,6 @@
 	);
 	?>
 
-	<?php comment_form( $comment_form_args ); ?>
+	<?php comment_form( $comment_form_args ) ?>
 
 	</div><!-- #comments .comments-area -->

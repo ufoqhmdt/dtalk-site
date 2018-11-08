@@ -110,9 +110,11 @@ class Presscore_Inc_Widgets_ContactInfo extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = $new_instance['title'];
 		$instance['text'] = $new_instance['text'];
-
-		$instance['links'] = isset($new_instance['links']) ? $new_instance['links'] : array();
-		$instance['fields'] = isset($new_instance['fields']) ? $new_instance['fields'] : array();
+		$instance['links'] = array();
+		if ( ! empty( $new_instance['links'] ) && is_array( $new_instance['links'] ) ) {
+			$instance['links'] = array_filter( array_map( 'trim', $new_instance['links'] ) );
+        }
+		$instance['fields'] = isset( $new_instance['fields'] ) ? $new_instance['fields'] : array();
 
 		return $instance;
 	}

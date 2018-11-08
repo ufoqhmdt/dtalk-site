@@ -10,8 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 // Radio field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Radio_Field' ) ) {
-	class RWMB_Radio_Field {
+if ( ! class_exists( 'THE7_RWMB_Radio_Field' ) ) {
+	class THE7_RWMB_Radio_Field {
 		/**
 		 * Get field HTML
 		 *
@@ -23,7 +23,7 @@ if ( ! class_exists( 'RWMB_Radio_Field' ) ) {
 		 */
 		static function html( $html, $meta, $field ) {
 			$html = '';
-			$tpl = '<label %s>%s<input type="radio" class="rwmb-radio" name="%s" value="%s" %s /> %s</label>';
+			$tpl = '<label %s>%s<input type="radio" class="the7-mb-radio" name="%s" value="%s" %s /> %s</label>';
 
 			if ( empty( $field['images_base_dir'] ) ) {
 				$theme_uri = get_template_directory_uri();
@@ -60,9 +60,9 @@ if ( ! class_exists( 'RWMB_Radio_Field' ) ) {
 						$image_meta = $label[1];
 
 						$image = sprintf(
-							'<img src="%s" class="hide-if-no-js"  style="%s" width="%d" height="%d" /><br />',
+							'<img src="%s" class="the7-mb-thumb hide-if-no-js"  style="%s" width="%d" height="%d" /><br />',
 							esc_url($admin_images_uri . 'blank.gif'),
-							"background-image:url('" . esc_url($admin_images_uri . $image_meta[0]) . "');",
+							esc_attr( "background-image:url('" . esc_url($admin_images_uri . $image_meta[0]) . "'); height: {$image_meta[2]}px;" ),
 							absint($image_meta[1]),
 							absint($image_meta[2])
 						);
@@ -91,21 +91,21 @@ if ( ! class_exists( 'RWMB_Radio_Field' ) ) {
 		static function dt_filter_begin_html( $begin, $field, $meta ) {
 
 			if ( !empty($field['hide_fields']) ) {
-				$begin = str_replace('class="rwmb-input', 'class="rwmb-input rwmb-radio-hide-fields', $begin);
+				$begin = str_replace('class="the7-mb-input', 'class="the7-mb-input the7-mb-radio-hide-fields', $begin);
 			}
 
 			return $begin;
 		}
 	}
-	add_filter('rwmb_radio_begin_html', array('RWMB_Radio_Field', 'dt_filter_begin_html'), 10, 3);
+	add_filter('the7_mb_radio_begin_html', array('THE7_RWMB_Radio_Field', 'dt_filter_begin_html'), 10, 3);
 }
 
 /**************************************************************************************/
 // Checkbox field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Checkbox_Field' ) ) {
-	class RWMB_Checkbox_Field {
+if ( ! class_exists( 'THE7_RWMB_Checkbox_Field' ) ) {
+	class THE7_RWMB_Checkbox_Field {
 		/**
 		 * Get field HTML
 		 *
@@ -125,7 +125,7 @@ if ( ! class_exists( 'RWMB_Checkbox_Field' ) ) {
 			}
 
 			return sprintf(
-				'<input type="checkbox" class="rwmb-checkbox" name="%s" id="%s" value="1" %s />',
+				'<input type="checkbox" class="the7-mb-checkbox" name="%s" id="%s" value="1" %s />',
 				$field['field_name'],
 				$field['id'],
 				$checked
@@ -155,28 +155,28 @@ if ( ! class_exists( 'RWMB_Checkbox_Field' ) ) {
 		static function dt_filter_begin_html( $begin, $field, $meta ) {
 
 			if ( !empty($field['hide_fields']) ) {
-				$begin = str_replace('class="rwmb-input', 'class="rwmb-input rwmb-checkbox-hide-fields', $begin);
+				$begin = str_replace('class="the7-mb-input', 'class="the7-mb-input the7-mb-checkbox-hide-fields', $begin);
 			}
 
 			return $begin;
 		}
 	}
-	add_filter('rwmb_checkbox_begin_html', array('RWMB_Checkbox_Field', 'dt_filter_begin_html'), 10, 3);
+	add_filter('the7_mb_checkbox_begin_html', array('THE7_RWMB_Checkbox_Field', 'dt_filter_begin_html'), 10, 3);
 }
 
 /**************************************************************************************/
 // Select field
 /**************************************************************************************/
 
-if ( !class_exists( 'RWMB_Select_Field' ) ) {
-	class RWMB_Select_Field {
+if ( !class_exists( 'THE7_RWMB_Select_Field' ) ) {
+	class THE7_RWMB_Select_Field {
 		/**
 		 * Enqueue scripts and styles
 		 *
 		 * @return void
 		 */
 		static function admin_enqueue_scripts() {
-			wp_enqueue_style( 'rwmb-select', RWMB_CSS_URL . 'select.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-select', THE7_RWMB_CSS_URL . 'select.css', array(), THE7_RWMB_VER );
 		}
 
 		/**
@@ -190,7 +190,7 @@ if ( !class_exists( 'RWMB_Select_Field' ) ) {
 		 */
 		static function html( $html, $meta, $field ) {
 			$html = sprintf(
-				'<select class="rwmb-select" name="%s" id="%s" size="%s"%s>',
+				'<select class="the7-mb-select" name="%s" id="%s" size="%s"%s>',
 				$field['field_name'],
 				$field['id'],
 				$field['size'],
@@ -245,7 +245,7 @@ if ( !class_exists( 'RWMB_Select_Field' ) ) {
 		static function save( $new, $old, $post_id, $field ) {
 			if ( !$field['clone'] )
 			{
-				RW_Meta_Box::save( $new, $old, $post_id, $field );
+				The7_RW_Meta_Box::save( $new, $old, $post_id, $field );
 				return;
 			}
 

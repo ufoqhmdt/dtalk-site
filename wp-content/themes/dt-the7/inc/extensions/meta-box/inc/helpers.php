@@ -7,17 +7,17 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-add_shortcode( 'rwmb_meta', 'rwmb_meta_shortcode' );
+add_shortcode( 'the7_mb_meta', 'the7_mb_meta_shortcode' );
 
 /**
  * Shortcode to display meta value
  *
- * @param $atts Array of shortcode attributes, same as rwmb_meta function, but has more "meta_key" parameter
- * @see rwmb_meta function below
+ * @param $atts Array of shortcode attributes, same as the7_mb_meta function, but has more "meta_key" parameter
+ * @see the7_mb_meta function below
  *
  * @return string
  */
-function rwmb_meta_shortcode( $atts )
+function the7_mb_meta_shortcode( $atts )
 {
 	$atts = wp_parse_args( $atts, array(
 		'type'    => 'text',
@@ -26,7 +26,7 @@ function rwmb_meta_shortcode( $atts )
 	if ( empty( $atts['meta_key'] ) )
 		return '';
 
-	$meta = rwmb_meta( $atts['meta_key'], $atts, $atts['post_id'] );
+	$meta = the7_mb_meta( $atts['meta_key'], $atts, $atts['post_id'] );
 
 	// Get uploaded files info
 	if ( in_array( $atts['type'], array( 'file', 'file_advanced' ) ) )
@@ -114,7 +114,7 @@ function rwmb_meta_shortcode( $atts )
  *
  * @return mixed
  */
-function rwmb_meta( $key, $args = array(), $post_id = null )
+function the7_mb_meta( $key, $args = array(), $post_id = null )
 {
 	$post_id = empty( $post_id ) ? get_the_ID() : $post_id;
 
@@ -135,7 +135,7 @@ function rwmb_meta( $key, $args = array(), $post_id = null )
 			$files = array();
 			foreach ( $meta as $id )
 			{
-				$files[$id] = rwmb_file_info( $id );
+				$files[$id] = the7_mb_file_info( $id );
 			}
 			$meta = $files;
 		}
@@ -149,7 +149,7 @@ function rwmb_meta( $key, $args = array(), $post_id = null )
 			$images = array();
 			foreach ( $meta as $id )
 			{
-				$images[$id] = rwmb_image_info( $id, $args );
+				$images[$id] = the7_mb_image_info( $id, $args );
 			}
 			$meta = $images;
 		}
@@ -183,7 +183,7 @@ function rwmb_meta( $key, $args = array(), $post_id = null )
 	// Get map
 	elseif ( 'map' == $args['type'] )
 	{
-		$meta = rwmb_meta_map( $key, $args, $post_id );
+		$meta = the7_mb_meta_map( $key, $args, $post_id );
 	}
 
 	return apply_filters( __FUNCTION__, $meta, $key, $args, $post_id );
@@ -196,7 +196,7 @@ function rwmb_meta( $key, $args = array(), $post_id = null )
  *
  * @return array|bool False if file not found. Array of (id, name, path, url) on success
  */
-function rwmb_file_info( $id )
+function the7_mb_file_info( $id )
 {
 	$path = get_attached_file( $id );
 	return array(
@@ -216,7 +216,7 @@ function rwmb_file_info( $id )
  *
  * @return array|bool False if file not found. Array of (id, name, path, url) on success
  */
-function rwmb_image_info( $id, $args = array() )
+function the7_mb_image_info( $id, $args = array() )
 {
 	$args = wp_parse_args( $args, array(
 		'size' => 'thumbnail',
@@ -252,7 +252,7 @@ function rwmb_image_info( $id, $args = array() )
  *
  * @return string
  */
-function rwmb_meta_map( $key, $args = array(), $post_id = null )
+function the7_mb_meta_map( $key, $args = array(), $post_id = null )
 {
 	$post_id = empty( $post_id ) ? get_the_ID() : $post_id;
 	$loc = get_post_meta( $post_id, $key, true );
@@ -279,7 +279,7 @@ function rwmb_meta_map( $key, $args = array(), $post_id = null )
 	static $counter = 0;
 
 	$html = sprintf(
-		'<div id="rwmb-map-canvas-%d" style="width:%s;height:%s"></div>',
+		'<div id="the7-mb-map-canvas-%d" style="width:%s;height:%s"></div>',
 		$counter,
 		$args['width'] . 'px',
 		$args['height'] . 'px'
@@ -299,7 +299,7 @@ function rwmb_meta_map( $key, $args = array(), $post_id = null )
 				zoom: %d,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			},
-			map = new google.maps.Map( document.getElementById( "rwmb-map-canvas-%d" ), mapOptions );',
+			map = new google.maps.Map( document.getElementById( "the7-mb-map-canvas-%d" ), mapOptions );',
 		$parts[0], $parts[1],
 		$args['zoom'],
 		$counter

@@ -97,7 +97,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 			if ( isset( $value['id'], $settings[($value['id'])] ) ) {
 				$val = $settings[($value['id'])];
 				// Striping slashes of non-array options
-				if ( !is_array($val) && ! in_array( $value['type'], array( 'textarea' ) ) ) {
+				if ( !is_array($val) && ! in_array( $value['type'], array( 'textarea', 'code_editor' ) ) ) {
 					$val = stripslashes( $val );
 				}
 			}
@@ -166,6 +166,34 @@ function optionsframework_interface( $options, $cur_page_id ) {
 		}
 
 		if ( isset( $value['dependency'] ) ) {
+			/**
+			 * Support short syntax:
+			 * array(
+			 *  'field' => '',
+			 *  'operator' => '',
+			 *  'value' => '',
+			 * );
+			 *
+			 * Short AND syntax:
+			 * array(
+			 *  array(),
+			 *  // AND
+			 *  array(),
+			 * );
+			 *
+			 * Default syntax:
+			 * array(
+			 *  array(
+			 *      array(),
+			 *  ),
+			 *  // OR
+			 *  array(
+			 *      array(),
+			 *      // AND
+			 *      array(),
+			 *  ),
+			 * );
+			 */
 			optionsframework_fields_dependency()->set( $value['id'], $value['dependency'] );
 		}
 
@@ -201,40 +229,84 @@ function optionsframework_interface( $options, $cur_page_id ) {
 			$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . esc_textarea( $val ) . '</textarea>';
 			break;
 
-		// Block of inputs
-		 case 'responsive_columns':
-            $responsiveness = array(
-                'desktop'  => __( 'Columns on Desktop', 'the7mk2' ),
-                'h_tablet' => __( 'Columns on Horizontal Tablet', 'the7mk2' ),
-                'v_tablet' => __( 'Columns on Vertical Tablet', 'the7mk2' ),
-                'phone'    => __( 'Columns on Mobile Phone', 'the7mk2' ),
-            );
+		case 'code_editor':
+			$rows = '8';
 
-            $columns = $val;
-            $html = '';
-            foreach ( $responsiveness as $device=>$desc ) {
-                $columns_on_device = '';
-                if ( ! empty( $columns[ $device ] ) ) {
-                    $columns_on_device = $columns[ $device ];
-                }
+			if ( isset( $value['settings']['rows'] ) ) {
+				$custom_rows = $value['settings']['rows'];
+				if ( is_numeric( $custom_rows ) ) {
+					$rows = $custom_rows;
+				}
+			}
 
-                $html .= '<div class="responsive_columns-column"><div class="responsive_columns-units-wrap">' . esc_html( $desc ) . '</div><input type="number" max="12" min="1" class="responsive_columns-value" data-device="' . esc_attr( $device ) . '" name="' . esc_attr( $option_name . '[' . $value['id'] . '][' . $device . ']' ) . '" value="' . esc_attr( $columns_on_device ) . '"></div>';
-            }
+			$code_style = isset( $value['settings']['code_style'] ) ? $value['settings']['code_style'] : 'text/html';
+			$field_id = esc_attr( $value['id'] );
 
-            $output .= $html;
-            break;
-        
+			$output .= '<textarea id="' . $field_id . '" class="of-input code-editor" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '" data-code-style="' . esc_attr( $code_style ) . '">' . esc_textarea( $val ) . '</textarea>';
+			break;
+
+		// Responsive columns.
+		case 'responsive_columns':
+			if ( isset( $value['columns'] ) ) {
+				$responsiveness = $value['columns'];
+			} else {
+				$responsiveness = array(
+					'desktop'  => _x( 'Desktop', 'theme-options', 'the7mk2' ),
+					'h_tablet' => _x( 'Horizontal Tablet', 'theme-options', 'the7mk2' ),
+					'v_tablet' => _x( 'Vertical Tablet', 'theme-options', 'the7mk2' ),
+					'phone'    => _x( 'Mobile Phone', 'theme-options', 'the7mk2' ),
+				);
+			}
+
+			$columns = $val;
+			$html = '';
+			foreach ( $responsiveness as $device=>$desc ) {
+			    $columns_on_device = '';
+			    if ( ! empty( $columns[ $device ] ) ) {
+			        $columns_on_device = $columns[ $device ];
+			    }
+				$field_name = sprintf( '%s[%s][%s]', $option_name, $value['id'], $device );
+			    $html .= '<div class="responsive_columns-column"><input type="number" max="12" min="1" class="responsive_columns-value" data-device="' . esc_attr( $device ) . '" name="' . esc_attr( $field_name ) . '" value="' . esc_attr( $columns_on_device ) . '"><div class="explain">' . esc_html( $desc ) . '</div></div>';
+			}
+
+			$output .= $html;
+			break;
 
 		// Select Box
 		case 'select':
-			$output .= '<select class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" id="' . esc_attr( $value['id'] ) . '">';
+			$show_hide = empty( $value['show_hide'] ) ? array() : (array) $value['show_hide'];
 
-			foreach ($value['options'] as $key => $option ) {
-				$selected = '';
-				if ( $val != '' ) {
-					if ( $val == $key) { $selected = ' selected="selected"';}
+			$class = 'of-input';
+			if ( $show_hide ) {
+				$class .= ' of-js-hider';
+			}
+
+			$output .= '<select class="' . $class . '" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" id="' . esc_attr( $value['id'] ) . '">';
+
+			foreach ( $value['options'] as $key => $option ) {
+				$option_class = '';
+				$attr = '';
+				if ( ! empty( $show_hide[ $key ] ) ) {
+					$option_class .= ' js-hider-show';
+
+					if ( true !== $show_hide[ $key ] ) {
+
+						if ( is_array( $show_hide[ $key ] ) ) {
+							$data_js_target = implode( ', .', $show_hide[ $key ] );
+						} else {
+							$data_js_target = $show_hide[ $key ];
+						}
+
+						$attr = ' data-js-target="' . $data_js_target . '"';
+					}
 				}
-				$output .= '<option'. $selected .' value="' . esc_attr( $key ) . '">' . esc_html( $option ) . '</option>';
+
+				$selected = '';
+				if ( $val === $key ) {
+					$selected = ' selected="selected"';
+				}
+
+				$output .= '<option class="' . $option_class . '" value="' . esc_attr( $key ) . '"' . $selected . $attr . '>' . esc_html( $option ) . '</option>';
 			}
 			$output .= '</select>';
 			break;
@@ -269,12 +341,12 @@ function optionsframework_interface( $options, $cur_page_id ) {
 					if ( true !== $show_hide[ $key ] ) {
 
 						if ( is_array( $show_hide[ $key ] ) ) {
-							$data_js_atregt = implode( ', .', $show_hide[ $key ] );
+							$data_js_target = implode( ', .', $show_hide[ $key ] );
 						} else {
-							$data_js_atregt = $show_hide[ $key ];
+							$data_js_target = $show_hide[ $key ];
 						}
 
-						$attr = ' data-js-target="' . $data_js_atregt . '"';
+						$attr = ' data-js-target="' . $data_js_target . '"';
 					}
 				}
 
@@ -284,6 +356,11 @@ function optionsframework_interface( $options, $cur_page_id ) {
 					. '</div>';
 			}
 			break;
+
+		case 'skins':
+			// Same as images but with some hidden field.
+			$output .= '<input type="hidden" name="optionsframework_apply_preset" value="true">';
+			// IMPORTANT! Must be right before 'images' to work.
 
 		// Image Selectors
 		case "images":
@@ -318,12 +395,12 @@ function optionsframework_interface( $options, $cur_page_id ) {
 					if ( true !== $show_hide[ $key ] ) {
 
 						if ( is_array( $show_hide[ $key ] ) ) {
-							$data_js_atregt = implode( ', .', $show_hide[ $key ] );
+							$data_js_target = implode( ', .', $show_hide[ $key ] );
 						} else {
-							$data_js_atregt = $show_hide[ $key ];
+							$data_js_target = $show_hide[ $key ];
 						}
 
-						$attr = ' data-js-target="' . $data_js_atregt . '"';
+						$attr = ' data-js-target="' . $data_js_target . '"';
 					}
 				}
 
@@ -409,8 +486,36 @@ function optionsframework_interface( $options, $cur_page_id ) {
 				if ( $val !=  $value['std'] )
 					$default_color = ' data-default-color="' .$value['std'] . '" ';
 			}
-			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" id="' . esc_attr( $value['id'] ) . '" class="of-color"  type="text" value="' . esc_attr( $val ) . '"' . $default_color .' />';
-	
+
+			$field_classes = array( 'of-color', 'of-hex-color' );
+
+			$output .= sprintf(
+				'<input name="%s" id="%s" class="%s" type="text" value="%s" %s />',
+				esc_attr( $option_name . '[' . $value['id'] . ']' ),
+				esc_attr( $value['id'] ),
+				join( ' ' , $field_classes ),
+				esc_attr( $val ),
+				$default_color
+			);
+			break;
+
+		case "alpha_color":
+			$default_color = '';
+			if ( isset($value['std']) ) {
+				if ( $val !=  $value['std'] )
+					$default_color = ' data-default-color="' .$value['std'] . '" ';
+			}
+
+			$field_classes = array( 'of-color', 'of-rgba-color' );
+
+			$output .= sprintf(
+				'<input name="%s" id="%s" class="%s" type="text" value="%s" %s />',
+				esc_attr( $option_name . '[' . $value['id'] . ']' ),
+				esc_attr( $value['id'] ),
+				join( ' ' , $field_classes ),
+				esc_attr( $val ),
+				$default_color
+			);
 			break;
 
 		// Uploader
@@ -483,7 +588,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 					if ( $val !=  $value['std']['color'] )
 						$default_color = ' data-default-color="' .$value['std']['color'] . '" ';
 				}
-				$font_color = '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-typography-color  type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
+				$font_color = '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-hex-color of-typography-color  type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
 			}
 	
 			// Allow modification/injection of typography fields
@@ -504,7 +609,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 				if ( $val !=  $value['std']['color'] )
 					$default_color = ' data-default-color="' .$value['std']['color'] . '" ';
 			}
-			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-background-color"  type="text" value="' . esc_attr( $background['color'] ) . '"' . $default_color .' />';
+			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-hex-color of-background-color"  type="text" value="' . esc_attr( $background['color'] ) . '"' . $default_color .' />';
 
 			// Background Image
 			if ( !isset($background['image']) ) {
@@ -646,8 +751,8 @@ function optionsframework_interface( $options, $cur_page_id ) {
 						$selected = ' of-radio-img-selected';
 						$img_preview = $img;
 					}
-					
-					$output .= '<img data-full-src="' . esc_attr($data_img) . '" src="' . esc_url( $img ) . '" alt="" class="of-radio-img-img' . $selected .'" width="47" height="47" />';
+
+					$output .= '<img data-full-src="' . esc_attr( $data_img ) . '" src="' . esc_url( $img ) . '" alt="' . esc_attr_x( 'Preset image', 'backend fields', 'the7mk2' ) . '" class="of-radio-img-img' . $selected . '" width="47" height="47" />';
 				}
 
 				$output .= '</div>';
@@ -1132,7 +1237,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 
 			$output .= '</select>';
 
-			$output .= '<div class="dt-web-fonts-preview"><span>Silence is a true friend who never betrays.</span><span class="spinner"></span></div>';
+			$output .= '<div class="dt-web-fonts-preview"><span>Don\'t stop until you’re proud!</span></div>';
 
 			break;
 
@@ -1187,11 +1292,11 @@ function optionsframework_interface( $options, $cur_page_id ) {
 					$default_color_2 = ' data-default-color="' .$value['std'][1] . '" ';
 			}
 
-			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][0]' ) . '" id="' . esc_attr( $value['id'] ) . '-0" class="of-color"  type="text" value="' . esc_attr( $val[0] ) . '"' . $default_color_1 .' />';
+			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][0]' ) . '" id="' . esc_attr( $value['id'] ) . '-0" class="of-color of-hex-color"  type="text" value="' . esc_attr( $val[0] ) . '"' . $default_color_1 .' />';
 
 			$output .= '&nbsp;';
 
-			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][1]' ) . '" id="' . esc_attr( $value['id'] ) . '-1" class="of-color"  type="text" value="' . esc_attr( $val[1] ) . '"' . $default_color_2 .' />';
+			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][1]' ) . '" id="' . esc_attr( $value['id'] ) . '-1" class="of-color of-hex-color"  type="text" value="' . esc_attr( $val[1] ) . '"' . $default_color_2 .' />';
 
 			break;
 
@@ -1209,8 +1314,6 @@ function optionsframework_interface( $options, $cur_page_id ) {
 			$config_icon = '<span class="sortConfigIcon of-icon-edit"></span>';
 
 			if ( !empty( $value['fields'] ) && is_array($value['fields']) ) {
-
-				$fields_count = 0;
 
 				$output .= '<div class="sortable-fields-holder">';
 
@@ -1230,7 +1333,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 
 						// field title
 						if ( !empty($field_settings['title']) ) {
-							$output .= '<div class="sortable-field-title">' . ++$fields_count . '. ' . esc_html($field_settings['title']) . '</div>'; 
+							$output .= '<div class="sortable-field-title">' . esc_html($field_settings['title']) . '</div>';
 						}
 
 						$output .= '<div class="sortable-field">';
@@ -1310,6 +1413,57 @@ function optionsframework_interface( $options, $cur_page_id ) {
 			$output .= $html;
 			break;
 
+		case 'spacing':
+			$field_id = $value['id'];
+			$field_name = "{$option_name}[$field_id]";
+			$units = 'px';
+			if ( isset( $value['units'] ) ) {
+				$units = $value['units'];
+			}
+			if ( isset( $value['fields'] ) ) {
+				$fields = $value['fields'];
+			} else {
+				// Default fields.
+				$fields = array(
+					_x( 'Top', 'theme-options', 'the7mk2' ),
+					_x( 'Right', 'theme-options', 'the7mk2' ),
+					_x( 'Bottom', 'theme-options', 'the7mk2' ),
+					_x( 'Left', 'theme-options', 'the7mk2' ),
+				);
+			}
+
+			$output .= The7_Option_Field_Spacing::html( $field_name, $field_id, $val, $fields, $units );
+			break;
+
+		case 'number':
+			$field_id = $value['id'];
+			$field_name = "{$option_name}[{$field_id}]";
+			$units = 'px';
+			if ( isset( $value['units'] ) ) {
+				$units = $value['units'];
+			}
+
+			$output .= The7_Option_Field_Number::html( $field_name, $val, $units );
+			break;
+
+		case 'gradient_picker':
+			$field_id = $value['id'];
+			$field_name = "{$option_name}[$field_id]";
+			$val = apply_filters( 'of_sanitize_gradient_picker', $val, $value );
+			$output .= The7_Option_Field_Gradient_Picker::html( $field_name, $field_id, $val, array(
+				'hide_angle_controls' => isset( $value['fixed_angle'] ),
+			) );
+			break;
+
+		case 'icons_picker':
+			$field_id   = $value['id'];
+			$field_name = "{$option_name}[$field_id]";
+			$allow_empty = isset( $value['allow_empty_value'] ) ? (bool) $value['allow_empty_value'] : false;
+			$output     .= The7_Option_Field_Icons_Picker::html( $field_name, $field_id, $val, array(
+				'allow_empty' => $allow_empty,
+			) );
+			break;
+
 		}
 
 		if ( !in_array( $value['type'], $elements_without_wrap ) ) {
@@ -1326,7 +1480,7 @@ function optionsframework_interface( $options, $cur_page_id ) {
 			 * Debug message.
 			 */
 			if ( $optionsframework_debug ) {
-				$output .= '<div class="debug">';
+				$output .= '<div class="of-debug-fields">';
 
 				// ID.
 				$output .= '<div class="of-debug-field of-debug-option-id">ID: <code>' . esc_html( $value['id'] ) . '</code></div>';

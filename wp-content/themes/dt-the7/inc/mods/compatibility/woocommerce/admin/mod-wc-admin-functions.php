@@ -49,7 +49,8 @@ if ( ! function_exists( 'dt_woocommerce_inject_theme_options' ) ) :
 	function dt_woocommerce_inject_theme_options( $options ) {
 		if ( array_key_exists( 'of-header-menu', $options ) ) {
 			$options['of-woocommerce-mod-injected-header-options'] = plugin_dir_path( __FILE__ ) . 'options-inject-in-header.php';
-		} elseif ( array_key_exists( 'of-likebuttons-menu', $options ) ) {
+		}
+		if ( array_key_exists( 'of-likebuttons-menu', $options ) ) {
 			$options[] = plugin_dir_path( __FILE__ ) . 'options-inject-in-likebuttons.php';
 		}
 		return $options;
@@ -60,75 +61,70 @@ endif;
 
 if ( ! function_exists( 'dt_woocommerce_setup_less_vars' ) ) :
 
+	/**
+	 * @param Presscore_Lib_LessVars_Manager $less_vars
+	 */
 	function dt_woocommerce_setup_less_vars( $less_vars ) {
 		$less_vars->add_hex_color(
 			'product-counter-color',
-			of_get_option( 'header-elements-woocommerce_cart-counter-color', '#ffffff' )
+			of_get_option( 'header-elements-woocommerce_cart-counter-color' )
 		);
 
+		$counter_color_vars = array( 'product-counter-bg', 'product-counter-bg-2' );
 		switch ( of_get_option( 'header-elements-woocommerce_cart-counter-bg' ) ) {
 			case 'color':
-				$colors = array( of_get_option( 'header-elements-woocommerce_cart-counter-bg-color', '#000000' ), null );
+				$less_vars->add_rgba_color( $counter_color_vars, array( of_get_option( 'header-elements-woocommerce_cart-counter-bg-color' ), null ) );
 				break;
 			case 'gradient':
-				$colors = of_get_option( 'header-elements-woocommerce_cart-counter-bg-gradient', array( '#ffffff', '#000000' ) );
+				$gradient_obj = the7_less_create_gradient_obj( of_get_option( 'header-elements-woocommerce_cart-counter-bg-gradient' ) );
+				$less_vars->add_rgba_color( $counter_color_vars[0], $gradient_obj->get_color_stop( 1 )->get_color() );
+				$less_vars->add_keyword( $counter_color_vars[1], $gradient_obj->with_angle( 'left' )->get_string() );
 				break;
 			case 'accent':
 			default:
-				$colors = presscore_less_get_accent_colors( $less_vars );
+				list( $first_color, $gradient ) = the7_less_get_accent_colors( $less_vars );
+				$less_vars->add_rgba_color( $counter_color_vars[0], $first_color );
+				$less_vars->add_keyword( $counter_color_vars[1], $gradient->with_angle( 'left' )->get_string() );
 		}
-		
+		unset( $gradient_obj, $first_color, $gradient, $counter_color_vars );
+
 		$less_vars->add_number(
 			'product-img-width',
 			of_get_option( 'woocommerce_product_img_width' )
  		);
  		$less_vars->add_pixel_number(
      		'switch-product-to-mobile',
-     		of_get_option( 'woocommerce_product_switch', '700' )
+     		of_get_option( 'woocommerce_product_switch' )
      	);
-		$less_vars->add_hex_color(
-			array( 'product-counter-bg', 'product-counter-bg-2' ),
-			$colors
-		);
 		$less_vars->add_number(
 			'cart-total-width',
 			of_get_option( 'woocommerce_cart_total_width' )
  		);
  		$less_vars->add_pixel_number(
      		'switch-cart-list-to-mobile',
-     		of_get_option( 'woocommerce_cart_switch', '700' )
+     		of_get_option( 'woocommerce_cart_switch' )
      	);
-     
 		$less_vars->add_rgba_color(
 			'wc-steps-bg',
-			of_get_option( 'woocommerce_steps_bg_color', '#f8f8f9' ),
-			of_get_option( 'woocommerce_steps-bg_opacity', '100' )
+			of_get_option( 'woocommerce_steps_bg_color' ),
+			of_get_option( 'woocommerce_steps-bg_opacity' )
 		);
 		$less_vars->add_hex_color(
 			'wc-steps-color',
-			of_get_option( 'woocommerce_steps_color', '#3b3f4a' )
+			of_get_option( 'woocommerce_steps_color', '#000000' )
 		);
-		$less_vars->add_pixel_number(
-     		'wc-step-padding-top',
-     		of_get_option( 'woocommerce_cart_top_padding', '30' )
-     	);
-     	$less_vars->add_pixel_number(
-     		'wc-step-padding-bottom',
-     		of_get_option( 'woocommerce_cart_bottom_padding', '30' )
-     	);
-
-     	//List layout img width
+		$less_vars->add_paddings( array(
+			'wc-step-padding-top',
+			'wc-step-padding-bottom',
+		), of_get_option( 'woocommerce_cart_padding' ) );
      	$less_vars->add_number(
 			'wc-list-img-width',
 			of_get_option( 'woocommerce_shop_template_img_width' )
  		);
- 		//List layout switch to mobile
      	$less_vars->add_pixel_number(
 			'wc-list-switch-to-mobile',
 			of_get_option( 'woocommerce_list_switch' )
  		);
-     	
-     	
 	}
 	add_action( 'presscore_setup_less_vars', 'dt_woocommerce_setup_less_vars', 20 );
 
@@ -147,6 +143,26 @@ if ( ! function_exists( 'dt_woocommerce_add_product_metaboxes' ) ) :
 	add_filter( 'presscore_pages_with_basic_meta_boxes', 'dt_woocommerce_add_product_metaboxes' );
 
 endif;
+
+if ( ! function_exists( 'dt_woocommerce_add_cart_micro_widget_filter' ) ) {
+
+	/**
+	 * This filter add cart micro widget to header options.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array $elements
+	 *
+	 * @return array
+	 */
+	function dt_woocommerce_add_cart_micro_widget_filter( $elements = array() ) {
+		$elements['cart'] = array( 'title' => _x( 'Cart', 'theme-options', 'the7mk2' ), 'class' => '' );
+
+		return $elements;
+	}
+
+	add_filter( 'header_layout_elements', 'dt_woocommerce_add_cart_micro_widget_filter' );
+}
 
 /**
  * Add sidebar columns to products on manage_edit page.

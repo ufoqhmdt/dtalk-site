@@ -110,7 +110,7 @@ class WPBakeryShortCode_VC_Tta_Accordion extends WPBakeryShortCodesContainer {
 		 * @since 4.6.2
 		 */
 		if ( isset( $this->atts['el_class'] ) ) {
-			$classes[] = $this->atts['el_class'];
+			$classes[] = $this->getExtraClass( $this->atts['el_class'] );
 		}
 
 		return implode( ' ', apply_filters( 'vc_tta_accordion_general_classes', array_filter( $classes ), $this->getAtts() ) );

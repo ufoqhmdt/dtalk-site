@@ -57,7 +57,10 @@
 #bottom-bar.full-width-line {
 	border-top: 1px solid @bottom-bg-color;
 }
-
+.wf-container-bottom {
+	padding: @bottom-bar-top-padding 0 @bottom-bar-bottom-padding 0;
+	min-height: @bottom-bar-height;
+}
 /*Bottom bar font color*/
 #bottom-bar {
 	.text-small;
@@ -70,6 +73,7 @@
 	#bottom-bar .mini-nav .customSelect,
 	#bottom-bar .menu-select {
 		color: @bottom-color;
+		//.custom-mixin-footer-with-accent-color (@bottom-color, @widget-footer-accent-color);
 	}
 	#bottom-bar .mini-search,
 	#bottom-bar .mini-contacts:before {

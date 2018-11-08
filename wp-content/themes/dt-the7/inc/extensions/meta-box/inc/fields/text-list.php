@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Text_List_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Text_List_Field' ) )
 {
-  class RWMB_Text_List_Field
+  class THE7_RWMB_Text_List_Field
 	{
 		/**
 		 * Get field HTML
@@ -19,7 +19,7 @@ if ( ! class_exists( 'RWMB_Text_List_Field' ) )
 		{
 			$meta = (array) $meta;
 			$html = array();
-			$tpl = '<label><input type="text" class="rwmb-text-list" name="%s" id="%s" value="%s" /> %s</label>';
+			$tpl = '<label><input type="text" class="the7-mb-text-list" name="%s" id="%s" value="%s" /> %s</label>';
 
 			foreach ( $field['options'] as $value => $label )
 			{
@@ -77,7 +77,7 @@ if ( ! class_exists( 'RWMB_Text_List_Field' ) )
 		{
 			if ( !$field['clone'] )
 			{
-				RW_Meta_Box::save( $new, $old, $post_id, $field );
+				The7_RW_Meta_Box::save( $new, $old, $post_id, $field );
 				return;
 			}
 

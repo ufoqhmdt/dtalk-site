@@ -9,7 +9,6 @@
 }
 .custom-mixin-color (@customColor) when (iscolor(@customColor)) {
 	color: @customColor;
-	-webkit-text-fill-color: @customColor;
 }
 .custom-mixin-border-color (@customColor) when (iscolor(@customColor)) {
 	border-bottom-color: desaturate(darken(@customColor, 12%), 20%);

@@ -3,11 +3,11 @@
 defined( 'ABSPATH' ) || exit;
 
 // Make sure "select" field is loaded
-require_once RWMB_FIELDS_DIR . 'select-advanced.php';
+require_once THE7_RWMB_FIELDS_DIR . 'select-advanced.php';
 
-if ( !class_exists( 'RWMB_Post_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Post_Field' ) )
 {
-	class RWMB_Post_Field
+	class THE7_RWMB_Post_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -16,7 +16,7 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			RWMB_Select_Advanced_Field::admin_enqueue_scripts();
+			THE7_RWMB_Select_Advanced_Field::admin_enqueue_scripts();
 		}
 
 		/**
@@ -34,11 +34,11 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 			switch ( $field['field_type'] )
 			{
 				case 'select':
-					return RWMB_Select_Field::html( $html, $meta, $field );
+					return THE7_RWMB_Select_Field::html( $html, $meta, $field );
 					break;
 				case 'select_advanced':
 				default:
-					return RWMB_Select_Advanced_Field::html( $html, $meta, $field );
+					return THE7_RWMB_Select_Advanced_Field::html( $html, $meta, $field );
 			}
 		}
 
@@ -51,7 +51,7 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 		 */
 		static function normalize_field( $field )
 		{
-			$default_post_type = __( 'Post', 'rwmb' );
+			$default_post_type = __( 'Post', 'the7mk2' );
 			if ( is_string( $field['post_type'] ) )
 			{
 				$post_type_object = get_post_type_object( $field['post_type'] );
@@ -65,7 +65,7 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 				'query_args' 				=> array()
 			) );
 
-			$field['std'] = empty( $field['std'] ) ? sprintf( __( 'Select a %s', 'rwmb' ), $default_post_type ) : $field['std'];
+			$field['std'] = empty( $field['std'] ) ? sprintf( __( 'Select a %s', 'the7mk2' ), $default_post_type ) : $field['std'];
 
 			if ( $field['parent'] )
 			{
@@ -85,11 +85,11 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 			switch ( $field['field_type'] )
 			{
 				case 'select':
-					return RWMB_Select_Field::normalize_field( $field );
+					return THE7_RWMB_Select_Field::normalize_field( $field );
 					break;
 				case 'select_advanced':
 				default:
-					return RWMB_Select_Advanced_Field::normalize_field( $field );
+					return THE7_RWMB_Select_Advanced_Field::normalize_field( $field );
 			}
 		}
 
@@ -114,7 +114,7 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 				$post = get_post( $post_id );
 				return $post->post_parent;
 			}
-			return RWMB_Select_Field::meta( $meta, $post_id, $saved, $field );
+			return THE7_RWMB_Select_Field::meta( $meta, $post_id, $saved, $field );
 		}
 
 		/**
@@ -131,7 +131,7 @@ if ( !class_exists( 'RWMB_Post_Field' ) )
 		 */
 		static function save( $new, $old, $post_id, $field )
 		{
-			return RWMB_Select_Field::save( $new, $old, $post_id, $field );
+			return THE7_RWMB_Select_Field::save( $new, $old, $post_id, $field );
 		}
 
 		/**

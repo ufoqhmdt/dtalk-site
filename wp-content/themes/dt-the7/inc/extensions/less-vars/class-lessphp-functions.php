@@ -42,16 +42,12 @@ class DT_LessPHP_Functions {
 	}
 
 	/**
-	 * Register lessc functions.
+	 * Register the7_lessc functions.
 	 *
-	 * @param lessc|null $less
+	 * @param the7_lessc|null $less
 	 */
-	public static function register_functions( lessc $less = null ) {
-		if ( is_null( $less ) && class_exists( 'WPLessPlugin' ) ) {
-			$less = WPLessPlugin::getInstance();
-		}
-
-		if ( is_null( $less ) ) {
+	public static function register_functions( the7_lessc $less = null ) {
+		if ( $less === null ) {
 			return;
 		}
 

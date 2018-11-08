@@ -6,6 +6,62 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+add_filter( 'of_sanitize_code_editor', 'of_sanitize_without_sanitize' );
+
+/**
+ * Sanitize filter for spacing field.
+ *
+ * @param string $input
+ * @param array $option
+ *
+ * @return array|string
+ */
+function of_sanitize_spacing( $input, $option ) {
+	$units = 'px';
+	if ( isset( $option['units'] ) ) {
+		$units = $option['units'];
+	}
+	$fields_num = 4;
+	if ( isset( $option['fields'] ) ) {
+		$fields_num = count( $option['fields'] );
+	}
+
+	$input = The7_Option_Field_Spacing::sanitize( $input, $units, $fields_num );
+	$input = The7_Option_Field_Spacing::encode( $input );
+
+	return $input;
+}
+add_filter( 'of_sanitize_spacing', 'of_sanitize_spacing', 10, 2 );
+
+/**
+ * Sanitize gradient picker value.
+ *
+ * @param array|string $input
+ * @param array $option
+ *
+ * @return string
+ */
+function of_sanitize_gradient_picker( $input, $option ) {
+	$fixed_angle = isset( $option['fixed_angle'] ) ? $option['fixed_angle'] : '';
+	if ( is_array( $input ) ) {
+		$input = ( $fixed_angle ? $fixed_angle : '135deg' ) . "|{$input[0]} 30%|{$input[1]} 100%";
+	}
+
+	$decoded_val = The7_Option_Field_Gradient_Picker::sanitize( $input );
+	if ( $fixed_angle ) {
+		$decoded_val['angle'] = $fixed_angle;
+	}
+	$sanitized_input = The7_Option_Field_Gradient_Picker::encode( $decoded_val );
+
+	if ( empty( $sanitized_input ) && isset( $option['std'] ) ) {
+		return $option['std'];
+	}
+
+	return $sanitized_input;
+}
+
+add_filter( 'of_sanitize_gradient_picker', 'of_sanitize_gradient_picker', 10, 2 );
+
 /* Social Buttons */
 
 function of_sanitize_social_buttons($input) {
@@ -224,6 +280,15 @@ function of_sanitize_textarea($input) {
 	return $output;
 }
 
+function of_sanitize_std_on_empty_val( $input, $option ) {
+	if ( empty( $input ) && isset( $option['std'] ) ) {
+		$input = $option['std'];
+	}
+
+	return $input;
+}
+add_filter( 'of_sanitize_std_on_empty_val', 'of_sanitize_std_on_empty_val', 10, 2 );
+
 function of_add_safe_style_css( $allowed_attr = array() ) {
 
 	$of_allowed_attr = array(
@@ -250,6 +315,7 @@ add_filter( 'of_sanitize_radio', 'of_sanitize_enum', 10, 2);
 /* Images */
 
 add_filter( 'of_sanitize_images', 'of_sanitize_enum', 10, 2);
+add_filter( 'of_sanitize_skins', 'of_sanitize_enum', 10, 2);
 
 /* Checkbox */
 
@@ -283,7 +349,13 @@ add_filter( 'of_sanitize_multicheck', 'of_sanitize_multicheck', 10, 2 );
 
 /* Color Picker */
 
+add_filter( 'of_sanitize_empty_color', 'of_sanitize_color', 10, 2 );
 add_filter( 'of_sanitize_color', 'of_sanitize_color', 10, 2 );
+add_filter( 'of_sanitize_color', 'of_sanitize_set_default_value', 20, 2 );
+
+add_filter( 'of_sanitize_empty_alpha_color', 'of_sanitize_alpha_color', 10, 2 );
+add_filter( 'of_sanitize_alpha_color', 'of_sanitize_alpha_color', 10, 2 );
+add_filter( 'of_sanitize_alpha_color', 'of_sanitize_set_default_value', 20, 2 );
 
 /* Gradient */
 
@@ -600,11 +672,36 @@ function of_sanitize_hex( $hex, $default = '' ) {
  * Sanitize color.
  *
  */
-function of_sanitize_color( $input, $option = array() ) {
-	$input = trim( $input );
-	$sanitized_color = of_sanitize_hex( $input, isset( $option['std'] ) ? $option['std'] : '#ffffff' );
-	$sanitized_color = '#' . ltrim( $sanitized_color, '#' );
+function of_sanitize_color( $input ) {
+	$sanitized_color = trim( $input );
+	$sanitized_color = of_sanitize_hex( $sanitized_color );
+	if ( $sanitized_color ) {
+		$sanitized_color = '#' . ltrim( $sanitized_color, '#' );
+	}
+
 	return $sanitized_color;
+}
+
+function of_sanitize_set_default_value( $input, $option = array() ) {
+	if ( empty( $input ) && isset( $option['std'] ) ) {
+		return $option['std'];
+	}
+
+	return $input;
+}
+
+function of_sanitize_alpha_color( $input, $options = array() ) {
+	if ( empty( $input ) ) {
+		return '';
+	}
+
+	if ( strpos( $input, 'rgb') !== false ) {
+		$input = preg_replace( '/\s+/', '', $input );
+	} else {
+		$input = of_sanitize_color( $input );
+	}
+
+	return $input;
 }
 
 /**
@@ -811,21 +908,59 @@ add_filter( 'of_sanitize_css_width_as_percents_on_default', 'of_sanitize_css_wid
 /**
  * Sanitize responsive columns.
  *
+ * @param mixed $input
+ * @param array $definition
+ *
+ * @return array
  */
-function of_sanitize_responsive_columns( $input = '' ) {
+function of_sanitize_responsive_columns( $input, $definition = array() ) {
+	$default = $definition['std'];
+
     if ( ! is_array( $input ) ) {
-        return array();
+        return $default;
     }
 
-    $default = array(
-        'desktop'  => 0,
-        'h_tablet' => 0,
-        'v_tablet' => 0,
-        'phone'    => 0,
-    );
-
     $input = wp_parse_args( $input, $default );
+    $input = array_intersect_key( $input, $default );
 
     return array_map( 'absint', $input );
 }
-add_filter( 'of_sanitize_responsive_columns', 'of_sanitize_responsive_columns' );
+add_filter( 'of_sanitize_responsive_columns', 'of_sanitize_responsive_columns', 10, 2 );
+
+/**
+ * Sanitize number value.
+ *
+ * @param string|array $input
+ * @param array $definition
+ *
+ * @return string
+ */
+function of_sanitize_number( $input, $definition ) {
+	if ( is_array( $input ) ) {
+		$input = $input['val'] . $input['units'];
+	}
+	$units = 'px';
+	if ( isset( $definition['units'] ) ) {
+		$units = $definition['units'];
+	}
+	$number = The7_Option_Field_Number::sanitize( $input, $units );
+
+	return The7_Option_Field_Number::encode( $number );
+}
+add_filter( 'of_sanitize_number', 'of_sanitize_number', 10, 2 );
+
+/**
+ * Sanitize icons picker.
+ *
+ * Just return a string.
+ *
+ * @since 7.0.0
+ *
+ * @param string $val
+ *
+ * @return string
+ */
+function of_sanitize_icons_picker($val) {
+	return (string) $val;
+}
+add_filter( 'of_sanitize_icons_picker', 'of_sanitize_icons_picker' );

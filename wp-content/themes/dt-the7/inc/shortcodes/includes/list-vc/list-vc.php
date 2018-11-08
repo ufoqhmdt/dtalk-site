@@ -92,7 +92,7 @@ if ( ! class_exists( 'DT_Shortcode_List_Vc', false ) ) {
 				$content = '<div>' . $content . '</div>';
 
 				if ( $image ) {
-					$content = sprintf( '<div><img src="%s" class="list-img" alt="" /></div>%s', $image, $content );
+					$content = sprintf( '<div><img src="%s" class="list-img" alt="%s" /></div>%s', $image, esc_attr( __( 'List item image', 'the7mk2' ) ), $content );
 				}
 
 				$content = '<div class="wf-table">' . $content . '</div>';

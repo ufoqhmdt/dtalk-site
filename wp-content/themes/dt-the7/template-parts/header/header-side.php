@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 
 <div <?php presscore_header_class( 'masthead side-header' ); ?> role="banner">
+	
+	<?php presscore_get_template_part( 'theme', 'header/top-bar' ); ?>
 
 	<header class="header-bar">
 

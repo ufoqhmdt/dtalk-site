@@ -3,21 +3,21 @@
 ================================================== */
 
 /*Top bar background & lines -> Solid background*/
-.top-bar.solid-bg:before {
+.top-bar-bg {
 	background: @top-bg-color @top-bg-image @top-bg-repeat @top-bg-position-x @top-bg-position-y;
 }
 
 /*Top bar background & lines -> Content-width line/Full-width line*/
-.top-bar.line-content:before,
-.top-bar.full-width-line:before {
-	border-bottom: 1px solid @top-bg-color;
+.top-bar.line-content:after,
+.top-bar.full-width-line:after {
+	border-bottom: @top-bar-line-size @top-bar-line-style @top-bar-line-color;
 }
 
 /*Top & bottom paddings*/
 .top-bar {
+	min-height: @top-bar-height;
 	padding: @top-bar-padding-top @top-bar-side-paddings @top-bar-padding-bottom;
 }
-
 /*Top bar font color*/
 .top-bar,
 .top-bar a,
@@ -36,7 +36,7 @@
 .wc-ico-cart,
 .text-area,
 .customSelectInner {
-	.top-bar & {
+	.masthead .top-bar & {
 		font: @top-bar-font-style @top-bar-font-weight @top-bar-font-size~"/"@top-bar-font-size + 6 @top-bar-font-family;
 		text-transform: @top-bar-text-transform;
 	}
@@ -44,7 +44,7 @@
 .shopping-cart,
 .soc-ico a,
 .soc-ico {
-	.top-bar & {
+	.masthead .top-bar & {
 		line-height: @top-bar-font-size + 6;
 	}
 }

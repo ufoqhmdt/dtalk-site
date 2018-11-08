@@ -111,16 +111,16 @@ if ( ! class_exists( 'DT_Shortcode_Benefits', false ) ) {
 
 			if ( !empty($default_image) ) {
 
-				$image = dt_is_hd_device() ? $images[1] : $images[0];
-
-				if ( empty($image) ) {
-					$image = $default_image;
+				if ( $images[0] && $images[1] ) {
+					$image_src = sprintf( 'src="%1$s" srcset="%1$s 1x, %2$s 2x"', $images[0], $images[1] );
+				} else {
+					$image_src = sprintf( 'src="%s"', $default_image );
 				}
 
 				// ssl support
-				$image = dt_make_image_src_ssl_friendly( $image );
+				$image_src = dt_make_image_src_ssl_friendly( $image_src );
 
-				$image = sprintf( '<img src="%s" alt="" />', $image );
+				$image = sprintf( '<img %s alt="%s" />', $image_src, esc_attr( $attributes['title'] ) );
 				$image_classes = array( 'benefits-grid-ico' );
 
 				if ( presscore_shortcode_animation_on( self::$atts['animation'] ) ) {

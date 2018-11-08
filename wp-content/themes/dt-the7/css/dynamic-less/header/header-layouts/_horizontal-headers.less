@@ -1,11 +1,4 @@
-/*Top header content width*/
-.masthead:not(.side-header) {
-	max-width: 100%;
-}
-.masthead:not(.side-header):not(.full-width):not(.side-header-v-stroke):not(.side-header-menu-icon) {
-	padding: 0 44px;
-	box-sizing: border-box;
-}
+
 	.top-bar,
 	.header-bar,
 	.mobile-header-bar {
@@ -21,12 +14,18 @@
 	.phantom-sticky .boxed .masthead:not(.side-header) {
 		max-width: @box-width;
 	}
-.boxed .top-bar:before,
+.boxed .top-bar-bg,
 .boxed .classic-header .navigation:before {
-	width: @box-width;
+	width: 100%;
 }
-.boxed .masthead.full-width:not(.side-header) {
-	max-width: @box-width;
+.width-in-pixel .top-bar-bg,
+.width-in-pixel.classic-header .navigation:before {
+	.boxed & {
+		width: @box-width;
+	}
+}
+.boxed .masthead.full-width:not(.side-header):not(.masthead-mobile) {
+	width: @box-width;
 }
 /*Header height */
 .masthead:not(.side-header):not(.mixed-header) .header-bar,

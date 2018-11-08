@@ -1,18 +1,19 @@
 <?php
 /**
- * Team template
+ * Team template.
  *
- * @package vogue
+ * @package The7
  * @since 1.0.0
  */
 
 /* Template Name: Team */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-$config = Presscore_Config::get_instance();
-
+$config = presscore_config();
 $config->set( 'template', 'team' );
 
 // add content area
@@ -31,9 +32,7 @@ get_header();
 
 					if ( post_password_required() ) {
 						the_content();
-
 					} else {
-
 						// fullwidth wrap open
 						if ( $config->get( 'full_width' ) ) { echo '<div class="full-width-wrap">'; }
 
@@ -44,10 +43,6 @@ get_header();
 
 						// masonry container open
 						echo '<div ' . presscore_masonry_container_class( $container_classes ) . presscore_masonry_container_data_atts() . '>';
-
-							//////////////////////
-							// Custom loop //
-							//////////////////////
 
 							$page_query = presscore_get_filtered_posts( array( 'post_type' => 'dt_team', 'taxonomy' => 'dt_team_category' ) );
 							if ( $page_query->have_posts() ): while( $page_query->have_posts() ): $page_query->the_post();
@@ -65,12 +60,7 @@ get_header();
 						// fullwidth wrap close
 						if ( $config->get( 'full_width' ) ) { echo '</div>'; }
 
-						/////////////////////
-						// Pagination //
-						/////////////////////
-
 						dt_paginator( $page_query );
-
 					}
 
 					do_action( 'presscore_after_loop' );

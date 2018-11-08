@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="the7-welcome">
         <div class="the7-logo">
-            <div class="the7-version"><?php echo esc_html( sprintf( __( 'v.%s', 'the7mk2' ), wp_get_theme( get_template() )->get( 'Version' ) ) ); ?></div>
+            <div class="the7-version"><?php echo esc_html( sprintf( __( 'v.%s', 'the7mk2' ), THE7_VERSION ) ); ?></div>
         </div>
         <h1>
             <?php if ( !presscore_theme_is_activated() ): ?>
@@ -35,35 +35,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="the7-postbox">
         <h2 class="the7-with-subtitle"><?php esc_html_e( 'Let’s get some work done!', 'the7mk2' ); ?></h2>
-        <p class="the7-subtitle"><?php esc_html_e( "We have assembled useful links to get you started:", 'the7mk2' ); ?></p>
+        <p class="the7-subtitle"><?php esc_html_e( 'We have assembled useful links to get you started:', 'the7mk2' ); ?></p>
 
         <div class="the7-column-container">
 
-            <?php if ( is_super_admin() ): ?>
+            <?php if ( ! defined( 'ENVATO_HOSTED_SITE' ) && is_super_admin() ): ?>
             <div class="the7-column" style="width: 40%">
-                <h3>
-                    <?php 
-                        if ( presscore_theme_is_activated() ) {
-                            esc_html_e( 'Theme is Registered', 'the7mk2' );
-                        } 
-                        else {
-                            esc_html_e( 'Theme Registration', 'the7mk2' ); 
-                        }
-                    ?>
-                </h3> 
-                <form method="post">
-                    <?php settings_fields( 'the7_theme_registration' ); ?>
-        
-                    <?php if ( presscore_theme_is_activated() ): ?>
-                        <p><?php esc_html_e( 'Your purchase code is:', 'the7mk2' ); ?><br><code class="the7-code"><?php echo esc_html( presscore_get_censored_purchase_code() ); ?></code></p>
-                    <?php endif; ?>
-
-                    <?php if ( !presscore_theme_is_activated() ): ?>
-                        <p><?php esc_html_e( 'Purchase Code:', 'the7mk2' ); ?><br><input id="the7_purchase_code" class="of-input" name="the7_purchase_code" type="text" value="" size="36"></p>
-                    <?php endif; ?>
-
-                    <p><?php Presscore_Modules_ThemeUpdateModule::print_submit_buttons(); ?></p>
-                </form>
+                <?php
+                if ( presscore_theme_is_activated() ) {
+                    include dirname( __FILE__ ) . '/partials/the7-dashboard/theme-de-registration-form.php';
+                } else {
+	                include dirname( __FILE__ ) . '/partials/the7-dashboard/theme-registration-form.php';
+                }
+                ?>
             </div>
             <?php endif; ?>
 
@@ -72,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <ul class="the7-links">
                     <li><a href="<?php echo admin_url( 'admin.php?page=the7-demo-content' );?>" class="the7-dashboard-icons-cloud-download"><?php esc_html_e( 'Import a pre-made site', 'the7mk2' ); ?></a></li>
                     <li><a href="<?php echo admin_url( 'admin.php?page=the7-plugins' );?>" class="the7-dashboard-icons-plug"><?php esc_html_e( 'Install or update plugins', 'the7mk2' ); ?></a></li>
-                    <li><a href="<?php echo admin_url( 'admin.php?page=of-options-wizard' );?>" class="the7-dashboard-icons-paint-brush"><?php esc_html_e( 'Customize your site', 'the7mk2' ); ?></a></li>
+                    <li><a href="<?php echo admin_url( 'admin.php?page=options-framework' );?>" class="the7-dashboard-icons-paint-brush"><?php esc_html_e( 'Customize your site', 'the7mk2' ); ?></a></li>
                 </ul>
             </div>
 
@@ -87,6 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 
+    <?php if ( ! defined( 'ENVATO_HOSTED_SITE' ) ): ?>
     <div class="the7-postbox">
         <h2><?php esc_html_e( 'System Status', 'the7mk2' ); ?></h2>
         <table class="the7-system-status" cellspacing="0" cellpadding="0">
@@ -123,7 +108,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <td>
                 <?php
                     $wp_uploads = wp_get_upload_dir();
-                    if ( wp_is_writable( $wp_uploads['basedir'] ) ) {
+                    if ( wp_is_writable( $wp_uploads['basedir'] . '/' ) ) {
                         _e( '<code class="status-good">Yes</code>', 'the7mk2' ); 
                     } else {
                         echo sprintf( __( '<code class="status-bad">No</code> Uploads folder must be writable to allow WordPress function properly.<br><span class="the7-tip">See <a href="%1$s" target="_blank" rel="noopener noreferrer">changing file permissions</a> or contact your hosting provider.</span>', 'the7mk2' ), 'https://codex.wordpress.org/Changing_File_Permissions' );
@@ -144,25 +129,51 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </td>
             </tr>
             <tr>
+                <td><?php esc_html_e( 'PHP Version:', 'the7mk2' ); ?></td>
+                <td>
+                <?php
+                    $php_version = PHP_VERSION;
+                    if ( version_compare( '7.0.0', $php_version, '>' ) ) {
+                        echo sprintf( __( '<code class="status-okay">%1$s</code> Current version is sufficient. However <strong>v.7.0.0</strong> or greater is recommended to improve the performance.', 'the7mk2' ), $php_version );
+                    } else {
+                        echo sprintf( __( '<code class="status-good">%1$s</code> Current version is sufficient.', 'the7mk2' ), $php_version );
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+                <td><?php esc_html_e( 'PHP Max Input Vars:', 'the7mk2' ); ?></td>
+                <td>
+                <?php
+                    $max_input_vars = ini_get( 'max_input_vars' );
+                    if ( $max_input_vars < 1000 ) {
+	                    echo sprintf( __( '<code class="status-bad">%1$s</code> Minimum value is <strong>1000</strong>. <strong>2000</strong> is recommended. <strong>3000</strong> or more may be required if lots of plugins are in use and/or you have a large amount of menu items.', 'the7mk2' ), $max_input_vars );
+                    } elseif ( $max_input_vars < 2000 ) {
+	                    echo sprintf( __( '<code class="status-okay">%1$s</code> Current limit is sufficient for most tasks. <strong>2000</strong> is recommended. <strong>3000</strong> or more may be required if lots of plugins are in use and/or you have a large amount of menu items.', 'the7mk2' ), $max_input_vars );
+                    } elseif ( $max_input_vars < 3000 ) {
+	                    echo sprintf( __( '<code class="status-good">%1$s</code> Current limit is sufficient. However, up to <strong>3000</strong> or more may be required if lots of plugins are in use and/or you have a large amount of menu items.', 'the7mk2' ), $max_input_vars );
+                    } else {
+	                    echo sprintf( __( '<code class="status-good">%1$s</code> Current limit is sufficient.', 'the7mk2' ), $max_input_vars );
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
                 <td><?php _e( 'WP Memory Limit:', 'the7mk2' ); ?></td>
                 <td>
                 <?php
                     $memory = presscore_get_wp_memory_limit();
                     $tip = sprintf( __( '<br><span class="the7-tip">See <a href="%1$s" target="_blank" rel="noopener noreferrer">increasing memory allocated to PHP</a> or contact your hosting provider.</span>', 'the7mk2' ), 'http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP' );
-
                     if ( $memory < 67108864 ) {
-                        echo sprintf( __( '<code class="status-bad">%1$s</code> Minimum value is <strong>64 MB</strong>. <strong>128 MB</strong> is recommended. Up to <strong>256 MB</strong> may be required to install the main demo.', 'the7mk2' ), size_format( $memory ) );
+                        echo sprintf( __( '<code class="status-bad">%1$s</code> Minimum value is <strong>64 MB</strong>. <strong>128 MB</strong> is recommended. <strong>256 MB</strong> or more may be required if lots of plugins are in use and/or you want to install the Main Demo.', 'the7mk2' ), size_format( $memory ) );
                         echo $tip;
-                    }
-                    else if ( $memory < 134217728 ) {
-                        echo sprintf( __( '<code class="status-okay">%1$s</code> Current memory limit is sufficient for most tasks. However, recommended value is <strong>128 MB</strong>. Up to <strong>256 MB</strong> may be required to install the main demo.', 'the7mk2' ), size_format( $memory ) );
+                    } elseif ( $memory < 134217728 ) {
+                        echo sprintf( __( '<code class="status-okay">%1$s</code> Current memory limit is sufficient for most tasks. However, recommended value is <strong>128 MB</strong>. <strong>256 MB</strong> or more may be required if lots of plugins are in use and/or you want to install the Main Demo.', 'the7mk2' ), size_format( $memory ) );
                         echo $tip;
-                    }
-                    else if ( $memory < 268435456 ) {
-                        echo sprintf( __( '<code class="status-good">%1$s</code> Current memory limit is sufficient. However, up to <strong>256 MB</strong> may be required to install the main demo.', 'the7mk2' ), size_format( $memory ) );
+                    } elseif ( $memory < 268435456 ) {
+                        echo sprintf( __( '<code class="status-good">%1$s</code> Current memory limit is sufficient. However, <strong>256 MB</strong> or more may be required if lots of plugins are in use and/or you want to install the Main Demo.', 'the7mk2' ), size_format( $memory ) );
                         echo $tip;
-                    }
-                    else {
+                    } else {
                         echo sprintf( __( '<code class="status-good">%1$s</code> Current memory limit is sufficient.', 'the7mk2' ), size_format( $memory ) );
                     }
                 ?>
@@ -199,6 +210,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <?php endif; ?>
         </table>
     </div>
+    <?php endif; ?>
 
     <?php include dirname( __FILE__ ) . '/partials/the7-dashboard/settings.php'; ?>
 </div>

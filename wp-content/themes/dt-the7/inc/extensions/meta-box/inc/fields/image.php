@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Image_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Image_Field' ) )
 {
-	class RWMB_Image_Field extends RWMB_File_Field
+	class THE7_RWMB_Image_Field extends THE7_RWMB_File_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -16,9 +16,9 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 			// Enqueue same scripts and styles as for file field
 			parent::admin_enqueue_scripts();
 
-			wp_enqueue_style( 'rwmb-image', RWMB_CSS_URL . 'image.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-image', THE7_RWMB_CSS_URL . 'image.css', array(), THE7_RWMB_VER );
 
-			wp_enqueue_script( 'rwmb-image', RWMB_JS_URL . 'image.js', array( 'jquery-ui-sortable', 'wp-ajax-response' ), RWMB_VER, true );
+			wp_enqueue_script( 'the7-mb-image', THE7_RWMB_JS_URL . 'image.js', array( 'jquery-ui-sortable', 'wp-ajax-response' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -32,7 +32,7 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 			parent::add_actions();
 
 			// Reorder images via Ajax
-			add_action( 'wp_ajax_rwmb_reorder_images', array( __CLASS__, 'wp_ajax_reorder_images' ) );
+			add_action( 'wp_ajax_the7_mb_reorder_images', array( __CLASS__, 'wp_ajax_reorder_images' ) );
 		}
 
 		/**
@@ -47,7 +47,7 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 			$post_id    = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : 0;
 
 
-			check_ajax_referer( "rwmb-reorder-images_{$field_id}" );
+			check_ajax_referer( "the7-mb-reorder-images_{$field_id}" );
 
 			parse_str( $order, $items );
 			$items = $items['item'];
@@ -59,7 +59,7 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 				add_post_meta( $post_id, $field_id, $item, false );
 			}
 
-			RW_Meta_Box::ajax_response( __( 'Order saved', 'rwmb' ), 'success' );
+			The7_RW_Meta_Box::ajax_response( __( 'Order saved', 'the7mk2' ), 'success' );
 		}
 
 		/**
@@ -73,8 +73,8 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 		 */
 		static function html( $html, $meta, $field )
 		{
-			$i18n_title = apply_filters( 'rwmb_image_upload_string', _x( 'Upload Images', 'image upload', 'rwmb' ), $field );
-			$i18n_more  = apply_filters( 'rwmb_image_add_string', _x( '+ Add new image', 'image upload', 'rwmb' ), $field );
+			$i18n_title = apply_filters( 'the7_mb_image_upload_string', _x( 'Upload Images', 'image upload', 'the7mk2' ), $field );
+			$i18n_more  = apply_filters( 'the7_mb_image_add_string', _x( '+ Add new image', 'image upload', 'the7mk2' ), $field );
 
 			// Uploaded images
 			$html .= self::get_uploaded_images( $meta, $field );
@@ -84,7 +84,7 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 				'<h4>%s</h4>
 				<div class="new-files">
 					<div class="file-input"><input type="file" name="%s[]" /></div>
-					<a class="rwmb-add-file" href="#"><strong>%s</strong></a>
+					<a class="the7-mb-add-file" href="#"><strong>%s</strong></a>
 				</div>',
 				$i18n_title,
 				$field['id'],
@@ -104,9 +104,9 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 		 */
 		static function get_uploaded_images( $images, $field )
 		{
-			$reorder_nonce = wp_create_nonce( "rwmb-reorder-images_{$field['id']}" );
-			$delete_nonce = wp_create_nonce( "rwmb-delete-file_{$field['id']}" );
-			$classes = array('rwmb-images', 'rwmb-uploaded');
+			$reorder_nonce = wp_create_nonce( "the7-mb-reorder-images_{$field['id']}" );
+			$delete_nonce = wp_create_nonce( "the7-mb-delete-file_{$field['id']}" );
+			$classes = array('the7-mb-images', 'the7-mb-uploaded');
 			if ( count( $images ) <= 0  )
 				$classes[] = 'hidden';
 			$ul = '<ul class="%s" data-field_id="%s" data-delete_nonce="%s" data-reorder_nonce="%s" data-force_delete="%s" data-max_file_uploads="%s">';
@@ -139,14 +139,14 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 		 */
 		static function img_html( $image )
 		{
-			$i18n_delete = apply_filters( 'rwmb_image_delete_string', _x( 'Delete', 'image upload', 'rwmb' ) );
-			$i18n_edit   = apply_filters( 'rwmb_image_edit_string', _x( 'Edit', 'image upload', 'rwmb' ) );
+			$i18n_delete = apply_filters( 'the7_mb_image_delete_string', _x( 'Delete', 'image upload', 'the7mk2' ) );
+			$i18n_edit   = apply_filters( 'the7_mb_image_edit_string', _x( 'Edit', 'image upload', 'the7mk2' ) );
 			$li = '
 				<li id="item_%s">
 					<img src="%s" />
-					<div class="rwmb-image-bar">
-						<a title="%s" class="rwmb-edit-file" href="%s" target="_blank">%s</a> |
-						<a title="%s" class="rwmb-delete-file" href="#" data-attachment_id="%s">×</a>
+					<div class="the7-mb-image-bar">
+						<a title="%s" class="the7-mb-edit-file" href="%s" target="_blank">%s</a> |
+						<a title="%s" class="the7-mb-delete-file" href="#" data-attachment_id="%s">×</a>
 					</div>
 				</li>
 			';
@@ -178,7 +178,7 @@ if ( ! class_exists( 'RWMB_Image_Field' ) )
 		{
 			global $wpdb;
 
-			$meta = RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+			$meta = The7_RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
 			
 			return empty( $meta ) ? array() : (array) $meta;
 		}

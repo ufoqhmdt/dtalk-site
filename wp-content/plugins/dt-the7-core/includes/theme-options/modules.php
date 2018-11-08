@@ -91,7 +91,7 @@ $new_options['modules-slideshow-status'] = array(
 	),
 );
 
-$new_options[] = array( "name" => _x("Slugs", "theme-options", 'the7mk2'), "type" => "block" );
+$new_options[] = array( "name" => _x("Slugs", "theme-options", 'dt-the7-core'), "type" => "block" );
 
 $new_options['posts_slugs_placeholder'] = array();
 

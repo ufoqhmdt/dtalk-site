@@ -10,35 +10,29 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @see 	    https://docs.woocommerce.com/document/template-structure/
- * @author 		WooThemes
- * @package 	WooCommerce/Templates
- * @version     2.0.0
+ * @see https://docs.woocommerce.com/document/template-structure/
+ * @package WooCommerce/Templates
+ * @version 3.4.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) {
 	return;
 }
 ?>
-	<div class="wc-login-wrap">
+<div class="wc-login-wrap">
 <?php
 $info_message  = apply_filters( 'woocommerce_checkout_login_message',  ' <span class="showlogin-tag"><i class="fa fa-user-circle" aria-hidden="true"></i>' .__( 'Returning customer?', 'the7mk2' ) ) . '</span>';
 $info_message .= ' <a href="#" class="showlogin">' . __( 'Click here to login', 'the7mk2' ) . '</a>';
 wc_print_notice( $info_message, 'notice' );
 
-?>
-
-<?php
-	woocommerce_login_form(
-		array(
-			'message'  => __( 'If you have shopped with us before, please enter your details in the boxes below. If you are a new customer, please proceed to the Billing &amp; Shipping section.', 'the7mk2' ),
-			'redirect' => wc_get_page_permalink( 'checkout' ),
-			'hidden'   => true
-		)
-	);
+woocommerce_login_form(
+	array(
+		'message'  => __( 'If you have shopped with us before, please enter your details below. If you are a new customer, please proceed to the Billing &amp; Shipping section.', 'the7mk2' ),
+		'redirect' => wc_get_page_permalink( 'checkout' ),
+		'hidden'   => true,
+	)
+);
 ?>
 </div>

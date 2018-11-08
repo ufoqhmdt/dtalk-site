@@ -39,39 +39,11 @@ if ( ! class_exists( 'Presscore_Modules_Legacy' ) ) :
 				) ) ;
 			}
 
-			add_filter( 'presscore_get_dynamic_stylesheets_list', array( __CLASS__, 'add_dynamic_css' ), 20 );
-
 			if ( ! defined( 'DOING_AJAX' ) ) {
 				add_action( 'admin_init', array( __CLASS__, 'regenerate_css_on_legacy_activation' ) );
 			}
 
 			self::handle_legacy_code();
-		}
-
-		/**
-		 * Add dynamic stylesheets.
-		 *
-		 * @param array $dynamic_stylesheets
-		 *
-		 * @return array
-		 */
-		public static function add_dynamic_css( $dynamic_stylesheets ) {
-			if ( self::is_legacy_mode_active() ) {
-				$template_uri = PRESSCORE_THEME_URI;
-				$template_directory = PRESSCORE_THEME_DIR;
-				$theme_version = wp_get_theme()->get( 'Version' );
-
-				$dynamic_stylesheets['dt-legacy.less'] = array(
-					'path'         => $template_directory . '/css/legacy.less',
-					'src'          => $template_uri . '/css/legacy.less',
-					'fallback_src' => '',
-					'deps'         => array(),
-					'ver'          => $theme_version,
-					'media'        => 'all'
-				);
-			}
-
-			return $dynamic_stylesheets;
 		}
 
 		/**

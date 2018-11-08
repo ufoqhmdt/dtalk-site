@@ -3,6 +3,33 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+if ( ! function_exists( 'dt_woocommerce_exclude_out_of_stock_products_from_search' ) ) :
+
+	/**
+	 * Exclude out of stock products from search.
+	 *
+	 * @param WP_Query $query
+	 */
+	function dt_woocommerce_exclude_out_of_stock_products_from_search( $query ) {
+		if ( is_admin() || ! $query->is_main_query() || ! $query->is_search ) {
+			return;
+		}
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$product_visibility_term_ids = wc_get_product_visibility_term_ids();
+			$tax_query = (array) $query->get('tax_query');
+			$tax_query[] = array(
+				'taxonomy' => 'product_visibility',
+				'field'    => 'term_taxonomy_id',
+				'terms'    => $product_visibility_term_ids['outofstock'],
+				'operator' => 'NOT IN',
+			);
+			$query->set( 'tax_query', $tax_query );
+		}
+	}
+
+endif;
+
 if ( ! function_exists( 'dt_woocommerce_enqueue_scripts' ) ) :
 
 	/**
@@ -178,20 +205,18 @@ if ( ! function_exists( 'dt_woocommerce_replace_theme_breadcrumbs' ) ) :
 	function dt_woocommerce_replace_theme_breadcrumbs( $html = '', $args = array() ) {
 
 		if ( ! $html ) {
-
 			ob_start();
 			woocommerce_breadcrumb( array(
 				'delimiter' => '',
-				'wrap_before' => '<div class="assistive-text"></div><ol' . $args['listAttr'] . ' xmlns:v="http://rdf.data-vocabulary.org/#">',
+				'wrap_before' => '<div class="assistive-text"></div><ol' . $args['listAttr'] . '>',
 				'wrap_after' => '</ol>',
-				'before' => '<li typeof="v:Breadcrumb">',
+				'before' => '<li>',
 				'after' => '</li>',
 				'home' => __( 'Home', 'the7mk2' ),
 			) );
 			$html = ob_get_clean();
 
 			$html = apply_filters( 'presscore_get_breadcrumbs', $args['beforeBreadcrumbs'] . $html . $args['afterBreadcrumbs'] );
-
 		}
 
 		return $html;
@@ -539,9 +564,8 @@ if ( ! function_exists( 'dt_woocommerce_get_product_add_to_cart_icon' ) ) :
 						$product->supports( 'ajax_add_to_cart' ) ? 'ajax_add_to_cart' : ''
 				) ) )
 			));
-			$html = ob_get_clean();
 
-			return $html;
+			return ob_get_clean();
 		}
 
 		return '';
@@ -718,9 +742,12 @@ endif;
 
 if ( ! function_exists( 'dt_woocommerce_filter_frontend_scripts_data' ) ) :
 
-	function dt_woocommerce_filter_frontend_scripts_data( $data ) {
-		$data['i18n_view_cart'] = esc_attr__( 'View cart', 'the7mk2' );
-		return $data;
+	function dt_woocommerce_filter_frontend_scripts_data( $params, $handle ) {
+        if ( 'wc-add-to-cart' === $handle ) {
+	        $params['i18n_view_cart'] = esc_attr__( 'View cart', 'the7mk2' );
+        }
+
+		return $params;
 	}
 
 endif;
@@ -731,6 +758,9 @@ if ( ! function_exists( 'dt_woocommerce_set_product_cart_button_position' ) ) :
 	 * Choose where to display product cart button.
 	 */
 	function dt_woocommerce_set_product_cart_button_position() {
+		remove_action( 'woocommerce_after_shop_loop_item', 'dt_woocommerce_render_product_add_to_cart_icon', 40 );
+		remove_filter( 'dt_woocommerce_get_product_preview_icons', 'dt_woocommerce_filter_product_preview_icons' );
+
 		if ( 'wc_btn_on_hoover' === presscore_config()->get( 'post.preview.description.style' ) || 'wc_btn_on_img' === presscore_config()->get( 'post.preview.description.style' ) ) {
 		    add_filter( 'dt_woocommerce_get_product_preview_icons', 'dt_woocommerce_filter_product_preview_icons' );
 		} else {
@@ -766,6 +796,9 @@ if ( ! function_exists( 'dt_woocommerce_filter_masonry_container_class' ) ) :
 		}
 		if(!presscore_config()->get( 'woocommerce_show_masonry_desc' )){
 			$class[] = 'hide-description';
+		}
+		if('grid' === of_get_option( 'woocommerce_shop_template_isotope' )){
+			$class[] = 'wc-grid';
 		}
 		return $class;
 	}
@@ -853,7 +886,7 @@ if ( ! function_exists( 'dt_woocommerce_product_shortcode_classes_filter' ) ) :
 	 */
     function dt_woocommerce_product_shortcode_classes_filter( $classes ) {
         $classes = array_diff( $classes, array(
-	        'iso-grid',
+	        'dt-css-grid wc-grid',
 	        'iso-container',
         ) );
 
@@ -889,6 +922,62 @@ if ( ! function_exists( 'dt_woocommerce_wrap_add_to_cart_text_in_filter_popup' )
 
 endif;
 
+if ( ! function_exists( 'dt_woocommerce_proper_taxonomy_for_masonry_wrap_classes' ) ) {
+
+	/**
+     * Return proper taxonomy for product post type. Used mostly in conjunction with posts filter.
+     *
+	 * @param string $taxonomy
+	 * @param string $post_type
+	 *
+	 * @return string
+	 */
+    function dt_woocommerce_proper_taxonomy_for_masonry_wrap_classes( $taxonomy, $post_type ) {
+        if ( $post_type == 'product' ) {
+            $taxonomy = 'product_cat';
+        }
+
+        return $taxonomy;
+    }
+
+}
+
+if ( ! function_exists( 'dt_woocommerce_add_shortcodes_inline_css_fix' ) ) {
+
+	/**
+	 * Add hooks to fix inline css on shop pages.
+	 */
+	function dt_woocommerce_add_shortcodes_inline_css_fix() {
+		// Don't display the description on search results page.
+		if ( is_search() ) {
+			return;
+		}
+
+		if ( is_post_type_archive( 'product' ) && 0 === absint( get_query_var( 'paged' ) ) ) {
+			add_filter( 'the7_shortcodes_get_inline_css', 'dt_woocommerce_fix_shortcodes_inline_css_for_archives' );
+		}
+	}
+}
+
+if ( ! function_exists( 'dt_woocommerce_fix_shortcodes_inline_css_for_archives' ) ) {
+
+	/**
+     * Proper inline css on shop pages.
+     *
+	 * @param string $inline_css
+	 *
+	 * @return string
+	 */
+	function dt_woocommerce_fix_shortcodes_inline_css_for_archives( $inline_css ) {
+		$shop_page_id = wc_get_page_id( 'shop' );
+		if ( $shop_page_id ) {
+			$inline_css = get_post_meta( $shop_page_id, 'the7_shortcodes_inline_css', true );
+		}
+
+		return $inline_css;
+	}
+}
+
 // **********************************************************************//
 // ! Grid/List switcher
 // **********************************************************************// 
@@ -917,26 +1006,29 @@ if ( ! function_exists( 'the7_layout_switcher_wrap_end' ) ) {
 add_action('woocommerce_before_shop_loop', 'the7_layout_mode_switcher',15);
 if(!function_exists('the7_layout_mode_switcher')) {
 	function the7_layout_mode_switcher() {
-		$current_url = the7_shop_page_link(true);
+	    if ( ! the7_shop_page_link() ) {
+	        return;
+        }
 
 		$view_mode = of_get_option('wc_view_mode');
 
+		if ( in_array( $view_mode, array( 'masonry_grid', 'list' ), true ) ) {
+		    return;
+        }
 
-		if($view_mode == 'masonry_grid' || $view_mode == 'list') return;
-
-		$url_grid = add_query_arg( 'wc_view_mode', 'masonry_grid', remove_query_arg( 'wc_view_mode', $current_url ) );
-		$url_list = add_query_arg( 'wc_view_mode', 'list', remove_query_arg( 'wc_view_mode', $current_url ) );
-
+		$current_url = the7_shop_page_link( true );
+		$current_url = remove_query_arg( 'wc_view_mode', $current_url );
+		$url_grid = add_query_arg( 'wc_view_mode', 'masonry_grid', $current_url );
+		$url_list = add_query_arg( 'wc_view_mode', 'list', $current_url );
 		$current_mode = the7_get_view_mode();
-
 		?>
 		<div class="view-mode-switcher">
 
-			<?php if($view_mode == 'view_mode'): ?>
-				<a class="switch-mode-grid <?php if( $current_mode == 'masonry_grid' ) echo 'switcher-active'; ?>" href="<?php echo esc_url( $url_grid ); ?>"><i class="fa fa-th" aria-hidden="true"></i><span class="filter-popup"><?php esc_html_e('Grid view', 'the7mk2'); ?>
+			<?php if($view_mode === 'view_mode'): ?>
+				<a class="switch-mode-grid <?php if( $current_mode === 'masonry_grid' ) echo 'switcher-active'; ?>" href="<?php echo esc_url( $url_grid ); ?>"><i class="fa fa-th" aria-hidden="true"></i><span class="filter-popup"><?php esc_html_e('Grid view', 'the7mk2'); ?>
 				</span></a>
 
-				<a class="switch-mode-list <?php if( $current_mode == 'list' ) echo 'switcher-active'; ?>" href="<?php echo esc_url( $url_list ); ?>"><i class="fa fa-th-list" aria-hidden="true"></i><span class="filter-popup"><?php esc_html_e('List view', 'the7mk2'); ?></span></a>
+				<a class="switch-mode-list <?php if( $current_mode === 'list' ) echo 'switcher-active'; ?>" href="<?php echo esc_url( $url_list ); ?>"><i class="fa fa-th-list" aria-hidden="true"></i><span class="filter-popup"><?php esc_html_e('List view', 'the7mk2'); ?></span></a>
 			<?php endif ;?>
 		</div>
 		<?php
@@ -970,6 +1062,10 @@ if ( ! function_exists( 'the7_shop_page_link' ) ) {
 			$link = get_term_link( get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 		}
 
+		if ( ! is_string( $link ) ) {
+		    $link = '';
+        }
+
 		if ( $keep_query ) {
 			foreach ( $_GET as $key => $val ) {
 				if ( 'orderby' === $key || 'submit' === $key ) {
@@ -981,4 +1077,37 @@ if ( ! function_exists( 'the7_shop_page_link' ) ) {
 
 		return $link;
 	}
+}
+
+/**
+ * Return product visibility tax query.
+ *
+ * @since 6.8.1
+ *
+ * @param array $tax_query Tax query that will be adjusted with visibility rules.
+ *
+ * @return array
+ */
+function the7_product_visibility_tax_query( $tax_query = array() ) {
+	if ( ! is_array( $tax_query ) ) {
+		$tax_query = array();
+	}
+
+	$tax_query['relation'] = 'AND';
+
+	$product_visibility_term_ids = wc_get_product_visibility_term_ids();
+	$product_visibility_not_in   = array( $product_visibility_term_ids['exclude-from-catalog'] );
+
+	if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+		$product_visibility_not_in[] = $product_visibility_term_ids['outofstock'];
+	}
+
+	$tax_query[] = array(
+		'taxonomy' => 'product_visibility',
+		'field'    => 'term_taxonomy_id',
+		'terms'    => $product_visibility_not_in,
+		'operator' => 'NOT IN',
+	);
+
+	return $tax_query;
 }

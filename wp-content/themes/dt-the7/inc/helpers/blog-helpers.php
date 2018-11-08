@@ -192,7 +192,7 @@ if ( ! function_exists( 'presscore_post_format_supports_media_content' ) ) :
 	/**
 	 * Check if post format supports media content
 	 *
-	 * TODO: Remove it.
+	 * TODO: Check all usage cases and then remove it.
 	 *
 	 * @since 1.0.0
 	 *
@@ -715,3 +715,77 @@ if ( ! function_exists( 'presscore_get_blog_query' ) ) :
 	}
 
 endif;
+
+if ( ! function_exists( 'the7_calculate_bwb_image_resize_options' ) ) {
+
+	/**
+	 * Return image resize options based on various parameters.
+	 *
+	 * @since 6.3.2
+	 *
+	 * @param array $columns
+	 * @param int $columns_gap
+	 *
+	 * @return array
+	 */
+	function the7_calculate_bwb_image_resize_options( $columns, $columns_gap ) {
+		$config = presscore_config();
+		$img_width_calculator_config = new The7_Image_Width_Calculator_Config( array(
+			'columns'             => $columns,
+			'columns_gaps'        => $columns_gap,
+			'content_width'       => of_get_option( 'general-content_width' ),
+			'side_padding'        => of_get_option( 'general-side_content_paddings' ),
+			'mobile_side_padding' => of_get_option( 'general-mobile_side_content_paddings' ),
+			'side_padding_switch' => of_get_option( 'general-switch_content_paddings' ),
+			'sidebar_enabled'     => ( 'disabled' !== $config->get( 'sidebar_position' ) ),
+			'sidebar_on_mobile'   => ( ! $config->get( 'sidebar_hide_on_mobile' ) ),
+			'sidebar_width'       => of_get_option( 'sidebar-width' ),
+			'sidebar_gap'         => of_get_option( 'sidebar-distance_to_content' ),
+			'sidebar_switch'      => of_get_option( 'sidebar-responsiveness' ),
+			'image_is_wide'       => ( 'wide' === $config->get( 'post.preview.width' ) && ! $config->get( 'all_the_same_width' ) ),
+		) );
+		$img_width_calculator = new The7_Image_BWB_Width_Calculator( $img_width_calculator_config );
+
+		return $img_width_calculator->calculate_options();
+	}
+}
+
+if ( ! function_exists( 'the7_calculate_columns_based_image_resize_options' ) ) {
+
+	/**
+	 * Calculate image resize options based on columns and minimum image width.
+	 *
+	 * @since 6.7.0
+	 * @uses  presscore_config()
+	 *
+	 * @param string|int $columns_count
+	 * @param string|int $min_img_width
+	 *
+	 * @return array
+	 */
+	function the7_calculate_columns_based_image_resize_options( $columns_count, $min_img_width ) {
+		$config        = presscore_config();
+		$content_width = $config->get( 'template.content.width' );
+		if ( false !== strpos( $content_width, '%' ) ) {
+			$content_width = round( (int) $content_width * 19.20 );
+		}
+		$content_width = (int) $content_width;
+
+		$computed_width = (int) $min_img_width;
+		$columns_count  = absint( $columns_count );
+		if ( $columns_count ) {
+			$computed_width = max( $content_width / $columns_count, $computed_width );
+		}
+
+		$multiplier    = 1.5;
+		$image_options = array( 'z' => 0 );
+		if ( 'wide' === $config->get( 'post.preview.width' ) && ! $config->get( 'all_the_same_width' ) ) {
+			$multiplier                  = 3;
+			$image_options['hd_convert'] = false;
+		}
+
+		$image_options['w'] = round( $computed_width * $multiplier );
+
+		return $image_options;
+	}
+}

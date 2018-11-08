@@ -28,7 +28,7 @@ class Vc_Navbar_Frontend extends Vc_Navbar {
 	/**
 	 * @var string
 	 */
-	protected $brand_url = 'http://vc.wpbakery.com/?utm_campaign=VCplugin&utm_source=vc_user&utm_medium=frontend_editor';
+	protected $brand_url = 'https://wpbakery.com/?utm_campaign=VCplugin&utm_source=vc_user&utm_medium=frontend_editor';
 
 	/**
 	 * @var string
@@ -112,7 +112,7 @@ class Vc_Navbar_Frontend extends Vc_Navbar {
 		ob_start();
 		?>
 		<li class="vc_show-mobile vc_pull-right">
-			<button data-url="<?php esc_attr_e( get_edit_post_link( $post->ID ) . '&wpb_vc_js_status=true' ) ?>"
+			<button data-url="<?php esc_attr_e( get_edit_post_link( $post->ID ) . '&wpb_vc_js_status=true&classic-editor' ) ?>"
 			        class="vc_btn vc_btn-default vc_btn-sm vc_navbar-btn vc_btn-backend-editor" id="vc_button-cancel"
 			        title="<?php _e( 'Cancel all changes and return to WP dashboard', 'js_composer' ) ?>"><?php echo vc_user_access()
 					->part( 'backend_editor' )
@@ -161,7 +161,7 @@ class Vc_Navbar_Frontend extends Vc_Navbar {
 	public function getControlViewPost() {
 		return '<li class="vc_pull-right">'
 		       . '<a href="' . esc_attr( get_permalink( $this->post() ) ) . '" class="vc_icon-btn vc_back-button"'
-		       . ' title="' . esc_attr__( 'Exit Visual Composer edit mode', 'js_composer' ) . '"><i class="vc-composer-icon vc-c-icon-close"></i></a>'
+		       . ' title="' . esc_attr__( 'Exit WPBakery Page Builder edit mode', 'js_composer' ) . '"><i class="vc-composer-icon vc-c-icon-close"></i></a>'
 		       . '</li>';
 	}
 }

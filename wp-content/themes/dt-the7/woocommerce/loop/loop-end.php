@@ -18,7 +18,9 @@
 
 // masonry container close
 echo '</div>';
-
+if ( 'grid' === presscore_config()->get( 'layout' )) {
+	echo '</div>';
+}
 // fullwidth wrap close
 if ( presscore_config()->get( 'full_width' ) ) { echo '</div>'; }
 

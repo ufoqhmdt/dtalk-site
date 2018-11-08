@@ -13,7 +13,9 @@ if ( vc_user_access()->part( 'presets' )->can()->get() ) {
 
 ?>
 	<script type="text/javascript">
-		var vc_all_presets = <?php echo json_encode( $vc_all_presets ) ?>
+		var vc_all_presets = <?php echo json_encode( $vc_all_presets ) ?>;
+		var vc_post_id = <?php echo get_the_ID(); ?>;
+		window.wpbGutenbergEditorUrl = '<?php echo set_url_scheme( admin_url( 'post-new.php?post_type=wpb_gutenberg_param' ) ); ?>';
 	</script>
 
 <?php
@@ -54,5 +56,6 @@ if ( '' === $wpb_vc_status || ! isset( $wpb_vc_status ) ) {
 	       value="<?php esc_attr_e( 'Crunching...', 'js_composer' ) ?>"/>
 	<input type="hidden" name="vc_post_custom_css" id="vc_post-custom-css"
 	       value="<?php echo esc_attr( $editor->post_custom_css ); ?>" autocomplete="off"/>
-
+<div id="vc_preloader" style="display: none;"></div>
+<div id="vc_overlay_spinner" class="vc_ui-wp-spinner vc_ui-wp-spinner-dark vc_ui-wp-spinner-lg" style="display:none;"></div>
 <?php vc_include_template( 'editors/partials/access-manager-js.tpl.php' );

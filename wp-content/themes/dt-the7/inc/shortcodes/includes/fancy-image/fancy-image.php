@@ -37,7 +37,6 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 
 				$image_id = $this->atts['image_id'];
 				$image_src = wp_get_attachment_image_src( $image_id, 'full' );
-				//var_dump($image_id);
 
 				if ( ! $image_src ) {
 					return '';
@@ -52,7 +51,6 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 				$this->atts['image'] = $image_src[0];
 				$this->atts['_image_width'] = $image_src[1];
 				$this->atts['_image_height'] = $image_src[2];
-				$this->atts['hd_image'] = '';
 				$this->atts['image_alt'] = esc_attr( get_post_meta( $image_id, '_wp_attachment_image_alt', true ) );
 				$this->atts['media'] = esc_url( get_post_meta( $image_id, 'dt-video-url', true ) );
 				$post_content = get_post_field( 'post_content', $image_id );
@@ -66,7 +64,7 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 
 			$output = '';
 
-			$output .= '<div ' . $this->get_container_html_class( 'shortcode-single-image-wrap' ) . $this->get_container_inline_style() . '>';
+			$output .= '<div ' . $this->get_container_html_class( 'shortcode-single-image-wrap' ) . $this->get_container_inline_style()  . presscore_get_share_buttons_for_prettyphoto( 'photo' ) .  '>';
 				$output .= $this->get_media();
 				$output .= $this->get_caption();
 			$output .= '</div>';
@@ -96,7 +94,7 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 				$class[] = 'caption-on';
 			}
 
-			$image_src = $this->choose_src_responsively( $this->atts['image'], $this->atts['hd_image'] );
+			$image_src = $this->atts['image'];
 			$video_url = $this->atts['media'];
 			$lightbox = ( 'lightbox' === $this->atts['onclick'] );
 
@@ -204,10 +202,11 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 				'alt' => $args['alt'],
 				'echo' => false,
 				'options' => ( isset( $args['resize_to'] ) ? $args['resize_to'] : array() ),
+				'custom' => sprintf( 'data-dt-location="%s"', esc_attr( $args['permalink'] ) ),
 			);
 
 			if ( $this->is_image() ) {
-				$thumb_args['custom'] = 'style="' . $this->image_inline_style() . '"';
+				$thumb_args['custom'] .= sprintf( ' style="%s"', $this->image_inline_style() );
 			}
 
 			return dt_get_thumb_img( $thumb_args );
@@ -221,9 +220,9 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 			}
 
 			if ( $this->lazy_loading_on() ) {
-				return presscore_get_lazy_image( array( array( $args['src'], $args['width'], $args['height'] ) ), $args['width'], $args['height'], array( 'alt' => $args['alt'], 'style' => $style ) );
+				return presscore_get_lazy_image( array( array( $args['src'], $args['width'], $args['height'] ) ), $args['width'], $args['height'], array( 'alt' => $args['alt'], 'style' => $style, 'dt-data-location' => $args['permalink'] ) );
 			} else {
-				return '<img style="' . $style . '" src="' . $args['src'] . '" srcset="' . $args['src'] . ' ' . $args['width'] . 'w" alt="' . $args['alt'] . '" ' . $hwstring . '/>';
+				return '<img style="' . $style . '" src="' . $args['src'] . '" srcset="' . $args['src'] . ' ' . $args['width'] . 'w" alt="' . $args['alt'] . '" ' . $hwstring . ' data-dt-location="' . esc_attr( $args['permalink'] ) . '"/>';
 			}
 		}
 
@@ -285,7 +284,6 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 				'image_alt'          => '',
 				'image_link'         => '',
 				'image_dimensions'   => '',
-				'hd_image'           => '',
 				'image_hovers'       => 'true',
 				'media'              => '',
 				'onclick'            => 'none',
@@ -319,7 +317,6 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 			$clear_atts['image_alt'] = $clear_atts['image_title'] = esc_attr( $clear_atts['image_alt'] );
 
 			$clear_atts['image'] = esc_url( $clear_atts['image'] );
-			$clear_atts['hd_image'] = esc_url( $clear_atts['hd_image'] );
 			$clear_atts['media'] = esc_url( $clear_atts['media'] );
 			$clear_atts['image_link'] = esc_url( $clear_atts['image_link'] );
 
@@ -374,24 +371,12 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 			return ( ! $this->atts['css'] );
 		}
 
-		protected function choose_src_responsively( $img, $hd_img = '' ) {
-			$default_img = $img ? $img : $hd_img;
-
-			$image_src = dt_is_hd_device() ? $hd_img : $img;
-
-			if ( empty( $image_src ) ) {
-				$image_src = $default_img;
-			}
-
-			return $image_src;
-		}
-
 		protected function get_media() {
 			$output = '';
 
 			$wrap_class = '';
 			$video_url = $this->atts['media'];
-			$image_src = $this->choose_src_responsively( $this->atts['image'], $this->atts['hd_image'] );
+			$image_src = $this->atts['image'];
 
 			if ( $this->is_uploaded_image() ) {
 				$image_html = $this->render_resized_image( array(
@@ -400,6 +385,7 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 					'width' => $this->atts['_image_width'],
 					'height' => $this->atts['_image_height'],
 					'resize_to' => array( 'w' => $this->atts['width'], 'h' => $this->atts['height'] ),
+					'permalink' => get_permalink( $this->atts['image_id'] ),
 				) );
 
 			} else {
@@ -408,6 +394,7 @@ if ( ! class_exists( 'DT_Shortcode_FancyImage', false ) ) {
 					'alt' => $this->atts['image_alt'],
 					'width' => $this->atts['_image_width'],
 					'height' => $this->atts['_image_height'],
+					'permalink' => $image_src,
 				) );
 			}
 

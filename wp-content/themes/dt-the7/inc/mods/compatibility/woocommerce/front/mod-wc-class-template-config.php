@@ -56,9 +56,7 @@ if ( ! class_exists( 'DT_WC_Template_Config', false ) ) :
 			$config->set( 'woocommerce_shop_template_responsiveness', of_get_option( 'woocommerce_shop_template_responsiveness' ) );
 			$config->set( 'woocommerce_show_masonry_desc', of_get_option( 'woocommerce_show_masonry_desc' ), false );
 
-			$config->set( 'item_padding', of_get_option( 'woocommerce_shop_template_gap', 20 ), 20 );
-
-			
+			$config->set( 'item_padding', (int) of_get_option( 'woocommerce_shop_template_gap', 20 ), 20 );
 
 			if ( $woocommerce_loop && ! empty( $woocommerce_loop['columns'] ) ) {
 				$config->set( 'template.columns.number', absint( $woocommerce_loop['columns'] ) );
@@ -66,7 +64,7 @@ if ( ! class_exists( 'DT_WC_Template_Config', false ) ) :
 				$config->set( 'template.columns.number', of_get_option( 'woocommerce_shop_template_columns', 3 ), 3 );
 			}
 
-			$config->set( 'post.preview.width.min', of_get_option( 'woocommerce_shop_template_column_min_width', 370 ), 370 );
+			$config->set( 'post.preview.width.min', (int) of_get_option( 'woocommerce_shop_template_column_min_width', 370 ), 370 );
 
 			$config->set( 'show_titles', of_get_option( 'woocommerce_show_product_titles', true ), true );
 

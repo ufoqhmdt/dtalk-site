@@ -2,6 +2,8 @@
 
 class The7_Demo_Content_Import extends WP_Import {
 
+	const THE7_PROCESSED_DATA_KEY = 'the7_demo_content_processed_data';
+
 	/**
 	 * Performs post-import cleanup of files and the cache
 	 */
@@ -127,4 +129,32 @@ class The7_Demo_Content_Import extends WP_Import {
 		}
 	}
 
+	/**
+	 * Cache processed data to be used in future imports.
+	 */
+	public function cache_processed_data() {
+		$data = array(
+			'processed_authors'    => $this->processed_authors,
+			'processed_terms'      => $this->processed_terms,
+			'processed_posts'      => $this->processed_posts,
+			'featured_images'      => $this->featured_images,
+		);
+		set_transient( self::THE7_PROCESSED_DATA_KEY, $data, 1200 );
+	}
+
+	/**
+	 * Read populate internal variables with processed data from cache.
+	 */
+	public function read_processed_data_from_cache() {
+		$processed_data = get_transient( self::THE7_PROCESSED_DATA_KEY );
+		if ( ! is_array( $processed_data ) || empty( $processed_data ) ) {
+			return;
+		}
+
+		foreach ( $processed_data as $group => $data ) {
+			if ( property_exists( $this, $group ) && $data ) {
+				$this->$group = $data;
+			}
+		}
+	}
 }

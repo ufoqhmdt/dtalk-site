@@ -20,7 +20,9 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 		'send_to'		=> '',
 		'msg_height'	=> 6,
 		'button_size'	=> 'm',
-		'button_title'	=> ''
+		'button_title'	=> '',
+        'terms'         => false,
+        'terms_msg'     => '',
 	);
 
 	public static $fields_list = array();
@@ -28,7 +30,7 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 	/**
 	 * Widget setup.
      */
-	function __construct() {  
+	function __construct() {
 		$widget_ops = array( 'description' => _x( 'Contact form', 'widget', 'the7mk2' ) );
 
 		parent::__construct(
@@ -47,6 +49,8 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 			'website'	=> array( 'title' => __( 'Website', 'the7mk2' ), 'defaults' => array( 'on' => false, 'required' => false ) ),
 			'message'	=> array( 'title' => __( 'Message', 'the7mk2' ), 'defaults' => array( 'on' => true, 'required' => false ) ),
 		);
+
+		self::$widget_defaults['terms_msg'] = _x( 'By using this form you agree with the storage and handling of your data by this website.', 'widget', 'the7mk2' );
 
 		add_filter('dt_core_send_mail-to', array( $this, 'presscore_send_to_filter' ), 20);
 	}
@@ -92,8 +96,17 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 		// fields
 		if ( $fields_not_empty ) {
 
+			$form_class = array(
+				'dt-contact-form',
+				'dt-form',
+			);
+
+			if ( $instance['terms'] ) {
+			    $form_class[] = 'privacy-form';
+            }
+
 			// form begin
-			echo '<form class="contact-form dt-form" action="/" method="post">' . "\n";
+			printf( '<form class="%s" action="/" method="post">' . "\n", implode( ' ', $form_class ) );
 			
 			echo '<input type="hidden" name="widget_id" value="' . $this->id . '" />';
 
@@ -190,6 +203,16 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 
 			echo $fields_str . $message;
 
+			if ( $instance['terms'] ) {
+			    $terms_field_id = 'the7-form-terms-' . md5( (string) rand( 0, 9999 ) );
+			    $terms_msg = $instance['terms_msg'] ? $instance['terms_msg'] : self::$widget_defaults['terms_msg'];
+				printf(
+				    '<p class="the7-form-terms-wrap"><input type="checkbox" id="%1$s" name="terms" class="validate[required] the7-form-terms" aria-required="true" />&nbsp;<label for="%1$s"><span class="form-terms-text">%2$s</span></label></p>',
+                    $terms_field_id,
+                    wp_kses_post( $terms_msg )
+                );
+			}
+
 			$button_title = !empty($instance['button_title']) ? $instance['button_title'] : __( 'Submit', 'the7mk2' );
 
 			// buttons
@@ -235,6 +258,10 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 		$instance['button_size'] = in_array( $instance['button_size'], array( 's', 'm', 'l' ) ) ? $instance['button_size'] : self::$widget_defaults['button_size'];
 		$instance['button_title'] = esc_html( $instance['button_title'] );
 
+		$instance['terms'] = (bool) $new_instance['terms'];
+		$terms_msg = $new_instance['terms_msg'] ? $new_instance['terms_msg'] : self::$widget_defaults['terms_msg'];
+		$instance['terms_msg'] = wp_kses_post( $terms_msg );
+
 		return $instance;
 	}
 
@@ -276,6 +303,13 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 		<?php endforeach; ?>
             </tbody>
         </table>
+        <p>
+			<label for="<?php echo $this->get_field_id( 'terms' ); ?>"><?php _ex('Show privacy message', 'widget', 'the7mk2'); ?></label>&nbsp;<input type="checkbox" id="<?php echo $this->get_field_id( 'terms' ); ?>" name="<?php echo $this->get_field_name( 'terms' ); ?>" value="1" <?php checked( $instance['terms'] ) ?> onchange="the7ContactFormWidgetCheckTerms(this)"/>
+		</p>
+        <p class="the7-contact-form-widget-terms-msg-block" <?php echo $instance['terms'] ? '' : 'style="display: none;"' ?>>
+            <label for="<?php echo $this->get_field_id( 'terms_msg' ); ?>"><?php _ex('Privacy message:', 'widget',  'the7mk2'); ?></label>
+            <textarea id="<?php echo $this->get_field_id( 'terms_msg' ); ?>" rows="5" class="widefat" name="<?php echo $this->get_field_name( 'terms_msg' ); ?>"><?php echo wp_kses_post($instance['terms_msg']); ?></textarea>
+        </p>
 		<p>
 			<label><?php _ex('Message field height (in lines)', 'widget', 'the7mk2'); ?>&nbsp;<input type="text" name="<?php echo $this->get_field_name( 'msg_height' ); ?>" value="<?php echo esc_attr($instance['msg_height']); ?>" size="3"/></label>
 		</p>
@@ -292,9 +326,9 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 	function presscore_enqueue_scripts() {
 		$ve_locale = $this->_get_validator_locale();
 
-		wp_enqueue_script( 'dt-validator', PRESSCORE_THEME_URI . '/js/atoms/plugins/validator/jquery.validationEngine.js', array( 'jquery' ), '2.6.1', true );
-		wp_enqueue_script( 'dt-validation-translation', PRESSCORE_THEME_URI . '/js/atoms/plugins/validator/languages/jquery.validationEngine-' . $ve_locale . '.js', array('dt-validator'), '2.6.1', true );
-		wp_enqueue_script( 'dt-contact-form', PRESSCORE_THEME_URI . '/js/dt-contact-form.js', array('dt-validator', 'dt-validation-translation'), false, true );
+		wp_enqueue_script( 'dt-validator', PRESSCORE_THEME_URI . '/js/atoms/plugins/validator/jquery.validationEngine.js', array( 'jquery' ), THE7_VERSION, true );
+		wp_enqueue_script( 'dt-validation-translation', PRESSCORE_THEME_URI . '/js/atoms/plugins/validator/languages/jquery.validationEngine-' . $ve_locale . '.js', array('dt-validator'), THE7_VERSION, true );
+		wp_enqueue_script( 'dt-contact-form', PRESSCORE_THEME_URI . '/js/dt-contact-form.min.js', array('dt-validator', 'dt-validation-translation'), THE7_VERSION, true );
 	}
 
 	function _get_validator_locale() {
@@ -353,14 +387,14 @@ class Presscore_Inc_Widgets_ContactForm extends WP_Widget {
 	 * @return string
 	 */
 	function presscore_send_to_filter( $em = '' ) {
-		if ( !empty($_POST['widget_id']) && $this->id == $_POST['widget_id'] ) {
-			$option = get_option($this->option_name);
-
-			if ( isset($option[ $this->number ]) && !empty($option[ $this->number ]['send_to']) ) {
-				$em = $option[ $this->number ]['send_to'];
+		if ( ! empty( $_POST['widget_id'] ) ) {
+			$widget_id = str_replace( "$this->id_base-", '', $_POST['widget_id'] );
+			$option = get_option( $this->option_name );
+			if ( isset( $option[ $widget_id ] ) && ! empty( $option[ $widget_id ]['send_to'] ) ) {
+				return $option[ $widget_id ]['send_to'];
 			}
-
 		}
+
 		return $em;
 	}
 

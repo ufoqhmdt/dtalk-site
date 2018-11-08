@@ -42,7 +42,7 @@ return array(
 		'menu_title' => _x( 'Buttons', 'backend', 'the7mk2' ),
 	),
 	'of-contact-menu'            => array(
-		'menu_title' => _x( 'Contact forms', 'backend', 'the7mk2' ),
+		'menu_title' => _x( 'Contact Forms', 'backend', 'the7mk2' ),
 	),
 	'of-blog-and-portfolio-menu' => array(
 		'menu_title' => _x( 'Blog', 'backend', 'the7mk2' ),

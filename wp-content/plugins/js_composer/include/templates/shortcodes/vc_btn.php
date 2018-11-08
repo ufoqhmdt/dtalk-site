@@ -51,13 +51,16 @@ $attributes = array();
 $atts = vc_map_get_attributes( $this->getShortcode(), $atts );
 extract( $atts );
 //parse link
+$link = trim( $link );
 $link = ( '||' === $link ) ? '' : $link;
 $link = vc_build_link( $link );
 $use_link = false;
 if ( strlen( $link['url'] ) > 0 ) {
 	$use_link = true;
 	$a_href = $link['url'];
+	$a_href = apply_filters( 'vc_btn_a_href', $a_href );
 	$a_title = $link['title'];
+	$a_title = apply_filters( 'vc_btn_a_title', $a_title );
 	$a_target = $link['target'];
 	$a_rel = $link['rel'];
 }

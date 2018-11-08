@@ -137,7 +137,7 @@ a.wpml-ls-item-toggle:after {
 			color: @accent-bg-color;
 		}
 		.accent-gradient #page & {
-			.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+			.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 		}
     }
 }
@@ -249,7 +249,7 @@ a.wpml-ls-item-toggle:after {
 
 		/*Active font color*/
 		.sub-nav > li.act:not(.dt-mega-parent).wpml-ls-item:not(.wpml-ls-item) > a,
-		.sub-nav > li.act:not(.dt-mega-parent).wpml-ls-item > a .fa,
+		.sub-nav > li.act:not(.dt-mega-parent).wpml-ls-item > a i[class^="fa"],
 		.sub-nav > li.dt-mega-parent.current-menu-item.wpml-ls-item > a {
 			.main-nav &,
 			.mini-nav & {
@@ -280,12 +280,6 @@ a.wpml-ls-item-toggle:after {
 	box-sizing: border-box;
  }
 
-
-	
-
-	@wpml-arrow(@colour){
-		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='8px' height='8px' viewBox='0 0 8 8' fill='@{colour}' enable-background='new 0 0 8 8' xml:space='preserve'%3E%3Cpolygon points='7.825,2.5 6.976,1.6 4.289,4.417 3.66,4.417 0.975,1.6 0.176,2.5 3.66,6 3.975,6 4.289,6 '/%3E%3C/svg%3E");
-	}
 	.mini-wpml,
 	.wpml-ls-item-legacy-dropdown > a,
 	.mini-wpml .wpml-ls-legacy-dropdown .wpml-ls-current-language:hover > a,
@@ -295,25 +289,29 @@ a.wpml-ls-item-toggle:after {
 	.wpml-ls-legacy-list-horizontal a,
 	.wpml-ls-legacy-list-vertical a
 	{
+		
+
 		font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 		color: @additional-menu-elements-color;
 		
-		.branding &,
-		.mixed-header &,
-		.classic-header .mobile-mini-widgets & {
+		.branding & {
 			font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 			color: @additional-logo-elements-color;
 		}
-		.top-bar & {
-			font: @top-bar-font-style @top-bar-font-weight @top-bar-font-size~"/"@top-bar-font-size + 6 @top-bar-font-family;
-			text-transform: @top-bar-text-transform;
-			color: @top-color;
+		.mixed-header & {
+			font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+			color: @microwidgets-in-top-line-color;
 		}
 		.dt-mobile-header & {
 			font: @mobile-sub-menu-font-style @mobile-sub-menu-font-variant @mobile-sub-menu-font-weight @mobile-sub-menu-font-size~"/"@mobile-sub-menu-font-size+4 @mobile-sub-menu-font-family;
 			text-transform: @mobile-sub-menu-text-transform;
 			color: @mobile-menu-color;
 		}
+		.mobile-header-bar .mobile-mini-widgets & {
+			font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+			color: @mobile-microwidgets-color;
+		}
+
 		.sidebar .widget &,
 		.sidebar-content .widget & {
 			color: @widget-sidebar-color;
@@ -351,8 +349,7 @@ a.wpml-ls-item-toggle:after {
 	font: @menu-font-style @menu-font-variant @menu-font-weight @menu-font-size~"/"@menu-font-size+4 @menu-font-family;
 	color: @menu-color;
 	text-transform: @menu-text-transform;
-	.top-header.light-preset-color:not(.sticky-on):not(.mobile-sticky-on) .masthead:not(#phantom) &,
-	.light-preset-color:not(.sticky-on):not(.mobile-sticky-on) .side-header-h-stroke.masthead:not(#phantom) & {
+	.light-preset-color:not(.mobile-sticky-on) .masthead:not(#phantom):not(.sticky-on) & {
 		color: #fff;
 	}
 }

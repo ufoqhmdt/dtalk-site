@@ -3,11 +3,11 @@
 defined( 'ABSPATH' ) || exit;
 
 // Make sure "text" field is loaded
-require_once RWMB_FIELDS_DIR . 'text.php';
+require_once THE7_RWMB_FIELDS_DIR . 'text.php';
 
-if ( ! class_exists( 'RWMB_URL_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_URL_Field' ) )
 {
-	class RWMB_URL_Field extends RWMB_Text_Field
+	class THE7_RWMB_URL_Field extends THE7_RWMB_Text_Field
 	{
 		/**
 		 * Get field HTML
@@ -21,7 +21,7 @@ if ( ! class_exists( 'RWMB_URL_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			return sprintf(
-				'<input type="url" class="rwmb-url" name="%s" id="%s" value="%s" size="%s" />',
+				'<input type="url" class="the7-mb-url" name="%s" id="%s" value="%s" size="%s" />',
 				$field['field_name'],
 				$field['id'],
 				$meta,

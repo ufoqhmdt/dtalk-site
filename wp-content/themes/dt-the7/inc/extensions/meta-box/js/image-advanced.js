@@ -2,16 +2,16 @@ jQuery( function( $ )
 {
 	// Use only one frame for all upload fields
 	var frame,
-		template = $( '#tmpl-rwmb-image-advanced' ).html();
+		template = $( '#tmpl-the7-mb-image-advanced' ).html();
 
-	$( 'body' ).on( 'click', '.rwmb-image-advanced-upload', function( e )
+	$( 'body' ).on( 'click', '.the7-mb-image-advanced-upload', function( e )
 	{
 		e.preventDefault();
 
 		var $uploadButton = $( this ),
-			$imageList = $uploadButton.siblings( '.rwmb-images' ),
+			$imageList = $uploadButton.siblings( '.the7-mb-images' ),
 			maxFileUploads = $imageList.data( 'max_file_uploads' ),
-			msg = maxFileUploads > 1 ? rwmbFile.maxFileUploadsPlural : rwmbFile.maxFileUploadsSingle;
+			msg = maxFileUploads > 1 ? the7mbFile.maxFileUploadsPlural : the7mbFile.maxFileUploadsSingle;
 
 		msg = msg.replace( '%d', maxFileUploads );
 
@@ -19,9 +19,9 @@ jQuery( function( $ )
 		if ( !frame )
 		{
 			frame = wp.media( {
-				className: 'media-frame rwmb-media-frame',
+				className: 'media-frame the7-mb-media-frame',
 				multiple : true,
-				title    : rwmbImageAdvanced.frameTitle,
+				title    : the7mbImageAdvanced.frameTitle,
 				library  : {
 					type: 'image'
 				}
@@ -61,7 +61,7 @@ jQuery( function( $ )
 			if( ids.length > 0 )
 			{
 				var data = {
-					action			: 'rwmb_attach_media',
+					action			: 'the7_mb_attach_media',
 					post_id			: $( '#post_ID' ).val(),
 					field_id		: $imageList.data( 'field_id' ),
 					attachment_ids	: ids,
@@ -78,7 +78,7 @@ jQuery( function( $ )
 								interpolate: /\{\{\{([\s\S]+?)\}\}\}/g,
 								escape:      /\{\{([^\}]+?)\}\}(?!\})/g
 							} ) )
-							.trigger('update.rwmbFile');
+							.trigger('update.the7mbFile');
 					}
 				}, 'json' );
 			}

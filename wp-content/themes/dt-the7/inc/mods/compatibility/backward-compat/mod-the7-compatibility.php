@@ -17,6 +17,7 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 		protected $import_status_slug = '';
 		protected $default_preset = 'skin11r';
 		protected $old_options_key = 'the72';
+		protected $background_updater = null;
 
 		public static function execute() {
 			if ( null === self::$instance ) {
@@ -36,12 +37,9 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 
 			if ( ! defined( 'DOING_AJAX' ) && ! defined( 'WP_CLI' ) ) {
 				add_action( 'admin_init', array( $this, 'disable_dt_dummy_on_theme_update' ) );
-				add_action( 'init', array( $this, 'upgrade_db_action' ) );
-				add_action( 'init', array( $this, 'upgrade_stylesheets_action' ) );
 			}
 
 			add_action( 'admin_init', array( $this, 'change_import_status' ) );
-
 
 			// dismiss admin notices.
 			add_action( 'wp_ajax_presscore_compatibility_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ) );
@@ -52,7 +50,7 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 					require_once "{$this->module_dir}/class-the7-core-compatibility.php";
 				}
 
-				The7_Core_Compatibility::hide_modules_options();
+				The7_Core_Compatibility::setup();
 			}
 		}
 
@@ -71,28 +69,6 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 			$plugin = 'dt-dummy/dt-dummy.php';
 			if ( is_plugin_active( $plugin ) || is_plugin_active_for_network( $plugin ) ) {
 				deactivate_plugins( $plugin );
-			}
-		}
-
-		public function upgrade_db_action() {
-			$db_version = get_option( 'the7_db_version' );
-
-			if ( version_compare( $db_version, PRESSCORE_DB_VERSION ) < 0 ) {
-				$this->patch_db( $db_version );
-
-				_optionsframework_delete_defaults_cache();
-
-				update_option( 'the7_db_version', PRESSCORE_DB_VERSION );
-			}
-		}
-
-		public function upgrade_stylesheets_action() {
-			if ( version_compare( get_option( 'the7_style_version' ), PRESSCORE_STYLESHEETS_VERSION ) < 0 ) {
-				_optionsframework_delete_defaults_cache();
-
-				self::regenerate_stylesheets();
-
-				update_option( 'the7_style_version', PRESSCORE_STYLESHEETS_VERSION );
 			}
 		}
 
@@ -785,8 +761,8 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 		}
 
 		public function admin_enqueue_scripts() {
-			wp_enqueue_style( 'the7-options-import', $this->assets_uri . '/css/the7-import-style.css', false, wp_get_theme()->get( 'Version' ) );
-			wp_enqueue_script( 'the7-options-import', $this->assets_uri . '/js/the7-import-script.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
+			wp_enqueue_style( 'the7-options-import', $this->assets_uri . '/css/the7-import-style.css', false, THE7_VERSION );
+			wp_enqueue_script( 'the7-options-import', $this->assets_uri . '/js/the7-import-script.js', array( 'jquery' ), THE7_VERSION, true );
 
 			wp_localize_script( 'the7-options-import', 'the7Adapter', array(
 				'importPostData' => array(
@@ -812,10 +788,6 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 			$current_dir = str_replace( '\\', '/', $this->module_dir );
 
 			return str_replace( $theme_root, get_theme_root_uri(), $current_dir );
-		}
-
-		public static function regenerate_stylesheets() {
-			presscore_refresh_dynamic_css();
 		}
 
 		protected static function fix_header_elements_option( $header, $values ) {
@@ -875,40 +847,6 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_oldThe7', false ) ) :
 					break;
 			}
 			return $canonized_font_size;
-		}
-
-		protected function patch_db( $cur_db_version ) {
-			$options = optionsframework_get_options();
-			if ( ! $options ) {
-				return;
-			}
-
-			$patches_dir = trailingslashit( trailingslashit( dirname( __FILE__ ) ) . 'patches' );
-			require_once $patches_dir . 'interface-the7-db-patch.php';
-
-			$patches = array(
-				'3.5.0' => 'The7_DB_Patch_030500',
-				'4.0.0' => 'The7_DB_Patch_040000',
-				'4.0.3' => 'The7_DB_Patch_040003',
-				'5.0.3' => 'The7_DB_Patch_050003',
-				'5.1.6' => 'The7_DB_Patch_050106',
-				'5.2.0' => 'The7_DB_Patch_050200',
-				'5.3.0' => 'The7_DB_Patch_050300',
-				'5.4.0' => 'The7_DB_Patch_050400',
-			);
-
-			foreach ( $patches as $ver => $class_name ) {
-				if ( version_compare( $ver, $cur_db_version ) <= 0 ) {
-					continue;
-				}
-
-				include $patches_dir . 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
-
-				$patch = new $class_name();
-				$options = $patch->apply( $options );
-			}
-
-			update_option( optionsframework_get_options_id(), $options );
 		}
 	}
 

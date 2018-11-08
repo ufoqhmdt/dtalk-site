@@ -8,6 +8,32 @@ class The7_WC_Mini_Cart {
 	public static function init() {
 		add_filter( 'woocommerce_add_to_cart_fragments', array( __CLASS__, 'get_cart_fragments' ), 10, 1 );
 		add_action( 'presscore_render_header_element-cart', array( __CLASS__, 'render_cart_micro_widget' ) );
+		add_filter( 'presscore_localized_script', array( __CLASS__, 'localize_cart_fragment_hash' ) );
+	}
+
+	/**
+	 * Return cart fragment hash.
+	 *
+	 * @since 6.2.2
+	 *
+	 * @return string
+	 */
+	public static function get_cart_fragment_hash() {
+		return md5( wp_json_encode( optionsframework_get_options() ) );
+	}
+
+	/**
+	 * Localize cart fragment hash to be used in js.
+	 *
+	 * @since 6.2.2
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public static function localize_cart_fragment_hash( $data ) {
+		$data['wcCartFragmentHash'] = self::get_cart_fragment_hash();
+
+		return $data;
 	}
 
 	/**
@@ -21,7 +47,7 @@ class The7_WC_Mini_Cart {
 		ob_start();
 		dt_woocommerce_configure_mini_cart();
 		self::render_cart_inner();
-		$fragments['.shopping-cart'] = ob_get_clean();
+		$fragments['.wc-shopping-cart'] = ob_get_clean();
 
 		return $fragments;
 	}

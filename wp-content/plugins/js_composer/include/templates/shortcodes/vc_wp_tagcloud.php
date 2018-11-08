@@ -36,6 +36,4 @@ if ( is_object( $wp_widget_factory ) && isset( $wp_widget_factory->widgets, $wp_
 	$output .= '</div>';
 
 	echo $output;
-} else {
-	echo $this->debugComment( 'Widget ' . esc_attr( $type ) . 'Not found in : vc_wp_tagcloud' );
 }

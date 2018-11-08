@@ -1,21 +1,16 @@
 <?php
 /**
  * Templates settings
- *
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-/**
- * Heading definition.
- */
-$options[] = array( "name" => _x("General", "theme-options", 'the7mk2'), "type" => "heading", "id" => "general" );
+$options[] = array( 'name' => _x( 'General', 'theme-options', 'the7mk2' ), 'type' => 'heading', 'id' => 'general' );
 
-/**
- * Categorization & sorting.
- */
-$options[] = array(	"name" => _x('Categorization & sorting', 'theme-options', 'the7mk2'), "type" => "block" );
+$options[] = array( 'name' => _x( 'Categorization & sorting', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
 $options['general-filter_style'] = array(
 	'id'      => 'general-filter_style',
@@ -26,65 +21,62 @@ $options['general-filter_style'] = array(
 	'options' => array(
 		'ios'      => array(
 			'title' => _x( 'No decoration', 'theme-options', 'the7mk2' ),
-			'src' => '/inc/admin/assets/images/general-filter-no-decor.gif',
+			'src'   => '/inc/admin/assets/images/general-filter-no-decor.gif',
 		),
 		'minimal'  => array(
 			'title' => _x( 'Background', 'theme-options', 'the7mk2' ),
-			'src' => '/inc/admin/assets/images/general-filter-background.gif',
+			'src'   => '/inc/admin/assets/images/general-filter-background.gif',
 		),
 		'material' => array(
 			'title' => _x( 'Underline', 'theme-options', 'the7mk2' ),
-			'src' => '/inc/admin/assets/images/general-filter-underline.gif',
+			'src'   => '/inc/admin/assets/images/general-filter-underline.gif',
 		),
 	),
-	'show_hide' => array(
-		'ios' => array(),
-		'minimal' => array( 'general-filter_style-minimal' ),
-		'material' => array( 'general-filter_style-material' ),
+);
+
+$options['general-filter_style-minimal-border_radius'] = array(
+	'name'       => _x( 'Border radius', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-filter_style-minimal-border_radius',
+	'std'        => '100px',
+	'type'       => 'number',
+	'units'      => 'px',
+	'dependency' => array(
+		'field'    => 'general-filter_style',
+		'operator' => '==',
+		'value'    => 'minimal',
 	),
 );
 
-$options[] = array( "type" => "js_hide_begin", "class" => "general-filter_style general-filter_style-minimal" );
-
-$options['general-filter_style-minimal-border_radius'] = array(
-	"name"		=> _x( 'Border radius (px)', 'theme-options', 'the7mk2' ),
-	"id"		=> "general-filter_style-minimal-border_radius",
-	"std"		=> '100',
-	"type"		=> "text",
-	"sanitize"	=> 'dimensions',
-);
-
-$options[] = array( "type" => "js_hide_end" );
-
-$options[] = array( "type" => "js_hide_begin", "class" => "general-filter_style general-filter_style-material" );
-
 $options['general-filter_style-material-line_size'] = array(
-	"name"		=> _x( 'Line size (px)', 'theme-options', 'the7mk2' ),
-	"id"		=> "general-filter_style-material-line_size",
-	"std"		=> '2',
-	"type"		=> "text",
-	"sanitize"	=> 'dimensions'
+	'name'       => _x( 'Line size', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-filter_style-material-line_size',
+	'std'        => '2px',
+	'type'       => 'number',
+	'units'      => 'px',
+	'dependency' => array(
+		'field'    => 'general-filter_style',
+		'operator' => '==',
+		'value'    => 'material',
+	),
 );
-
-$options[] = array( "type" => "js_hide_end" );
 
 $options[] = array( 'type' => 'divider' );
 
 $options['general-filter-font-family'] = array(
-	'id'        => 'general-filter-font-family',
-	'name'      => _x( 'Font', 'theme-options', 'the7mk2' ),
-	'type'      => 'web_fonts',
-	'std'       => 'Open Sans',
-	'fonts'     => 'all',
+	'id'    => 'general-filter-font-family',
+	'name'  => _x( 'Font', 'theme-options', 'the7mk2' ),
+	'type'  => 'web_fonts',
+	'std'   => 'Open Sans',
+	'fonts' => 'all',
 );
 
 $options['general-filter-font-size'] = array(
-	'id'        => 'general-filter-font-size',
-	'name'      => _x( 'Font size', 'theme-options', 'the7mk2' ),
-	'type'      => 'slider',
-	'sanitize'  => 'font_size',
-	'std'       => 16,
-	'options'   => array( 'min' => 9, 'max' => 120 ),
+	'id'       => 'general-filter-font-size',
+	'name'     => _x( 'Font size', 'theme-options', 'the7mk2' ),
+	'type'     => 'slider',
+	'sanitize' => 'font_size',
+	'std'      => 16,
+	'options'  => array( 'min' => 9, 'max' => 120 ),
 );
 
 $options['general-filter_ucase'] = array(
@@ -96,336 +88,303 @@ $options['general-filter_ucase'] = array(
 
 $options[] = array( 'type' => 'divider' );
 
-presscore_options_apply_template( $options, 'indents', 'general-filter-padding', array(
-	'left'   => array( 'std' => '5' ),
-	'right'  => array( 'std' => '5' ),
-	'top'    => array( 'std' => '5' ),
-	'bottom' => array( 'std' => '5' ),
-) );
+$options['general-filter-padding'] = array(
+	'id'   => 'general-filter-padding',
+	'name' => _x( 'Padding', 'theme-options', 'the7mk2' ),
+	'type' => 'spacing',
+	'std'  => '5px 5px 5px 5px',
+);
 
 $options[] = array( 'type' => 'divider' );
 
-presscore_options_apply_template( $options, 'indents-margins', 'general-filter-margin', array(
-	'left'   => array(  'std' => '5' ),
-	'right'  => array(  'std' => '5' ),
-) );
-
-/**
- * Gap below categorization & before pagination.
- */
-$options[] = array(	"name" => _x('Gap below categorization & before pagination', 'theme-options', 'the7mk2'), "type" => "block" );
-
-$options['general-navigation_margin'] = array(
-	'id' => 'general-navigation_margin',
-	'name' => _x( 'Gap (px)', 'theme-options', 'the7mk2' ),
-	'type' => 'text',
-	'std' => '50',
-	'sanitize' => 'dimensions',
-	'class' => 'mini',
+$options['general-filter-margin'] = array(
+	'id'   => 'general-filter-margin',
+	'name' => _x( 'Margin', 'theme-options', 'the7mk2' ),
+	'type' => 'spacing',
+	'std'  => '0px 5px 0px 5px',
 );
 
-/**
- * Heading definition.
- */
-$options[] = array( "name" => _x("Blog", "theme-options", 'the7mk2'), "type" => "heading", "id" => "blog" );
+$options[] = array(
+	'name' => _x( 'Gap below categorization & before pagination', 'theme-options', 'the7mk2' ),
+	'type' => 'block',
+);
 
-	/**
-	 * Fancy date.
-	 */
-	$options[] = array(	"name" => _x('Fancy date', 'theme-options', 'the7mk2'), "type" => "block" );
+$options['general-navigation_margin'] = array(
+	'id'    => 'general-navigation_margin',
+	'name'  => _x( 'Gap', 'theme-options', 'the7mk2' ),
+	'std'   => '50px',
+	'type'  => 'number',
+	'units' => 'px',
+);
 
-		$options['blog-fancy_date-style'] = array(
-			'name' => _x( 'Style', 'theme-options', 'the7mk2' ),
-			'id' => 'blog-fancy_date-style',
-			'type' => 'images',
-			'class' => 'small',
-			'std' => 'circle',
-			'options' => array(
-				'circle' => array(
-					'title' => _x( 'Circle', 'theme-options', 'the7mk2' ),
-				    'src' => '/inc/admin/assets/images/date-round.gif',
-				),
-				'vertical' => array(
-					'title' => _x( 'Vertical', 'theme-options', 'the7mk2' ),
-				    'src' => '/inc/admin/assets/images/date-vert.gif',
-				),
-				'horizontal' => array(
-					'title' => _x( 'Horizontal', 'theme-options', 'the7mk2' ),
-				    'src' => '/inc/admin/assets/images/date-hor.gif',
-				),
-			),
-		);
+$options[] = array( 'name' => _x( 'Blog', 'theme-options', 'the7mk2' ), 'type' => 'heading', 'id' => 'blog' );
 
-	/**
-	 * Fancy elements in posts.
-	 */
-	$options[] = array(	"name" => _x('Fancy elements in posts', 'theme-options', 'the7mk2'), "type" => "block" );
+$options[] = array( 'name' => _x( 'Fancy date', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-		$options['post-show_fancy_date'] = array(
-			"name" => _x( 'Show fancy date', 'theme-options', 'the7mk2' ),
-			"id" => 'post-show_fancy_date',
-			"type" => 'checkbox',
-			'std' => '1',
-		);
+$options['blog-fancy_date-style'] = array(
+	'name'    => _x( 'Style', 'theme-options', 'the7mk2' ),
+	'id'      => 'blog-fancy_date-style',
+	'type'    => 'images',
+	'class'   => 'small',
+	'std'     => 'circle',
+	'options' => array(
+		'circle'     => array(
+			'title' => _x( 'Circle', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/date-round.gif',
+		),
+		'vertical'   => array(
+			'title' => _x( 'Vertical', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/date-vert.gif',
+		),
+		'horizontal' => array(
+			'title' => _x( 'Horizontal', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/date-hor.gif',
+		),
+	),
+);
 
-		$options['post-show_fancy_categories'] = array(
-			"name" => _x( 'Show fancy categories', 'theme-options', 'the7mk2' ),
-			"id" => 'post-show_fancy_categories',
-			"type" => 'checkbox',
-			'std' => '1',
-		);
+$options[] = array( 'name' => _x( 'Fancy elements in posts', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-	/**
-	 * Image settings.
-	 */
-	$options[] = array(	"name" => _x('Single post featured image', 'theme-options', 'the7mk2'), "type" => "block" );
+$options['post-show_fancy_date'] = array(
+	'name' => _x( 'Show fancy date', 'theme-options', 'the7mk2' ),
+	'id'   => 'post-show_fancy_date',
+	'type' => 'checkbox',
+	'std'  => '1',
+);
 
-		$options['blog-thumbnail_size'] = array(
-			'name' => _x( 'Featured image sizing', 'theme-options', 'the7mk2' ),
-			'id' => 'blog-thumbnail_size',
-			'type' => 'radio',
-			'std' => 'original',
-			'options' => array(
-				'original' => _x( 'Preserve images proportions', 'theme-options', 'the7mk2' ),
-				'resize' => _x( 'Resize images', 'theme-options', 'the7mk2' ),
-			),
-			'show_hide' => array( 'resize' => true ),
-		);
+$options['post-show_fancy_categories'] = array(
+	'name' => _x( 'Show fancy categories', 'theme-options', 'the7mk2' ),
+	'id'   => 'post-show_fancy_categories',
+	'type' => 'checkbox',
+	'std'  => '1',
+);
 
-		$options[] = array( 'type' => 'js_hide_begin' );
+$options[] = array( 'name' => _x( 'Single post featured image', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-			$options['blog-thumbnail_proportions'] = array(
-				'name' => _x( 'Featured image proportions', 'theme-options', 'the7mk2' ),
-				'id' => 'blog-thumbnail_proportions',
-				'type' => 'square_size',
-				'std' => array(
-					'width' => 3,
-					'height' => 2,
-				),
-			);
+$options['blog-thumbnail_size'] = array(
+	'name'    => _x( 'Featured image sizing', 'theme-options', 'the7mk2' ),
+	'id'      => 'blog-thumbnail_size',
+	'type'    => 'radio',
+	'std'     => 'original',
+	'options' => array(
+		'original' => _x( 'Preserve images proportions', 'theme-options', 'the7mk2' ),
+		'resize'   => _x( 'Resize images', 'theme-options', 'the7mk2' ),
+	),
+);
 
-		$options[] = array( 'type' => 'js_hide_end' );
+$options['blog-thumbnail_proportions'] = array(
+	'name'       => _x( 'Featured image proportions', 'theme-options', 'the7mk2' ),
+	'id'         => 'blog-thumbnail_proportions',
+	'type'       => 'square_size',
+	'std'        => array(
+		'width'  => 3,
+		'height' => 2,
+	),
+	'dependency' => array(
+		'field'    => 'blog-thumbnail_size',
+		'operator' => '==',
+		'value'    => 'resize',
+	),
+);
 
-	/**
-	 * Author info in posts
-	 */
-	$options[] = array(	"name" => _x('Author info in posts', 'theme-options', 'the7mk2'), "type" => "block_begin" );
+$options[] = array( 'name' => _x( 'Author info in posts', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-		// checkbox
-		$options[] = array(
-			"name"      => _x( 'Show author info in blog posts', 'theme-options', 'the7mk2' ),
-			"id"    	=> 'general-show_author_in_blog',
-			'std'   	=> 1,
-			'type'		=> 'images',
-			'class'     => 'small',
-			'options'	=> array(
-				'1'    => array(
-					'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/general-show_author_in_blog-yes.gif',
-				),
-				'0'    => array(
-					'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/microwidgets-disabled.gif',
-				),	
-			),
-		);
+$options['general-show_author_in_blog'] = array(
+	'name'    => _x( 'Show author info in blog posts', 'theme-options', 'the7mk2' ),
+	'id'      => 'general-show_author_in_blog',
+	'std'     => 1,
+	'type'    => 'images',
+	'class'   => 'small',
+	'options' => array(
+		'1' => array(
+			'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/general-show_author_in_blog-yes.gif',
+		),
+		'0' => array(
+			'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/microwidgets-disabled.gif',
+		),
+	),
+);
 
-	$options[] = array(	"type" => "block_end");
+$options[] = array(
+	'name' => _x( 'Previous & next buttons', 'theme-options', 'the7mk2' ),
+	'type' => 'block',
+);
 
-	/**
-	 * Previous &amp; next buttons
-	 */
-	$options[] = array(	"name" => _x('Previous &amp; next buttons', 'theme-options', 'the7mk2'), "type" => "block_begin" );
+$options['general-next_prev_in_blog'] = array(
+	'name'    => _x( 'Show in blog posts', 'theme-options', 'the7mk2' ),
+	'id'      => 'general-next_prev_in_blog',
+	'type'    => 'images',
+	'class'   => 'small',
+	'std'     => 1,
+	'options' => array(
+		'1' => array(
+			'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/general-next-prev-enabled.gif',
+		),
+		'0' => array(
+			'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/microwidgets-disabled.gif',
+		),
+	),
+);
 
-		// checkbox
-		$options[] = array(
-			"name"      => _x( 'Show in blog posts', 'theme-options', 'the7mk2' ),
-			"id"    	=> 'general-next_prev_in_blog',
-			'type'		=> 'images',
-			'class'     => 'small',
-			'std'   	=> 1,
-			'options'	=> array(
-				'1'    => array(
-					'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/general-next-prev-enabled.gif',
-				),
-				'0'    => array(
-					'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/microwidgets-disabled.gif',
-				),	
-			),
-		);
+$options[] = array( 'name' => _x( 'Back button', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-	$options[] = array(	"type" => "block_end");
+$options['general-show_back_button_in_post'] = array(
+	'name'    => _x( 'Back button', 'theme-options', 'the7mk2' ),
+	'id'      => 'general-show_back_button_in_post',
+	'std'     => '0',
+	'type'    => 'images',
+	'class'   => 'small',
+	'options' => array(
+		'1' => array(
+			'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/general-show-back-button-enabled.gif',
+		),
+		'0' => array(
+			'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/microwidgets-disabled.gif',
+		),
+	),
+);
 
-	/**
-	 * Back button.
-	 */
-	$options[] = array(	"name" => _x('Back button', 'theme-options', 'the7mk2'), "type" => "block_begin" );
+$options['general-post_back_button_target_page_id'] = array(
+	'name'       => _x( 'Choose page', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-post_back_button_target_page_id',
+	'type'       => 'pages_list',
+	'dependency' => array(
+		'field'    => 'general-show_back_button_in_post',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-		// radio
-		$options[] = array(
-			"desc"		=> '',
-			"name"		=> _x('Back button', 'theme-options', 'the7mk2'),
-			"id"		=> 'general-show_back_button_in_post',
-			"std"		=> '0',
-			'type'		=> 'images',
-			'class'     => 'small',
-			'options'	=> array(
-				'1'    => array(
-					'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/general-show-back-button-enabled.gif',
-				),
-				'0'    => array(
-					'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/microwidgets-disabled.gif',
-				),	
-			),
-			"show_hide"	=> array( '1' => true ),
-		);
+$options[] = array( 'name' => _x( 'Meta information', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-		// hidden area
-		$options[] = array( 'type' => 'js_hide_begin' );
+$options['general-blog_meta_on'] = array(
+	'name'    => _x( 'Meta information', 'theme-options', 'the7mk2' ),
+	'id'      => 'general-blog_meta_on',
+	'std'     => '1',
+	'type'    => 'images',
+	'class'   => 'small',
+	'options' => array(
+		'1' => array(
+			'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/general-album_meta_on-enabled.gif',
+		),
+		'0' => array(
+			'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/microwidgets-disabled.gif',
+		),
+	),
+);
 
-			// select
-			$options[] = array(
-				"name"		=> _x( 'Choose page', 'theme-options', 'the7mk2' ),
-				"id"		=> 'general-post_back_button_target_page_id',
-				"type"		=> 'pages_list'
-			);
+$options['general-blog_meta_date'] = array(
+	'name'       => _x( 'Date', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-blog_meta_date',
+	'type'       => 'checkbox',
+	'std'        => 1,
+	'dependency' => array(
+		'field'    => 'general-blog_meta_on',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-		$options[] = array( 'type' => 'js_hide_end' );
+$options['general-blog_meta_author'] = array(
+	'name'       => _x( 'Author', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-blog_meta_author',
+	'type'       => 'checkbox',
+	'std'        => 1,
+	'dependency' => array(
+		'field'    => 'general-blog_meta_on',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-	$options[] = array(	"type" => "block_end");
+$options['general-blog_meta_categories'] = array(
+	'name'       => _x( 'Categories', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-blog_meta_categories',
+	'type'       => 'checkbox',
+	'std'        => 1,
+	'dependency' => array(
+		'field'    => 'general-blog_meta_on',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-	/**
-	 * Meta information.
-	 */
-	$options[] = array(	"name" => _x('Meta information', 'theme-options', 'the7mk2'), "type" => "block_begin" );
+$options['general-blog_meta_comments'] = array(
+	'name'       => _x( 'Comments', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-blog_meta_comments',
+	'type'       => 'checkbox',
+	'std'        => 1,
+	'dependency' => array(
+		'field'    => 'general-blog_meta_on',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-		// radio
-		$options[] = array(
-			"desc"		=> '',
-			"name"		=> _x('Meta information', 'theme-options', 'the7mk2'),
-			"id"		=> 'general-blog_meta_on',
-			"std"		=> '1',
-			'type'		=> 'images',
-			'class'     => 'small',
-			'options'	=> array(
-				'1'    => array(
-					'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/general-album_meta_on-enabled.gif',
-				),
-				'0'    => array(
-					'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/microwidgets-disabled.gif',
-				),	
-			),
-			"show_hide"	=> array( '1' => true ),
-		);
+$options['general-blog_meta_tags'] = array(
+	'name'       => _x( 'Tags', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-blog_meta_tags',
+	'type'       => 'checkbox',
+	'std'        => 1,
+	'dependency' => array(
+		'field'    => 'general-blog_meta_on',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-		// hidden area
-		$options[] = array( 'type' => 'js_hide_begin' );
+$options[] = array( 'name' => _x( 'Related posts', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-			// checkbox
-			$options[] = array(
-				"desc"  	=> '',
-				"name"      => _x( 'Date', 'theme-options', 'the7mk2' ),
-				"id"    	=> 'general-blog_meta_date',
-				"type"  	=> 'checkbox',
-				'std'   	=> 1
-			);
+$options['general-show_rel_posts'] = array(
+	'name'    => _x( 'Related posts', 'theme-options', 'the7mk2' ),
+	'id'      => 'general-show_rel_posts',
+	'std'     => '0',
+	'type'    => 'images',
+	'class'   => 'small',
+	'options' => array(
+		'1' => array(
+			'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/general-show_rel_posts-enabled.gif',
+		),
+		'0' => array(
+			'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+			'src'   => '/inc/admin/assets/images/microwidgets-disabled.gif',
+		),
+	),
+);
 
-			// checkbox
-			$options[] = array(
-				"desc"  	=> '',
-				"name"      => _x( 'Author', 'theme-options', 'the7mk2' ),
-				"id"    	=> 'general-blog_meta_author',
-				"type"  	=> 'checkbox',
-				'std'   	=> 1
-			);
+$options['general-rel_posts_head_title'] = array(
+	'name'       => _x( 'Title', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-rel_posts_head_title',
+	'std'        => __( 'Related Posts', 'the7mk2' ),
+	'type'       => 'text',
+	'dependency' => array(
+		'field'    => 'general-show_rel_posts',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
-			// checkbox
-			$options[] = array(
-				"desc"  	=> '',
-				"name"      => _x( 'Categories', 'theme-options', 'the7mk2' ),
-				"id"    	=> 'general-blog_meta_categories',
-				"type"  	=> 'checkbox',
-				'std'   	=> 1
-			);
-
-			// checkbox
-			$options[] = array(
-				"desc"  	=> '',
-				"name"      => _x( 'Comments', 'theme-options', 'the7mk2' ),
-				"id"    	=> 'general-blog_meta_comments',
-				"type"  	=> 'checkbox',
-				'std'   	=> 1
-			);
-
-			// checkbox
-			$options[] = array(
-				"desc"  	=> '',
-				"name"      => _x( 'Tags', 'theme-options', 'the7mk2' ),
-				"id"    	=> 'general-blog_meta_tags',
-				"type"  	=> 'checkbox',
-				'std'   	=> 1
-			);
-
-		$options[] = array( 'type' => 'js_hide_end' );
-
-	$options[] = array(	"type" => "block_end");
-
-	/**
-	 * Related posts.
-	 */
-	$options[] = array(	"name" => _x('Related posts', 'theme-options', 'the7mk2'), "type" => "block_begin" );
-
-		// radio
-		$options[] = array(
-			"desc"		=> '',
-			"name"		=> _x('Related posts', 'theme-options', 'the7mk2'),
-			"id"		=> 'general-show_rel_posts',
-			"std"		=> '0',
-			'type'		=> 'images',
-			'class'     => 'small',
-			'options'	=> array(
-				'1'    => array(
-					'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/general-show_rel_posts-enabled.gif',
-				),
-				'0'    => array(
-					'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-					'src' => '/inc/admin/assets/images/microwidgets-disabled.gif',
-				),	
-			),
-			"show_hide"	=> array( '1' => true ),
-		);
-
-		// hidden area
-		$options[] = array( 'type' => 'js_hide_begin' );
-
-			// input
-			$options[] = array(
-				"name"		=> _x( 'Title', 'theme-options', 'the7mk2' ),
-				"id"		=> 'general-rel_posts_head_title',
-				"std"		=> __('Related Posts', 'the7mk2'),
-				"type"		=> 'text',
-			);
-
-			// input
-			$options[] = array(
-				"name"		=> _x( 'Maximum number of related posts', 'theme-options', 'the7mk2' ),
-				"id"		=> 'general-rel_posts_max',
-				"std"		=> 6,
-				"type"		=> 'text',
-				// number
-				"sanitize"	=> 'ppp'
-			);
-
-		$options[] = array( 'type' => 'js_hide_end' );
-
-	$options[] = array(	"type" => "block_end");
+$options['general-rel_posts_max'] = array(
+	'name'       => _x( 'Maximum number of related posts', 'theme-options', 'the7mk2' ),
+	'id'         => 'general-rel_posts_max',
+	'std'        => 6,
+	'type'       => 'text',
+	'sanitize'   => 'ppp',
+	'dependency' => array(
+		'field'    => 'general-show_rel_posts',
+		'operator' => '==',
+		'value'    => '1',
+	),
+);
 
 // options placeholder
 $options['blog_and_portfolio_placeholder'] = array();

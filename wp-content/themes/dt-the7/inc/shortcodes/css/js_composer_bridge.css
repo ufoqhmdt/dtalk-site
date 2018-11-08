@@ -71,9 +71,33 @@
 }
 
 /* Number property */
-.wpb_el_type_dt_number input.dt_number-value {
+.wpb_el_type_dt_number input.dt_number-value,
+.dt-number-with-icon input.dt_number-value  {
 	max-width: 100px;
 	margin-right: 10px;
+}
+/*Number with icon decorat*/
+.dt-number-with-icon {
+	display: flex;
+}
+.dt-number-with-icon .dt_number-units-wrap {
+	display: flex;
+	align-items: center;
+}
+.dt-number-with-icon .dt-number-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 5px;
+	box-sizing: border-box;
+	min-width: 27px;
+	background: #e6e6e6;
+	border: 1px solid #ddd;
+    box-shadow: inset 0 1px 2px rgba( 0, 0, 0, 0.07 );
+}
+.vc_edit_form_elements .vc_column.wpb_el_type_dt_subtitle+.vc_column,
+.vc_edit_form_elements .vc_column + .vc_column.wpb_el_type_dt_number_with_icon {
+	padding-top: 5px;
 }
 
 .wpb_el_type_dt_number .dt_number-units-wrap {
@@ -274,18 +298,32 @@
 	background-image: url("../images/vc-blog.png") !important;
 }
 
+.vc_element-icon.dt_vc_ico_media_gallery {
+	background-image: url("../images/icon-media-gallery-grid.png") !important;
+}
+
 .vc_element-icon.dt_vc_ico_portfolio_slider ,
 .vc_element-icon.dt_vc_ico_portfolio {
 	background-image: url("../images/vc-portfolio.png") !important;
 }
-
+.vc_element-icon.dt_vc_ico_portfolio_carousel {
+	background-image: url("../images/portfolio-carousel.png") !important;
+}
 .vc_element-icon.dt_vc_ico_small_photos ,
 .vc_element-icon.dt_vc_ico_photos {
 	background-image: url("../images/vc-photos.png") !important;
 }
-
+.vc_element-icon.dt_vc_ico_photos_carousel {
+	background-image: url("../images/photos-carousel.png") !important;
+}
 .vc_element-icon.dt_vc_ico_albums {
 	background-image: url("../images/vc-photo-album.png") !important;
+}
+.vc_element-icon.dt_vc_ico_albums_carousel {
+	background-image: url("../images/albums-carousel.png") !important;
+}
+.vc_element-icon.dt_vc_ico_carousel_media_gallery {
+	background-image: url("../images/media-gallery-carousel.png") !important;
 }
 
 .vc_element-icon.dt_vc_ico_slideshow {
@@ -299,11 +337,19 @@
 .vc_element-icon.dt_vc_ico_team {
 	background-image: url("../images/vc-team.png") !important;
 }
+.vc_element-icon.dt_vc_ico_team_carousel {
+	background-image: url("../images/team-car.png") !important;
+}
 
 .vc_element-icon.dt_vc_ico_testimonials {
 	background-image: url("../images/vc-testimonials.png") !important;
 }
-
+.vc_element-icon.dt_vc_ico_testimonials_carousel {
+	background-image: url("../images/testim-car.png") !important;
+}
+.vc_element-icon.dt_vc_ico_testimonials_masonry {
+	background-image: url("../images/testim-grid.png") !important;
+}
 .vc_element-icon.dt_vc_ico_gap {
 	background-image: url("../images/vc-gap.png") !important;
 }
@@ -367,7 +413,15 @@
 	background-image: url("../images/woo-shortcodes.png") !important;
 	background-position: 0px 0px !important;
 }
-//Carousel
+.vc_element-icon.dt_vc_soc_icons {
+	background-image: url("../images/social-icon.png") !important;
+}
+
+.vc_element-icon.dt_vc_soc_icon {
+	background-image: url("../images/social-icon.png") !important;
+}
+
+/* Carousel */
 .wpb_dt_carousel {}
 .wpb_dt_carousel .wpb_sortable {
 	position: relative;
@@ -386,71 +440,6 @@
 }
 .wpb_dt_carousel .wpb_vc_row_inner.wpb_sortable:not(:last-child) {
 	margin-bottom: 25px;
-}
-
-.dt-icon-list {
-	margin: 0;
-}
-	.dt-icon-list .dt-icons-selector {
-		width:100px;
-	}
-	.selector-button {
-	    width: 39px;
-	    height: 100%;
-	    display: block;
-	    text-align: center;
-	    cursor: pointer;
-	    float: right;
-        background-color: #f4f4f4;
-	    border-left: 1px solid #e1e1e1;
-	    color: #999;
-	}
-	.selector-button:hover {
-	    background-color: #f1f1f1;
-	}
-.dt-icon-list  li {
-    display: inline-block;
-    margin: 2px;
-    width: 60px;
-    line-height: 42px;
-    text-align: center;
-    cursor: pointer;
-    vertical-align: top;
-    height: 40px;
-    border: 1px solid #efefef;
-}
-.dt-icon-list-sub li:not(.selected):hover {
-    background-color: #f6f6f6;
-}
-.dt-icon-list li label.moon-icon {
-	display: none;
-}
-.dt-icon-list-sub {
-	position: absolute;
-	z-index: 10;
-	top:100%;
-	display: none;
-    background-color: #fefefe;
-    padding: 5px 5px 20px;
-    height: auto;
-    margin-top: -1px;
-    width: 100%;
-    max-width: 606px;
-    box-sizing: border-box;
-    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.04);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
-    border: 1px solid #e5e5e5;
-    text-align: left;
-}
-.moon-icon-preview {
-	padding: 5px;
-	font-size: 24px;
-	border: 1px solid #ddd;
-	display: inline-block;
-}
-.dt-icon-list li.selected {
-	background: #3486D1;
-	color: #fff;
 }
 
 .wpb_el_type_css_editor.no-vc-background .vc_settings .color-group~.color-group,
@@ -485,4 +474,34 @@
 
 .custom-textarea-height .textarea_raw_html {
 	max-height: 150px;
+}
+.vc_ui-panel-content.vc_properties-list.vc_edit_form_elements {
+	margin-top: 0 !important;
+}
+
+.vc_wrapper-param-type-dt_radio_image .of-radio-img-inner-container {
+	display: inline-block;
+	float: left;
+	max-width: 173px;
+	margin:0 5px 10px 0;
+	border-width: 0px;
+	text-align: center;
+}
+.vc_wrapper-param-type-dt_radio_image .of-radio-img-inner-container {
+	max-width: 106px;
+	margin: 0px 45px 10px 0px;
+}
+.vc_wrapper-param-type-dt_radio_image .of-radio-img-img {
+	border: 3px solid #fcfcfc;
+	cursor: pointer;
+}
+.vc_wrapper-param-type-dt_radio_image .of-radio-img-selected {
+	border:3px solid #5ea1ed;
+}
+
+.the7-form-terms-field .textarea_raw_html {
+	color: #32373c !important;
+	font-size: 14px !important;
+	word-break: normal !important;
+	height: 6em !important;
 }

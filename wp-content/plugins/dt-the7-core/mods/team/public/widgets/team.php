@@ -80,7 +80,7 @@ class Presscore_Inc_Widgets_Team extends WP_Widget {
 
 		if ( $p_query->have_posts() ) {
 
-			echo '<ul class="team-items slider-content round-images bg-under-post"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
+			echo '<div class="team-items owl-carousel slider-content round-images bg-under-post"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
 
 			// get config instance
 			$config = Presscore_Config::get_instance();
@@ -92,9 +92,7 @@ class Presscore_Inc_Widgets_Team extends WP_Widget {
 			while( $p_query->have_posts() ) { $p_query->the_post();
 				presscore_populate_team_config();
 
-				echo '<li>';
 				$this->render_teammate( $instance );
-				echo '</li>';
 
 			} // while have posts
 			wp_reset_postdata();
@@ -102,7 +100,7 @@ class Presscore_Inc_Widgets_Team extends WP_Widget {
 			// restore config
 			$config->reset($config_backup);
 
-			echo '</ul>', "\n";
+			echo '</div>', "\n";
 
 		} // if have posts
 

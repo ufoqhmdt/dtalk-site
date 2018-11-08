@@ -364,11 +364,20 @@ class DT_Shortcode_Gallery extends DT_Shortcode {
 	 * @return string
 	 */
 	protected function slideshow( $attachments, $atts, $instance, $id ) {
+		if ( presscore_vc_is_inline() ) {
+		    return $this->vc_inline_dummy( array(
+                'class'  => 'dt_slideshow_mode',
+                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_slideshow_editor_ico.gif', 98, 104 ),
+                'title'  => _x( 'Slideshow mode', 'vc inline dummy', 'the7mk2' ),
+
+                'style' => array( 'height' => 'auto' )
+            ) );
+		}
 		$attachments_data = presscore_get_attachment_post_data( wp_list_pluck( $attachments, 'ID' ) );
 		$html = presscore_get_photo_slider( $attachments_data, array(
 			'width'     => $atts['width'],
 			'height'    => $atts['height'],
-			'class'     => array( 'slider-simple', "galleryid-{$id}" ),
+			'class'     => array( 'slider-simple','owl-carousel', 'dt-owl-carousel-init',  "galleryid-{$id}" ),
 			'style'     => ' style="width: 100%;"',
 			'show_info' => array( 'title', 'link', 'description' ),
 		) );

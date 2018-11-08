@@ -12,16 +12,16 @@ class Presscore_Mod_Portfolio_Admin {
 		$post_type = 'dt_portfolio';
 		$args = array(
 			'labels'                => array(
-				'name'                  => _x( 'Portfolio',              'backend portfolio', 'dt-the7-core' ),
-				'singular_name'         => _x( 'Portfolio Project',      'backend portfolio', 'dt-the7-core' ),
-				'add_new'               => _x( 'Add New',                'backend portfolio', 'dt-the7-core' ),
-				'add_new_item'          => _x( 'Add New Item',           'backend portfolio', 'dt-the7-core' ),
-				'edit_item'             => _x( 'Edit Item',              'backend portfolio', 'dt-the7-core' ),
-				'new_item'              => _x( 'New Item',               'backend portfolio', 'dt-the7-core' ),
-				'view_item'             => _x( 'View Item',              'backend portfolio', 'dt-the7-core' ),
-				'search_items'          => _x( 'Search Items',           'backend portfolio', 'dt-the7-core' ),
-				'not_found'             => _x( 'No items found',         'backend portfolio', 'dt-the7-core' ),
-				'not_found_in_trash'    => _x( 'No items found in Trash','backend portfolio', 'dt-the7-core' ),
+				'name'               => _x( 'Portfolio', 'backend portfolio', 'dt-the7-core' ),
+				'singular_name'      => _x( 'Project', 'backend portfolio', 'dt-the7-core' ),
+				'add_new'            => _x( 'Add New', 'backend portfolio', 'dt-the7-core' ),
+				'add_new_item'       => _x( 'Add New Item', 'backend portfolio', 'dt-the7-core' ),
+				'edit_item'          => _x( 'Edit Item', 'backend portfolio', 'dt-the7-core' ),
+				'new_item'           => _x( 'New Item', 'backend portfolio', 'dt-the7-core' ),
+				'view_item'          => _x( 'View Item', 'backend portfolio', 'dt-the7-core' ),
+				'search_items'       => _x( 'Search Items', 'backend portfolio', 'dt-the7-core' ),
+				'not_found'          => _x( 'No items found', 'backend portfolio', 'dt-the7-core' ),
+				'not_found_in_trash' => _x( 'No items found in Trash', 'backend portfolio', 'dt-the7-core' ),
 				'parent_item_colon'     => '',
 				'menu_name'             => _x( 'Portfolio', 'backend portfolio', 'dt-the7-core' )
 			),
@@ -84,9 +84,15 @@ class Presscore_Mod_Portfolio_Admin {
 
 	public function add_options( $options ) {
 		if ( array_key_exists( 'of-blog-and-portfolio-menu', $options ) ) {
-			$options['of-portfolio-mod-injected-options'] = plugin_dir_path( __FILE__ ) . 'options/options-portfolio.php';
+			if ( defined( 'PRESSCORE_STYLESHEETS_VERSION' ) && version_compare( PRESSCORE_STYLESHEETS_VERSION, '6.2.0', '>=' ) ) {
+				$options_file = 'options/options-portfolio.php';
+			} else {
+				$options_file = 'options/options-portfolio-old.php';
+			}
+			$options['of-portfolio-mod-injected-options'] = plugin_dir_path( __FILE__ ) . $options_file;
 			$options['of-portfolio-mod-injected-slug-options'] = plugin_dir_path( __FILE__ ) . 'options/options-slug-portfolio.php';
-		} else if ( function_exists( 'presscore_module_archive_get_menu_slug' ) && array_key_exists( presscore_module_archive_get_menu_slug(), $options ) ) {
+		}
+		if ( function_exists( 'presscore_module_archive_get_menu_slug' ) && array_key_exists( presscore_module_archive_get_menu_slug(), $options ) ) {
 			$options['of-portfolio-mod-injected-archive-options'] = plugin_dir_path( __FILE__ ) . 'options/options-archive-portfolio.php';
 		}
 		return $options;
@@ -95,5 +101,26 @@ class Presscore_Mod_Portfolio_Admin {
 	public function js_composer_default_editor_post_types_filter( $post_types ) {
 		$post_types[] = 'dt_portfolio';
 		return $post_types;
+	}
+
+	/**
+	 * Add menu item, linked to page with import by url interface.
+	 *
+	 * @since 14.0.0
+	 *
+	 * @param array $menu_items
+	 *
+	 * @return array
+	 */
+	public function add_import_by_url_menu_item( $menu_items ) {
+		$menu_items[] = array(
+			'edit.php?post_type=dt_portfolio',
+			_x( 'Import Project', 'backend portfolio', 'dt-the7-core' ),
+			_x( 'Import', 'backend portfolio', 'dt-the7-core' ),
+			'the7-import-dt_portfolio-by-url',
+			'post-new.php?post_type=dt_portfolio',
+		);
+
+		return $menu_items;
 	}
 }

@@ -2,35 +2,46 @@
 /**
  * The template for displaying the footer.
  *
- * Contains the closing of the <div class="wf-container wf-clearfix"> and all content after
+ * Contains the closing of the <div class="wf-container"> and all content after
  *
- * @package vogue
+ * @package The7
  * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 if ( presscore_is_content_visible() ): ?>
 
 			</div><!-- .wf-container -->
 		</div><!-- .wf-wrap -->
+
+	<?php
+	/**
+	 * @since 6.8.1
+	 */
+	do_action( 'the7_after_content_container' );
+	?>
+
 	</div><!-- #main -->
 
 	<?php
 	if ( presscore_config()->get( 'template.footer.background.slideout_mode' ) ) {
 		echo '</div>';
 	}
-
-	do_action( 'presscore_after_main_container' );
 	?>
 
-<?php endif; // presscore_is_content_visible ?>
+<?php endif // presscore_is_content_visible ?>
 
-	<a href="#" class="scroll-top"><span class="screen-reader-text"><?php esc_html_e('Go to Top', 'the7mk2'); ?></span></a>
+	<?php do_action( 'presscore_after_main_container' ) ?>
+
+	<a href="#" class="scroll-top"><span class="screen-reader-text"><?php esc_html_e( 'Go to Top', 'the7mk2' ) ?></span></a>
 
 </div><!-- #page -->
-<?php wp_footer(); ?>
+
+<?php wp_footer() ?>
 
 <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="pswp__bg"></div>

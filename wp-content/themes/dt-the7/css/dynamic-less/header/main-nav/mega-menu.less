@@ -18,11 +18,11 @@
 	}
 	.top-header .sub-nav > li.dt-mega-parent > a .menu-text,
 	.sub-sideways .sub-nav > li.dt-mega-parent > a .menu-text {
-		font: @h5-font-style @h4-font-variant @h4-font-weight @h4-font-size~"/"@h4-line-height @h4-font-family;
-		text-transform: @h4-text-transform;
+		font: @submenu-font-style @submenu-font-variant @submenu-font-weight @submenu-font-size + 3~"/"@submenu-font-size+6 @submenu-font-family;
+			text-transform: @submenu-text-transform;
 	}
-	.main-nav .dt-mega-menu .sub-nav .dt-mega-parent > a .fa {
-		font-size: @h5-font-size;
+	.main-nav .dt-mega-menu .sub-nav .dt-mega-parent > a i[class^="fa"] {
+		font-size: @submenu-font-size + 3;
 	}
 	.sub-nav .menu-subtitle,
 	.sub-nav li.act > a:hover .menu-subtitle {

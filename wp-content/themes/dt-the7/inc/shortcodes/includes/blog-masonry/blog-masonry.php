@@ -43,16 +43,18 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		 * DT_Shortcode_BlogMasonry constructor.
 		 */
 		public function __construct() {
-			$this->sc_name = 'dt_blog_masonry';
+			$this->sc_name           = 'dt_blog_masonry';
 			$this->unique_class_base = 'blog-masonry-shortcode-id';
-			$this->taxonomy = 'category';
-			$this->post_type = 'post';
-			$this->default_atts = array(
+			$this->taxonomy          = 'category';
+			$this->post_type         = 'post';
+			$this->default_atts      = array(
 				'post_type'                      => 'category',
 				'category'                       => '',
 				'tags'                           => '',
 				'posts'                          => '',
+				'posts_offset'                   => 0,
 				'mode'                           => 'masonry',
+				'loading_effect'                 => 'none',
 				'layout'                         => 'classic',
 				'bo_content_width'               => '75%',
 				'bo_content_overlap'             => '100px',
@@ -86,7 +88,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 				'jsl_posts_total'                => '-1',
 				'jsl_posts_per_page'             => '',
 				'content_alignment'              => 'left',
-				'post_title_font_style'          => '',
+				'post_title_font_style'          => ':bold:',
 				'post_title_font_size'           => '',
 				'post_title_line_height'         => '',
 				'custom_title_color'             => '',
@@ -133,18 +135,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		 * Do shortcode here.
 		 */
 		protected function do_shortcode( $atts, $content = '' ) {
-			// Loop query.
-			$post_type = $this->get_att( 'post_type' );
-			if ( 'posts' === $post_type ) {
-				$query = $this->get_posts_by_post_type( 'post', $this->get_att( 'posts' ) );
-			} elseif ( 'tags' === $post_type ) {
-				$query = $this->get_posts_by_taxonomy( 'post', 'post_tag', $this->get_att( 'tags' ) );
-			} else {
-				$category_terms = presscore_sanitize_explode_string( $this->get_att( 'category' ) );
-				$category_field = ( is_numeric( $category_terms[0] ) ? 'term_id' : 'slug' );
-
-				$query = $this->get_posts_by_taxonomy( 'post', 'category', $category_terms, $category_field );
-			}
+			$query = $this->get_loop_query();
 
 			do_action( 'presscore_before_shortcode_loop', $this->sc_name, $this->atts );
 
@@ -187,6 +178,10 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 			if ( 'standard' == $loading_mode ) {
 				$filter_class[] = 'without-isotope';
 			}
+			if ( 'grid' === $this->get_att( 'mode' ) ) {
+				$filter_class[] = 'css-grid-filter';
+			}
+
 
 			if ( ! $this->get_flag( 'show_orderby_filter' ) && ! $this->get_flag( 'show_order_filter' ) ) {
 				$filter_class[] = 'extras-off';
@@ -372,12 +367,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 				$excerpt = apply_filters( 'the_content', get_the_content( '' ) );
 			} else {
 				$length = absint( $this->atts['excerpt_words_limit'] );
-				$excerpt = get_the_excerpt();
-
-				// VC excerpt fix.
-				if ( function_exists( 'vc_manager' ) ) {
-					$excerpt = vc_manager()->vc()->excerptFilter( $excerpt );
-				}
+				$excerpt = apply_filters( 'the7_shortcodeaware_excerpt', get_the_excerpt() );
 
 				if ( $length ) {
 					$excerpt = wp_trim_words( $excerpt, $length );
@@ -471,6 +461,9 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 			) {
 				$class[] = 'disable-layout-hover';
 			}
+			if ( 'grid' === $this->get_att( 'mode' ) ) {
+				$class[] = 'dt-css-grid-wrap';
+			}
 
 
 			if ( $this->get_flag( 'image_hover_bg_color' ) ) {
@@ -502,7 +495,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		 */
 		protected function iso_container_class( $class = array() ) {
 			if ( 'grid' === $this->get_att( 'mode' ) ) {
-				$class[] = 'iso-grid';
+				$class[] = 'dt-css-grid';
 			} else {
 				$class[] = 'iso-container';
 			}
@@ -560,7 +553,9 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 				foreach ( $columns as $column => $data_att ) {
 					$val = ( isset( $bwb_columns[ $column ] ) ? absint( $bwb_columns[ $column ] ) : '' );
 					$data_atts[] = 'data-' . $data_att . '-columns-num="' . esc_attr( $val ) . '"';
+			
 				}
+
 			}
 
 			return $data_atts;
@@ -584,6 +579,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 			$config->set( 'load_style', 'default' );
 			$config->set( 'template', 'blog' );
 			$config->set( 'layout', $this->get_att( 'mode' ) );
+			$config->set( 'post.preview.load.effect', $this->get_att( 'loading_effect'), 'none' );
 			$config->set( 'all_the_same_width', $this->get_flag( 'all_posts_the_same_width' ) );
 			$show_post_content = ( 'off' !== $this->get_att( 'post_content' ) );
 			$config->set( 'show_excerpts', $show_post_content );
@@ -619,10 +615,9 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 			$config->set( 'post.preview.background.enabled', false );
 			$config->set( 'post.preview.background.style', '' );
 			$config->set( 'post.preview.media.width', 30 );
-			$config->set( 'post.preview.load.effect', 'fade_in' );
 			$config->set( 'post.preview.width.min', $this->get_att( 'pwb_column_min_width' ) );
-
 			$config->set( 'template.columns.number', $this->get_att( 'pwb_columns' ) );
+
 			$config->set( 'template.posts_filter.terms.enabled', $this->get_flag( 'show_categories_filter' ) );
 			$config->set( 'template.posts_filter.orderby.enabled', $this->get_flag( 'show_orderby_filter' ) );
 			$config->set( 'template.posts_filter.order.enabled', $this->get_flag( 'show_order_filter' ) );
@@ -689,6 +684,27 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 				'post-thumb-padding-left',
 			), $this->get_att( 'image_paddings' ), '%|px' );
 
+			if ( 'browser_width_based' === $this->get_att( 'responsiveness' ) ) {
+				$bwb_columns = DT_VCResponsiveColumnsParam::decode_columns( $this->get_att( 'bwb_columns' ) );
+				$columns = array(
+					'desktop'  => 'desktop',
+					'v_tablet' => 'v-tablet',
+					'h_tablet' => 'h-tablet',
+					'phone'    => 'phone',
+				);
+
+				foreach ( $columns as $column => $data_att ) {
+					$val = ( isset( $bwb_columns[ $column ] ) ? absint( $bwb_columns[ $column ] ) : '' );
+					$data_atts[] = 'data-' . $data_att . '-columns-num="' . esc_attr( $val ) . '"';
+					
+					$less_vars->add_keyword( $data_att. '-columns-num', esc_attr( $val ) );
+			
+				}
+			};
+			$less_vars->add_pixel_number( 'grid-posts-gap', $this->get_att( 'gap_between_posts' ) );
+			$less_vars->add_pixel_number( 'grid-post-min-width', $this->get_att( 'pwb_column_min_width' ));
+
+
 			$less_vars->add_keyword( 'fancy-data-color', $this->get_att( 'fancy_date_font_color', '~""' ) );
 			$less_vars->add_keyword( 'fancy-data-bg', $this->get_att( 'fancy_date_bg_color', '~""' ) );
 			$less_vars->add_keyword( 'fancy-data-line-color', $this->get_att( 'fancy_date_line_color', '~""' ) );
@@ -754,17 +770,13 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		 * @return string
 		 */
 		protected function get_vc_inline_html() {
-			$terms_title = _x( 'Display categories', 'vc inline dummy', 'the7mk2' );
 
 			return $this->vc_inline_dummy( array(
 				'class'  => 'dt_vc-blog_masonry',
-				'title'  => _x( 'NEW Blog Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
-				'fields' => array(
-					$terms_title => presscore_get_terms_list_by_slug( array(
-						'slugs'    => $this->atts['category'],
-						'taxonomy' => 'category',
-					) ),
-				),
+				'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_blog_masonry_editor_ico.gif', 98, 104 ),
+				'title'  => _x( 'Blog Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
+
+				'style' => array( 'height' => 'auto' )
 			) );
 		}
 
@@ -840,6 +852,69 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		}
 
 		/**
+		 * @return WP_Query
+		 */
+		protected function get_loop_query() {
+			$query = apply_filters( 'the7_shortcode_query', null, $this->sc_name, $this->atts );
+			if ( is_a( $query, 'WP_Query' ) ) {
+				return $query;
+			}
+
+			add_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			add_filter( 'found_posts', array( $this, 'fix_pagination' ), 1, 2 );
+
+			$post_type = $this->get_att( 'post_type' );
+			if ( 'posts' === $post_type ) {
+				$query = $this->get_posts_by_post_type( 'post', $this->get_att( 'posts' ) );
+			} elseif ( 'tags' === $post_type ) {
+				$query = $this->get_posts_by_taxonomy( 'post', 'post_tag', $this->get_att( 'tags' ) );
+			} else {
+				$category_terms = presscore_sanitize_explode_string( $this->get_att( 'category' ) );
+				$category_field = ( is_numeric( $category_terms[0] ) ? 'term_id' : 'slug' );
+
+				$query = $this->get_posts_by_taxonomy( 'post', 'category', $category_terms, $category_field );
+			}
+
+			remove_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			remove_filter( 'found_posts', array( $this, 'fix_pagination' ), 1 );
+
+			return $query;
+		}
+
+		/**
+		 * Add offset to the posts query.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param WP_Query $query
+		 */
+		public function add_offset( &$query ) {
+			$offset  = (int) $this->get_att( 'posts_offset' );
+			$ppp     = (int) $query->query_vars['posts_per_page'];
+			$current = (int) $query->query_vars['paged'];
+
+			if ( $query->is_paged ) {
+				$page_offset = $offset + ( $ppp * ( $current - 1 ) );
+				$query->set( 'offset', $page_offset );
+			} else {
+				$query->set( 'offset', $offset );
+			}
+		}
+
+		/**
+		 * Fix pagination accordingly with posts offset.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param int $found_posts
+		 *
+		 * @return int
+		 */
+		public function fix_pagination( $found_posts ) {
+			return $found_posts - (int) $this->get_att( 'posts_offset' );
+		}
+
+		/**
 		 * Return query args.
 		 *
 		 * @return array
@@ -893,13 +968,14 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 		}
 
 		protected function get_posts_per_page( $pagination_mode ) {
-			$posts_per_page = - 1;
+			$max_posts_per_page = 99999;
 			switch ( $pagination_mode ) {
 				case 'disabled':
 					$posts_per_page = $this->get_att( 'dis_posts_total' );
 					break;
 				case 'standard':
 					$posts_per_page = $this->get_att( 'st_posts_per_page' );
+					$posts_per_page = $posts_per_page ? $posts_per_page : get_option( 'posts_per_page' );
 					break;
 				case 'js_pagination':
 					$posts_per_page = $this->get_att( 'jsp_posts_total' );
@@ -910,6 +986,13 @@ if ( ! class_exists( 'DT_Shortcode_BlogMasonry', false ) ):
 				case 'js_lazy_loading':
 					$posts_per_page = $this->get_att( 'jsl_posts_total' );
 					break;
+				default:
+					return $max_posts_per_page;
+			}
+
+			$posts_per_page = (int) $posts_per_page;
+			if ( $posts_per_page === -1 ) {
+				return $max_posts_per_page;
 			}
 
 			return $posts_per_page;

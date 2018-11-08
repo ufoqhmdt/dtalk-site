@@ -50,6 +50,10 @@ class Vc_Column_Offset {
 			__( '10 columns - 5/6', 'js_composer' ) => '10',
 			__( '11 columns - 11/12', 'js_composer' ) => '11',
 			__( '12 columns - 1/1', 'js_composer' ) => '12',
+			__( '20% - 1/5', 'js_composer' ) => '1/5',
+			__( '40% - 2/5', 'js_composer' ) => '2/5',
+			__( '60% - 3/5', 'js_composer' ) => '3/5',
+			__( '80% - 4/5', 'js_composer' ) => '4/5',
 		);
 	}
 

@@ -118,10 +118,8 @@ if ( ! class_exists( 'DT_Shortcode_Logos', false ) ) {
 			// if link not empty - wrap image with it
 			$link = get_post_meta( $post_id, '_dt_logo_options_link', true );
 			if ( $link ) {
-				$image_id = ( dt_is_hd_device() && isset($retina_logo_id[0]) ) ? $retina_logo_id[0] : $thumb_id;
-
 				$esc_caption = '';
-				$attachment = dt_get_attachment( $image_id );
+				$attachment = dt_get_attachment( $thumb_id );
 				if ( $attachment ) {
 					$esc_caption = esc_attr($attachment['description']);
 				}

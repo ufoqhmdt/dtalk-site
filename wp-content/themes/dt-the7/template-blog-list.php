@@ -2,16 +2,18 @@
 /* Template Name: Blog - list */
 
 /**
- * Blog list template
+ * Blog list template.
  *
- * @package vogue
+ * @package The7
  * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-$config = Presscore_Config::get_instance();
+$config = presscore_config();
 $config->set( 'template', 'blog' );
 $config->set( 'template.layout.type', 'list' );
 
@@ -32,15 +34,9 @@ if ( presscore_is_content_visible() ): ?>
 
 					if ( post_password_required() ) {
 						the_content();
-
 					} else {
-
 						// backup config
 						$config_backup = $config->get();
-
-						///////////////////////
-						// Posts Filer //
-						///////////////////////
 
 						presscore_display_posts_filter( array(
 							'post_type' => 'post',
@@ -53,10 +49,6 @@ if ( presscore_is_content_visible() ): ?>
 						}
 
 						echo '<div ' . presscore_list_container_html_class( $container_class ) . presscore_list_container_data_atts() . '>';
-
-							//////////////////////
-							// Custom loop //
-							//////////////////////
 
 							$page_query = presscore_get_blog_query();
 
@@ -75,15 +67,10 @@ if ( presscore_is_content_visible() ): ?>
 
 						echo '</div>';
 
-						/////////////////////
-						// Pagination //
-						/////////////////////
-
 						presscore_complex_pagination( $page_query );
 
 						// restore config
 						$config->reset( $config_backup );
-
 					}
 
 					do_action( 'presscore_after_loop' );

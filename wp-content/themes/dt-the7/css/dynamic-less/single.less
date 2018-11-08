@@ -163,10 +163,10 @@
 }
 .post-navigation .nav-links {
 	.transparent-border-mixin;
-	& .fa {
+	& i[class^="fa"] {
 		color: fade(@h1-color, 12%);
 	}
-	& a .fa:hover {
+	& a i[class^="fa"]:hover {
 		color: fade(@h1-color, 23%);
 	}
 	& a .post-title:hover {
@@ -181,7 +181,11 @@
 .comment-respond {
 	& > h3 {
 		&:after{
-			.accent-bg-mixin;
+			//.accent-bg-mixin;
+			background-color: @accent-bg-color;
+			.accent-gradient & {
+				.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+			}
 		}
 	}
 }

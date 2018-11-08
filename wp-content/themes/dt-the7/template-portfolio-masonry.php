@@ -4,15 +4,16 @@
 /**
  * Portfolio masonry layout.
  *
- * @package presscore
- * @since presscore 0.1
+ * @package The7
+ * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-global $post;
-$config = Presscore_Config::get_instance();
+$config = presscore_config();
 $config->set( 'template', 'portfolio' );
 
 add_action('presscore_before_main_container', 'presscore_page_content_controller', 15);
@@ -30,15 +31,9 @@ if ( presscore_is_content_visible() ): ?>
 
 					if ( post_password_required() ) {
 						the_content();
-
 					} else {
-
 						// backup config
 						$config_backup = $config->get();
-
-						///////////////////////
-						// Posts Filer //
-						///////////////////////
 
 						presscore_display_posts_filter( array(
 							'post_type' => 'dt_portfolio',
@@ -72,15 +67,10 @@ if ( presscore_is_content_visible() ): ?>
 						// fullwidth wrap close
 						if ( $config->get( 'full_width' ) ) { echo '</div>'; }
 
-						/////////////////////
-						// Pagination //
-						/////////////////////
-
 						presscore_complex_pagination( $page_query );
 
 						// restore config
 						$config->reset( $config_backup );
-
 					}
 
 					do_action( 'presscore_after_loop' );

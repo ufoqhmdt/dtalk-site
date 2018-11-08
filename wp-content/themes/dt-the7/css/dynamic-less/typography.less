@@ -145,6 +145,7 @@ h3.entry-title,
 	}
 	.footer & {
 		color: @widget-footer-header-color;
+		.custom-mixin-footer-with-accent-color (@widget-footer-header-color, @widget-footer-accent-color);
 	}
 }
 .fade-header-color( @property, @property-str-1, @property-str-2, @property-str-3, @property-str-4, @property-str-5, @opacity) {
@@ -195,10 +196,16 @@ h3.entry-title,
 	.stripe & {
 		color: @accent-bg-color;
 	}
+	.wf-container-footer & {
+		.custom-mixin-footer-color (@widget-footer-accent-color);
+	}
 }
 a,
 a:hover {
-	color: @accent-bg-color;
+	color: @links-color;
+	.wf-container-footer & {
+		.custom-mixin-footer-color (@widget-footer-accent-color);
+	}
 }
 
 /*Accent text*/
@@ -207,13 +214,25 @@ a:hover {
 		color: @accent-bg-color;
 	}
 	.accent-gradient #page & {
-		.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+		.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	}
+	#page .wf-container-footer &,
+	.accent-gradient #page .footer &  {
+		.custom-mixin-footer-color (@widget-footer-accent-color);
 	}
 }
 .paint-accent-color {
+	// color: @accent-bg-color !important;
+	// .accent-gradient & {
+	// 	.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	// }
 	color: @accent-bg-color !important;
-	.accent-gradient & {
-		.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+		.accent-gradient & {
+			.text-gradient-text-fill (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	  	}
+	.wf-container-footer &,
+	.accent-gradient &  {
+		.custom-mixin-footer-color (@widget-footer-accent-color) !important;
 	}
 }
 /*Transparent color*/
@@ -247,10 +266,14 @@ a:hover {
 	max-width:  @content-width - 88;
 }
 #phantom.full-width .ph-wrap.boxed,
-#page.boxed,
+#page.boxed {
+	max-width: @box-width;
+}
 .boxed .footer,
 .boxed #bottom-bar {
-	max-width: @box-width;
+	.footer-overlap & {
+		max-width: @box-width;
+	}
 }
 
 #phantom .ph-wrap.boxed,
@@ -262,9 +285,9 @@ a:hover {
 .boxed .classic-header.full-width.content-width-line .navigation:before {
 	max-width: 100%;
 }
-	.content {
-		width: calc(100% ~'-' @sidebar-width);
-	}
+	// .content {
+	// 	width: calc(100% ~'-' @sidebar-width);
+	// }
 
 #main {
 	padding: @page-top-margin 0 @page-bottom-margin 0;
@@ -328,8 +351,6 @@ body {
 	#megaMenu ul.megaMenu > li.menu-item > a,
 	.customSelect,
 	.loading-label,
-	.rsHomePorthole .rsPreloader,
-	.rsShor .rsPreloader,
 	.widget .testimonial-content,
 	.skill,
 	.skill-value,
@@ -351,6 +372,8 @@ body {
 	.st-accordion li > a:before,
 	.arrows-accent .prev i,
 	.arrows-accent .next i,
+	.arrows-accent .owl-prev i,
+	.arrows-accent .owl-next i,
 	.round-images .bg-on.team-container:not(.fullwidth-img),
 	.solid-bg .sidebar-content,
 	.solid-bg.sidebar-content .widget,

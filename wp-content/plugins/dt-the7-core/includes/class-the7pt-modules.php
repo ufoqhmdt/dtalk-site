@@ -29,15 +29,20 @@ class The7PT_Modules {
 	 * Load modules.
 	 */
 	public static function load() {
+		$plugin_path = The7PT()->plugin_path();
+
+		require_once  "{$plugin_path}mods/portfolio/public/shortcodes/portfolio-masonry/class-dt-portfolio-shortcode-html.php";
+
 		$supported_modules = get_theme_support( 'presscore-modules' );
 		if ( ! empty( $supported_modules[0] ) ) {
-			$plugin_path = The7PT()->plugin_path();
 			foreach ( $supported_modules[0] as $module ) {
 				$file_path = $plugin_path . "mods/{$module}/{$module}.php";
 				if ( file_exists( $file_path ) ) {
 					include $file_path;
 				}
 			}
+
+			require_once "{$plugin_path}/includes/functions.php";
 		}
 	}
 

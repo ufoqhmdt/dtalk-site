@@ -11,8 +11,8 @@ if ( ! class_exists( 'DT_Shortcode', false ) ):
 
 	class DT_Shortcode {
 
-		protected $post_backup = null;
-		protected $config_backup = null;
+		protected $post_backup;
+		protected $config_backup;
 
 		/**
 		 * @TODO Replace it with Presscore_Query
@@ -22,6 +22,20 @@ if ( ! class_exists( 'DT_Shortcode', false ) ):
 		 * @return bool|WP_Query
 		 */
 		public function get_posts_by_terms( $instance = array() ) {
+			// Maintain back compatibility.
+			if ( ! isset( $this->atts ) ) {
+				$this->atts = array();
+			}
+
+			if ( ! isset( $this->shortcode_name ) ) {
+				 $this->shortcode_name = '';
+			}
+
+			$query = apply_filters( 'the7_shortcode_query', null, $this->shortcode_name, $this->atts );
+			if ( is_a( $query, 'WP_Query' ) ) {
+				return $query;
+			}
+
 			if ( empty($this->post_type) || empty($this->taxonomy) ) {
 				return false;
 			}
@@ -61,6 +75,7 @@ if ( ! class_exists( 'DT_Shortcode', false ) ):
 				'title_tag' => 'h5',
 				'fields' => array(),
 				'class' => array(),
+				'img' => array(),
 				'style' => array( 'height' => '250px' )
 			);
 
@@ -105,14 +120,21 @@ if ( ! class_exists( 'DT_Shortcode', false ) ):
 
 			}
 
+			// Image.
+			$img_html = '';
+			if ( ! empty( $img ) ) {
+				$img_html = sprintf( '<img class="dt_vc-shortcode_dummy-img" src="%s" width="%s" height="%s" />', $img[0], $img[1], $img[2] );
+			}
+
 			$output = sprintf(
-				'<div class="%1$s"%2$s><%3$s>%4$s</%3$s>%5$s</div>',
-				esc_attr( join( ' ', $class ) ),
-				$style_attr,
-				$title_tag,
-				$title,
-				$fields_html
-			);
+                '<div class="%1$s"%2$s>%6$s<%3$s>%4$s</%3$s>%5$s</div>',
+                esc_attr( join( ' ', $class ) ),
+                $style_attr,
+                $title_tag,
+                $title,
+                $fields_html,
+                $img_html
+            );
 
 			return $output;
 		}

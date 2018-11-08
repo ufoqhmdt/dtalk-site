@@ -1,7 +1,7 @@
 
 /* #Blog, Portfolio, Albums
 ================================================== */
-	.pace .pace-activity {
+	.dt-posts-preload .dt-posts-preload-activity {
 		.transparent-accent-bg-mixin(90%);
 	}
 
@@ -102,15 +102,28 @@ article {
 
 	.blog-shortcode &,
 	.portfolio-shortcode &,
+	.albums-shortcode &,
 	.owl-carousel.blog-carousel-shortcode & {
-		font: @h3-font-style @h3-font-variant @h3-font-weight @h3-font-size~"/"@h3-line-height @h3-font-family;
+		font: normal @h3-font-variant normal @h3-font-size~"/"@h3-line-height @h3-font-family;
 		.mode-masonry&,
 		.mode-grid&,
-		.blog-carousel-shortcode& {
-			font: @h4-font-style @h4-font-variant @h4-font-weight @h4-font-size~"/"@h4-line-height @h4-font-family;
+		.blog-carousel-shortcode&,
+		.portfolio-carousel-shortcode&,
+		.albums-carousel-shortcode& {
+			font: normal @h4-font-variant normal @h4-font-size~"/"@h4-line-height @h4-font-family;
 		}
 		& a {
 			.header-color;
+		}
+	}
+}
+.entry-title {
+
+	.blog-shortcode &,
+	.portfolio-shortcode:not(.gradient-overlay-layout-list):not(.content-rollover-layout-list) &,
+	.albums-shortcode &,
+	.owl-carousel.blog-carousel-shortcode & {
+		& a {
 			&:hover {
 				.color-accent;
 			}
@@ -120,6 +133,7 @@ article {
 .entry-meta {
 	.blog-shortcode &,
 	.portfolio-shortcode &,
+	.albums-shortcode &,
 	.owl-carousel & {
 		.text-small;
 		.color-base-transparent;
@@ -128,6 +142,7 @@ article {
 .entry-excerpt {
 	.blog-shortcode &,
 	.portfolio-shortcode &,
+	.albums-shortcode &,
 	.owl-carousel & {
 		.text-normal;
 	}
@@ -196,8 +211,39 @@ article {
 .entry-date {
 	.fancy-date & {
 		&:after {
-			.accent-bg-mixin;
+			//.accent-bg-mixin;
+			.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 		}
 	}
 	
+}
+
+//Portfolio
+.project-links-container {
+	.portfolio-shortcode & {
+		& a span,
+		& a:hover span {
+			color: @accent-bg-color;
+		}
+		&:before,
+		&:after {
+			border-color: @accent-bg-color;
+		}
+		& a:before {
+			.dt-icon-bg-on& {
+				background-color: @accent-bg-color;
+				.accent-gradient & {
+					.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+				}
+			}
+		}
+		& a:after {
+			.dt-icon-hover-bg-on& {
+				background-color: @accent-bg-color;
+				.accent-gradient & {
+					.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+				}
+			}
+		}
+	}
 }

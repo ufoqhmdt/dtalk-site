@@ -3,7 +3,7 @@
  * Export/Import Options.
  *
  * @package the7
- * @since 1.0.0
+ * @since   1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,15 +15,18 @@ $options[] = array(
 	'type' => 'info',
 );
 
-$options[] = array( 'name' => _x( 'Export/Import Options', 'theme-options', 'the7mk2' ), 'type' => 'heading', 'id' => 'export-import-options' );
+$options[] = array(
+	'name' => _x( 'Export/Import Options', 'theme-options', 'the7mk2' ),
+	'type' => 'heading',
+	'id'   => 'export-import-options',
+);
 
-	$options[] = array( 'name' => _x( 'Export/Import Options', 'theme-options', 'the7mk2' ), 'type' => 'block' );
+$options[] = array( 'name' => _x( 'Export/Import Options', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-
-		$options['import_export'] = array(
-			'id' => 'import_export',
-			'type' => 'import_export_options',
-			'std' => '',
-			'settings' => array( 'rows' => 16 ),
-		    'exclude_from_search' => true,
-		);
+$options['import_export'] = array(
+	'id'                  => 'import_export',
+	'type'                => 'import_export_options',
+	'std'                 => '',
+	'settings'            => array( 'rows' => 16 ),
+	'exclude_from_search' => true,
+);

@@ -52,6 +52,7 @@ if ( 'external_link' === $source ) {
 $border_color = ( '' !== $border_color ) ? ' vc_box_border_' . $border_color : '';
 
 $img = false;
+$img_id = 0;
 
 switch ( $source ) {
 	case 'media_library':
@@ -61,8 +62,6 @@ switch ( $source ) {
 			$post_id = get_the_ID();
 			if ( $post_id && has_post_thumbnail( $post_id ) ) {
 				$img_id = get_post_thumbnail_id( $post_id );
-			} else {
-				$img_id = 0;
 			}
 		} else {
 			$img_id = preg_replace( '/[^\d]/', '', $image );
@@ -106,6 +105,20 @@ switch ( $source ) {
 
 	default:
 		$img = false;
+}
+
+/**
+ * Share buttons fix.
+ *
+ * @since 5.5.0 The7
+ */
+if ( $img ) {
+	$permalink = $custom_src;
+	if ( in_array( $source, array( 'media_library', 'featured_image' ) ) && isset( $img_id ) ) {
+		$permalink = get_permalink( $img_id );
+	}
+
+	$img['thumbnail'] = str_replace( '/>', ' data-dt-location="' . $permalink . '" />', $img['thumbnail'] );
 }
 
 if ( ! $img ) {
@@ -234,12 +247,12 @@ if ( $link ) {
 		unset( $a_attrs['class'] );
 	}
 	$link_datas = wp_get_attachment_image_src( $img_id, 'large' );
-	$html = '<a ' . vc_stringify_attributes( $a_attrs ) . ' class="' . $wrapperClass . '" data-large_image_width="' . $link_datas[1] . '" data-large_image_height = "' . $link_datas[2]. '" >' . $img['thumbnail'] . '</a>';
+	$html = '<a ' . vc_stringify_attributes( $a_attrs ) . '  class="' . $wrapperClass . '" data-large_image_width="' . $link_datas[1] . '" data-large_image_height = "' . $link_datas[2]. '"   ' . presscore_get_share_buttons_for_prettyphoto( 'photo' ) . '  >' . $img['thumbnail'] . '</a>';
 } else {
 	$html = '<div class="' . $wrapperClass . '">' . $img['thumbnail'] . '</div>';
 }
 
-$class_to_filter = 'wpb_single_image wpb_content_element vc_align_' . $alignment . ' ' . presscore_get_shortcode_animation_html_class( $css_animation );
+$class_to_filter = 'wpb_single_image wpb_content_element vc_align_' . $alignment . ' ' . $this->getCSSAnimation( $css_animation );
 $class_to_filter .= vc_shortcode_custom_css_class( $css, ' ' ) . $this->getExtraClass( $el_class );
 $css_class = apply_filters( VC_SHORTCODE_CUSTOM_CSS_FILTER_TAG, $class_to_filter, $this->settings['base'], $atts );
 

@@ -58,7 +58,7 @@ if ( ! function_exists( 'presscore_post_navigation' ) ) :
 		$output = '';
 
 		if ( $config->get( 'post.navigation.arrows.enabled' ) ) {
-			$output .= presscore_get_next_post_link( '', 'prev-post', '<a class="prev-post disabled" href="javascript:void(0);"></a>' );
+			$output .= presscore_get_previous_post_link( '', 'prev-post', '<a class="prev-post disabled" href="javascript:void(0);"></a>' );
 		}
 
 		if ( $config->get( 'post.navigation.back_button.enabled' ) ) {
@@ -66,7 +66,7 @@ if ( ! function_exists( 'presscore_post_navigation' ) ) :
 		}
 
 		if ( $config->get( 'post.navigation.arrows.enabled' ) ) {
-			$output .= presscore_get_previous_post_link( '', 'next-post', '<a class="next-post disabled" href="javascript:void(0);"></a>' );
+			$output .= presscore_get_next_post_link( '', 'next-post', '<a class="next-post disabled" href="javascript:void(0);"></a>' );
 		}
 
 		return $output;
@@ -101,7 +101,7 @@ if ( ! function_exists( 'presscore_new_post_navigation' ) ) :
 			             '<span class="post-title h4-size">%title</span>';
 
 			// We use opposite order.
-			$prev_link = get_next_post_link(
+			$prev_link = get_previous_post_link(
 				'%link',
 				$prev_text,
 				$args['in_same_term'],
@@ -128,7 +128,7 @@ if ( ! function_exists( 'presscore_new_post_navigation' ) ) :
 			             '<span class="post-title h4-size">%title</span>';
 
 			// We use opposite order.
-			$next_link = get_previous_post_link(
+			$next_link = get_next_post_link(
 				'%link',
 				$next_text,
 				$args['in_same_term'],
@@ -153,38 +153,6 @@ if ( ! function_exists( 'presscore_new_post_navigation' ) ) :
 
 endif;
 
-if ( ! function_exists( 'presscore_single_post_navigation_bar' ) ) :
-
-	// TODO: Maybe remove it.
-	function presscore_single_post_navigation_bar() {
-
-		if ( ! ( is_single() && presscore_is_content_visible() ) ) {
-			return;
-		}
-
-		$post_meta = presscore_get_posted_on();
-		$post_navigation = presscore_post_navigation();
-
-		if ( $post_meta || $post_navigation ) {
-
-			$article_top_bar_html_class = 'article-top-bar ' . presscore_get_page_title_bg_mode_html_class();
-
-			if ( ! $post_meta ) {
-				$article_top_bar_html_class .= ' post-meta-disabled';
-			}
-
-			echo '<div class="' . esc_attr( $article_top_bar_html_class ) . '"><div class="wf-wrap"><div class="wf-container-top">';
-
-			echo $post_meta;
-
-//			echo '<div class="navigation-inner"><div class="single-navigation-wrap">' . $post_navigation . '</div></div>';
-
-			echo '</div></div></div>';
-		}
-
-	}
-
-endif;
 
 //add_action( 'presscore_before_content', 'presscore_single_post_navigation_bar', 20 );
 
@@ -228,11 +196,12 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 	 * original script you can find on http://dimox.net
 	 * 
 	 * @since 1.0.0
+	 *
+	 * @param array $args
 	 * 
 	 * @return string Breadcrumbs html
 	 */
 	function presscore_get_breadcrumbs( $args = array() ) {
-
 		$default_args = array(
 			'text' => array(
 				'home' => __( 'Home', 'the7mk2'),
@@ -242,8 +211,8 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 				'author' => __( 'Article author %s', 'the7mk2'),
 				'404' => __( 'Error 404', 'the7mk2'),
 			),
-			'showCurrent' => 1,
-			'showOnHome' => 1,
+			'showCurrent' => true,
+			'showOnHome' => true,
 			'delimiter' => '',
 			'before' => '<li class="current">',
 			'after' => '</li>',
@@ -262,18 +231,20 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 			return $breadcrumbs_html;
 		}
 
-		extract( array_intersect_key( $args, $default_args ) );
+		extract( array_intersect_key( $args, $default_args ), EXTR_OVERWRITE );
 
 		$link = $linkBefore . '<a' . $linkAttr . ' href="%1$s" title="">%2$s</a>' . $linkAfter;
 
 		$breadcrumbs_html .= '<div class="assistive-text">' . __( 'You are here:', 'the7mk2' ) . '</div>';
 
-		$homeLink = home_url() . '/';
+		$homeLink = trailingslashit( home_url() );
 		global $post;
+
+		$current_words_num = apply_filters( 'presscore_get_breadcrumbs-current_words_num', 5 );
 
 		if (is_home() || is_front_page()) {
 
-			if ($showOnHome == 1) {
+			if ($showOnHome) {
 				$breadcrumbs_html .= '<ol' . $listAttr . '><a href="' . $homeLink . '">' . $text['home'] . '</a></ol>';
 			}
 
@@ -285,7 +256,7 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 
 				$thisCat = get_category(get_query_var('cat'), false);
 
-				if ($thisCat->parent != 0) {
+				if ($thisCat->parent !== 0) {
 
 					$cats = get_category_parents($thisCat->parent, TRUE, $delimiter);
 					$cats = str_replace('<a', $linkBefore . '<a' . $linkAttr, $cats);
@@ -327,8 +298,8 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 					$post_type_obj = get_post_type_object( $post_type );
 					$breadcrumbs_html .= sprintf($link, get_post_type_archive_link( $post_type ), $post_type_obj->labels->singular_name);
 
-					if ($showCurrent == 1) {
-						$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), 5 ) . $after;
+					if ($showCurrent) {
+						$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), $current_words_num ) . $after;
 					}
 
 				} else {
@@ -339,7 +310,7 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 						$cats = get_category_parents($cat, TRUE, $delimiter);
 
 						if ( ! is_wp_error( $cats ) ) {
-							if ($showCurrent == 0) {
+							if (! $showCurrent) {
 								$cats = preg_replace("#^(.+)$delimiter$#", "$1", $cats);
 							}
 
@@ -350,8 +321,8 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 						}
 					}
 
-					if ($showCurrent == 1) {
-						$breadcrumbs_html .= $before . wp_trim_words( get_the_title(), 5 ) . $after;
+					if ($showCurrent) {
+						$breadcrumbs_html .= $before . wp_trim_words( get_the_title(), $current_words_num ) . $after;
 					}
 
 				}
@@ -365,14 +336,14 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 
 			} elseif ( is_attachment() ) {
 
-				if ($showCurrent == 1) {
-					$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), 5 ) . $after;
+				if ($showCurrent) {
+					$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), $current_words_num ) . $after;
 				}
 
 			} elseif ( is_page() && !$post->post_parent ) {
 
-				if ($showCurrent == 1) {
-					$breadcrumbs_html .= $before . wp_trim_words( get_the_title(), 5 ) . $after;
+				if ($showCurrent) {
+					$breadcrumbs_html .= $before . wp_trim_words( get_the_title(), $current_words_num ) . $after;
 				}
 
 			} elseif ( is_page() && $post->post_parent ) {
@@ -397,8 +368,8 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 					}
 				}
 
-				if ($showCurrent == 1) {
-					$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), 5 ) . $after;
+				if ($showCurrent) {
+					$breadcrumbs_html .= $delimiter . $before . wp_trim_words( get_the_title(), $current_words_num ) . $after;
 				}
 
 			} elseif ( is_tag() ) {
@@ -438,7 +409,7 @@ if ( ! function_exists( 'presscore_get_breadcrumbs' ) ) :
 		}
 
 		return apply_filters( 'presscore_get_breadcrumbs', $beforeBreadcrumbs . $breadcrumbs_html . $afterBreadcrumbs, $args );
-	} // end presscore_get_breadcrumbs()
+	}
 
 endif;
 

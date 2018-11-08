@@ -6,42 +6,6 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-if ( ! function_exists( 'presscore_themeoptions_get_hoover_options' ) ) :
-
-	/**
-	 * Hoover options.
-	 *
-	 * @todo  delete
-	 */
-	function presscore_themeoptions_get_hoover_options() {
-		return array(
-			'none' => _x('None', 'theme-options', 'the7mk2'),
-			'grayscale' => _x('Grayscale', 'theme-options', 'the7mk2'),
-			'gray_color' => _x('Grayscale with color hovers', 'theme-options', 'the7mk2'),
-			'blur' => _x('Blur', 'theme-options', 'the7mk2'),
-			'scale' => _x('Scale', 'theme-options', 'the7mk2')
-		);
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_themeoptions_get_general_layout_options' ) ) :
-
-	/**
-	 * General layout.
-	 *
-	 * @todo delete
-	 */
-	function presscore_themeoptions_get_general_layout_options() {
-		return array(
-			'wide'	=> _x('Wide', 'theme-options', 'the7mk2'),
-			'boxed'	=> _x('Boxed', 'theme-options', 'the7mk2')
-		);
-	}
-
-endif; // presscore_themeoptions_get_general_layout_options
-
-
 if ( ! function_exists( 'presscore_meta_boxes_get_images_proportions' ) ) :
 
 	/**
@@ -121,6 +85,7 @@ if ( ! function_exists( 'presscore_get_social_icons_data' ) ) :
 			'viber'	=> __('Viber', 'the7mk2'),
 			'whatsapp'	=> __('Whatsapp', 'the7mk2'),
 			'reddit'	=> __('Reddit', 'the7mk2'),
+			'snapchat'	=> __('Snapchat', 'the7mk2'),
 		);
 
 		return apply_filters( 'presscore_get_social_icons_data', $icons );
@@ -192,6 +157,8 @@ if ( ! function_exists( 'presscore_themeoptions_get_buttons_defaults' ) ) :
 
 	/**
 	 * Buttons defaults array.
+	 *
+	 * @return array
 	 */
 	function presscore_themeoptions_get_buttons_defaults() {
 		return array(
@@ -355,37 +322,6 @@ if ( ! function_exists( 'presscore_themeoptions_get_stripes_list' ) ) :
 
 endif; // presscore_themeoptions_get_stripes_list
 
-if ( ! function_exists( 'presscore_get_team_links_array' ) ) :
-
-	/**
-	 * Return links list for team post meta box.
-	 *
-	 * @return array.
-	 */
-	function presscore_get_team_links_array() {
-		$team_links =  array(
-			'website'		=> array( 'desc' => _x( 'Personal blog / website', 'team link', 'the7mk2' ) ),
-			'mail'			=> array( 'desc' => _x( 'E-mail', 'team link', 'the7mk2' ) ),
-		);
-
-		$common_links = presscore_get_social_icons_data();
-		if ( $common_links ) {
-
-			foreach ( $common_links as $key=>$value ) {
-
-				if ( isset($team_links[ $key ]) ) {
-					continue;
-				}
-
-				$team_links[ $key ] = array( 'desc' => $value );
-			}
-		}
-
-		return $team_links;
-	}
-
-endif; // presscore_get_team_links_array
-
 if ( ! function_exists( 'presscore_options_get_safe_fonts' ) ) :
 
 	/**
@@ -472,95 +408,31 @@ endif;
 
 if ( ! function_exists( 'presscore_options_get_header_layout_elements' ) ) :
 
+	/**
+	 * Retrieve header micro-widgets list.
+	 *
+	 * @return array
+	 */
 	function presscore_options_get_header_layout_elements() {
 		return apply_filters( 'header_layout_elements', array(
-			'social_icons'  => array( 'title' => _x('Social icons', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'search'        => array( 'title' => _x('Search', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'cart'          => array( 'title' => _x('Cart', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'custom_menu'   => array( 'title' => _x('Menu 1', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'menu2'         => array( 'title' => _x('Menu 2', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'login'         => array( 'title' => _x('Login', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'text_area'     => array( 'title' => _x('Text 1', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'text2_area'    => array( 'title' => _x('Text 2', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'text3_area'    => array( 'title' => _x('Text 3', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'skype'         => array( 'title' => _x('Skype', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'email'         => array( 'title' => _x('Mail', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'address'       => array( 'title' => _x('Address', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'phone'         => array( 'title' => _x('Phone', 'theme-options', 'the7mk2'), 'class' => '' ),
-			'working_hours' => array( 'title' => _x('Working hours', 'theme-options', 'the7mk2'), 'class' => '' ),
+			'social_icons'  => array( 'title' => _x( 'Social icons', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'search'        => array( 'title' => _x( 'Search', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'custom_menu'   => array( 'title' => _x( 'Menu 1', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'menu2'         => array( 'title' => _x( 'Menu 2', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'login'         => array( 'title' => _x( 'Login', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'text_area'     => array( 'title' => _x( 'Text 1', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'text2_area'    => array( 'title' => _x( 'Text 2', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'text3_area'    => array( 'title' => _x( 'Text 3', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'text4_area'    => array( 'title' => _x( 'Text 4', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'text5_area'    => array( 'title' => _x( 'Text 5', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'skype'         => array( 'title' => _x( 'Skype', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'email'         => array( 'title' => _x( 'Mail', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'address'       => array( 'title' => _x( 'Address', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'phone'         => array( 'title' => _x( 'Phone', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'working_hours' => array( 'title' => _x( 'Working hours', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'button' => array( 'title' => _x( 'Button 1', 'theme-options', 'the7mk2' ), 'class' => '' ),
+			'button-2' => array( 'title' => _x( 'Button 2', 'theme-options', 'the7mk2' ), 'class' => '' ),
 		) );
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_options_get_font_sizes' ) ) :
-
-	function presscore_options_get_font_sizes() {
-		return array(
-			"big"    => _x( 'large', 'theme-options', 'the7mk2' ),
-			"normal" => _x( 'medium', 'theme-options', 'the7mk2' ),
-			"small"  => _x( 'small', 'theme-options', 'the7mk2' )
-		);
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_options_get_show_hide' ) ) :
-
-	function presscore_options_get_show_hide() {
-		return array(
-			'show'	=> _x('Show', 'theme-options', 'the7mk2'),
-			'hide'	=> _x('Hide', 'theme-options', 'the7mk2'),
-		);
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_options_get_enabled_disabled' ) ) :
-
-	function presscore_options_get_en_dis() {
-		return array(
-			'1' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-			'0' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-		);
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_options_tpl_logo' ) ) :
-
-	function presscore_options_tpl_logo( &$options, $prefix = '', $fields = array() ) {
-		$_fields = array();
-
-		$_fields['logo_regular'] = array(
-			'name'		=> _x( 'Logo', 'theme-options', 'the7mk2' ),
-			'type'		=> 'upload',
-			'mode'		=> 'full',
-			'std'		=> array( '', 0 ),
-		);
-
-		$_fields['logo_hd'] = array(
-			'name'		=> _x( 'High-DPI (retina) logo', 'theme-options', 'the7mk2' ),
-			'type'		=> 'upload',
-			'mode'		=> 'full',
-			'std'		=> array( '', 0 ),
-		);
-
-		$_fields = array_merge_recursive( $_fields, $fields );
-
-		$prefix = ( $prefix ? $prefix . '-' : '' );
-		foreach ( $_fields as $field_id => $field ) {
-			$field_id = ( isset( $field['id'] ) ? $field['id'] : $field_id );
-			if ( ! is_numeric( $field_id ) ) {
-				$field_id = $prefix . $field_id;
-
-				$field['id'] = $field_id;
-
-				$options[ $field_id ] = $field;
-			} else {
-				$options[] = $field;
-			}
-		}
 	}
 
 endif;

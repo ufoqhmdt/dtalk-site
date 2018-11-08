@@ -1,9 +1,9 @@
 jQuery( function( $ )
 {
-	$( 'body' ).on( 'click', '.rwmb-thickbox-upload', function()
+	$( 'body' ).on( 'click', '.the7-mb-thickbox-upload', function()
 	{
 		var $this = $( this ),
-			$holder = $this.siblings( '.rwmb-images' ),
+			$holder = $this.siblings( '.the7-mb-images' ),
 			post_id = $( '#post_ID' ).val(),
 			field_id = $this.data( 'field_id' ),
 			backup = window.send_to_editor;
@@ -17,8 +17,8 @@ jQuery( function( $ )
 
 			html = '<li id="item_' + id + '">';
 			html += '<img src="' + url + '">';
-			html += '<div class="rwmb-image-bar">';
-			html += '<a class="rwmb-delete-file" href="#" data-attachment_id="' + id + '">×</a>';
+			html += '<div class="the7-mb-image-bar">';
+			html += '<a class="the7-mb-delete-file" href="#" data-attachment_id="' + id + '">×</a>';
 			html += '</div>';
 			html += '<input type="hidden" name="' + field_id + '[]" value="' + id + '">';
 			html += '</li>';

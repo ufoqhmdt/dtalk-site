@@ -11,8 +11,8 @@ $dummies_list = $this->get_dummy_list();
 	<?php if ( count( $dummies_list ) > 5 ): ?>
 
 	<div class="dt-dummy-search">
-		<label class="screen-reader-text" for="dt-dummy-search-input"><?php esc_html_e( 'Search for demo:', 'the7mk2' ); ?></label>
-		<input type="search" id="dt-dummy-search-input" value="" placeholder="<?php esc_attr_e( 'Search for demo', 'the7mk2' ); ?>" autofocus />
+		<label class="screen-reader-text" for="dt-dummy-search-input"><?php esc_html_e( 'Search by demo name or URL (link):', 'the7mk2' ); ?></label>
+		<input type="search" id="dt-dummy-search-input" class="widefat" value="" placeholder="<?php esc_attr_e( 'Search by demo name or URL (link)', 'the7mk2' ); ?>" autofocus />
 	</div>
 
 	<?php endif; ?>

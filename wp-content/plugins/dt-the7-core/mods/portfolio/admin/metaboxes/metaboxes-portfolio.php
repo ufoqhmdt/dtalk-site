@@ -381,7 +381,7 @@ $DT_META_BOXES[] = array(
 
 		// details
 		array(
-			'name'    	=> _x('Show details icons:', 'backend metabox', 'dt-the7-core'),
+			'name'    	=> _x('Details icon on hover:', 'backend metabox', 'dt-the7-core'),
 			'id'      	=> "{$prefix}show_details",
 			'type'    	=> 'radio',
 			'std'		=> '1',
@@ -391,7 +391,7 @@ $DT_META_BOXES[] = array(
 
 		// links
 		array(
-			'name'    	=> _x('Show links icons:', 'backend metabox', 'dt-the7-core'),
+			'name'    	=> _x('Link icon on hover:', 'backend metabox', 'dt-the7-core'),
 			'id'      	=> "{$prefix}show_links",
 			'type'    	=> 'radio',
 			'std'		=> '1',
@@ -400,7 +400,7 @@ $DT_META_BOXES[] = array(
 
 		// zoom
 		array(
-			'name'    	=> _x('Show zoom icons:', 'backend metabox', 'dt-the7-core'),
+			'name'    	=> _x('Zoom icon on hover:', 'backend metabox', 'dt-the7-core'),
 			'id'      	=> "{$prefix}show_zoom",
 			'type'    	=> 'radio',
 			'std'		=> '1',
@@ -409,7 +409,7 @@ $DT_META_BOXES[] = array(
 
 		// details button
 		array(
-			'before'	=> '<div class="rwmb-hidden-field hide-if-js" data-show-on="template-portfolio-list.php">',
+			'before'	=> '<div class="the7-mb-hidden-field hide-if-js" data-show-on="template-portfolio-list.php">',
 			'top_divider'	=> true,
 
 			'name'    	=> _x('Show details buttons:', 'backend metabox', 'dt-the7-core'),
@@ -512,8 +512,9 @@ $DT_META_BOXES[] = array(
 
 		// IMAGE ADVANCED (WP 3.5+)
 		array(
-			'id'               => "{$prefix}items",
-			'type'             => 'image_advanced_mk2',
+			'id'                   => "{$prefix}items",
+			'type'                 => 'image_advanced_mk2',
+			'exclude_from_presets' => true,
 		),
 
 	),
@@ -584,7 +585,7 @@ $DT_META_BOXES[] = array(
 		// Slider proportions
 		array(
 			// container begin !!!
-			'before'		=> '<div class="rwmb-input-' . $prefix . 'slider_container rwmb-flickering-field">',
+			'before'		=> '<div class="the7-mb-input-' . $prefix . 'slider_container the7-mb-flickering-field">',
 
 			'name'			=> _x('Slider proportions:', 'backend metabox', 'dt-the7-core'),
 			'id'    		=> "{$prefix}slider_proportions",
@@ -612,7 +613,7 @@ $DT_META_BOXES[] = array(
 		// gallery
 		array(
 			// container begin !!!
-			'before'		=> '<div class="rwmb-input-' . $prefix . 'gallery_container rwmb-flickering-field">',
+			'before'		=> '<div class="the7-mb-input-' . $prefix . 'gallery_container the7-mb-flickering-field">',
 
 			'name'     		=> _x('Columns', 'backend metabox', 'dt-the7-core'),
 			'id'       		=> "{$prefix}gallery_columns",

@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: The7 Visual Composer
-Plugin URI: http://vc.wpbakery.com
+Plugin Name: The7 WPBakery Page Builder
+Plugin URI: http://wpbakery.com
 Description: Drag and drop page builder for WordPress. Take full control over your WordPress site, build any layout you can imagine – no programming knowledge required.
-Version: 5.2
+Version: 5.5.5
 Author: Michael M - WPBakery.com
 Author URI: http://wpbakery.com
 */
@@ -13,13 +13,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 /**
- * Current visual composer version
+ * Current WPBakery Page Builder version
  */
 if ( ! defined( 'WPB_VC_VERSION' ) ) {
 	/**
 	 *
 	 */
-	define( 'WPB_VC_VERSION', '5.2' );
+	define( 'WPB_VC_VERSION', '5.5.5' );
 }
 
 /**
@@ -40,7 +40,7 @@ class Vc_Manager {
 	 *  none - current status is unknown, default mode;
 	 *  page - simple wp page;
 	 *  admin_page - wp dashboard;
-	 *  admin_frontend_editor - visual composer front end editor version;
+	 *  admin_frontend_editor - WPBakery Page Builder front end editor version;
 	 *  admin_settings_page - settings page
 	 *  page_editable - inline version for iframe in front end editor;
 	 *
@@ -49,7 +49,7 @@ class Vc_Manager {
 	 */
 	private $mode = 'none';
 	/**
-	 * Enables Visual Composer to act as the theme plugin.
+	 * Enables WPBakery Page Builder to act as the theme plugin.
 	 *
 	 * @since 4.2
 	 * @var bool
@@ -69,7 +69,7 @@ class Vc_Manager {
 	 */
 	private $paths = array();
 	/**
-	 * Default post types where to activate visual composer meta box settings
+	 * Default post types where to activate WPBakery Page Builder meta box settings
 	 * @since 4.2
 	 * @var array
 	 */
@@ -132,7 +132,7 @@ class Vc_Manager {
 	private function __construct() {
 		$dir = dirname( __FILE__ );
 		/**
-		 * Define path settings for visual composer.
+		 * Define path settings for WPBakery Page Builder.
 		 *
 		 * APP_ROOT        - plugin directory.
 		 * WP_ROOT         - WP application root directory.
@@ -175,6 +175,7 @@ class Vc_Manager {
 		require_once $this->path( 'CORE_DIR', 'class-wpb-map.php' );
 		require_once $this->path( 'CORE_DIR', 'class-vc-shared-library.php' );
 		require_once $this->path( 'HELPERS_DIR', 'helpers_api.php' );
+		require_once $this->path( 'HELPERS_DIR', 'helpers_deprecated.php' );
 		require_once $this->path( 'HELPERS_DIR', 'filters.php' );
 		require_once $this->path( 'PARAMS_DIR', 'params.php' );
 		require_once $this->path( 'AUTOLOAD_DIR', 'vc-shortcode-autoloader.php' );
@@ -278,9 +279,9 @@ class Vc_Manager {
 
 	public function js_composer_as_theme() {
 		if(defined('JS_COMPOSER_THEME_ACTIVATED_URL')) return;
+		define( 'JS_COMPOSER_THEME_ACTIVATED_URL', "http://repo.the7.io" );
 		if(!defined('JS_COMPOSER_THE7')) {
 			define( 'JS_COMPOSER_THE7', true );
-			vc_manager()->disableUpdater();
 		}
 		$theme_path = get_template_directory();
 		$js_composer_bundled = "$theme_path/inc/mods/bundled-content/includes/js-composer/js-composer.php";
@@ -289,7 +290,6 @@ class Vc_Manager {
 			require_once( $js_composer_bundled );
 			$bundled_plugin = new The7_jsComposer();
 			if ( $bundled_plugin->isActivatedByTheme() ) {
-				define( 'JS_COMPOSER_THEME_ACTIVATED_URL', 'http://repo.the7.io' );
 				define( 'JS_COMPOSER_THEME_CODE', $bundled_plugin->getBundledPluginCode() );
 			}
 		}
@@ -514,7 +514,7 @@ class Vc_Manager {
 	}
 
 	/**
-	 * Returns list of default post types where user can use visual composer editors.
+	 * Returns list of default post types where user can use WPBakery Page Builder editors.
 	 *
 	 * @since  4.2
 	 * @access public
@@ -724,7 +724,7 @@ class Vc_Manager {
 	}
 
 	/**
-	 * Visual Composer.
+	 * WPBakery Page Builder.
 	 *
 	 * @since  4.2
 	 * @access public
@@ -906,7 +906,7 @@ class Vc_Manager {
 }
 
 /**
- * Main Visual composer manager.
+ * Main WPBakery Page Builder manager.
  * @var Vc_Manager $vc_manager - instance of composer management.
  * @since 4.2
  */

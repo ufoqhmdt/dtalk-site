@@ -26,9 +26,13 @@ class The7_Admin_Dashboard {
 			),
 			'the7-status'       => array(
 				'title'      => __( 'Service Information', 'the7mk2' ),
-				'capability' => 'edit_theme_options',
+				'capability' => 'switch_themes',
 			),
 		);
+
+		if ( defined( 'ENVATO_HOSTED_SITE' ) ) {
+			unset( $this->pages['the7-status'] );
+		}
 	}
 
 	/**
@@ -37,6 +41,15 @@ class The7_Admin_Dashboard {
 	public function init() {
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
 		add_action( 'after_switch_theme', array( $this, 'redirect_to_dashboard' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+	}
+
+	public function register_scripts() {
+		the7_register_style( 'the7-dashboard', PRESSCORE_ADMIN_URI . '/assets/css/the7-dashboard' );
+		the7_register_style( 'the7-dashboard-icons', PRESSCORE_ADMIN_URI . '/assets/fonts/the7-dashboard-icons/the7-dashboard-icons' );
+
+		the7_register_script( 'the7-dashboard', PRESSCORE_ADMIN_URI . '/assets/js/the7-dashboard', array(), false, true );
+		the7_register_script( 'the7-status', PRESSCORE_ADMIN_URI . '/assets/js/the7-status', array(), false, true );
 	}
 
 	/**
@@ -64,15 +77,21 @@ class The7_Admin_Dashboard {
         $sub_pages = $this->get_sub_pages();
 
 		foreach ( $sub_pages as $sub_page_slug=>$sub_page ) {
+			$page['dashboard_slug'] = $dashboard_slug;
+			$page['slug'] = $sub_page_slug;
+			$page['title'] = $sub_page['title'];
+			$page['capability'] = $sub_page['capability'];
+
+			$page = apply_filters('the7_subpages_filter', $page);
 			$hook_suffix = add_submenu_page(
-				$dashboard_slug,
-				$sub_page['title'],
-				$sub_page['title'],
-				$sub_page['capability'],
-				$sub_page_slug,
+				$page['dashboard_slug'],
+				$page['title'],
+				$page['title'],
+				$page['capability'],
+				$page['slug'],
 				array( $this, 'menu_page_screen' )
 			);
-            $sub_page_hook_suffix[ $sub_page_slug ] = $hook_suffix;
+            $sub_page_hook_suffix[ 	$page['slug'] ] = $hook_suffix;
 
 			// Adds actions to hook in the required css and javascript
             add_action( 'admin_print_styles-' . $hook_suffix, array( $this, 'enqueue_styles' ) );
@@ -91,6 +110,9 @@ class The7_Admin_Dashboard {
 
 		// Theme registration.
 		Presscore_Modules_ThemeUpdateModule::setup_hooks( $the7_page );
+
+		// Status page.
+		add_action( 'admin_print_scripts-' . $sub_page_hook_suffix['the7-status'], array( $this, 'enqueue_status_scripts' ) );
 
 		global $submenu;
 		if ( isset( $submenu[ $dashboard_slug ] ) ) {
@@ -114,21 +136,28 @@ class The7_Admin_Dashboard {
 	 * Enqueue common styles.
 	 */
 	public function enqueue_styles() {
-        wp_enqueue_style( 'the7-dashboard', PRESSCORE_ADMIN_URI . '/assets/the7-dashboard.css', array(), the7_get_theme_version() );
+        wp_enqueue_style( 'the7-dashboard' );
     }
 
 	/**
 	 * Enqueue common scripts.
 	 */
     public function enqueue_scripts() {
-	    wp_enqueue_script( 'the7-dashboard', PRESSCORE_ADMIN_URI . '/assets/the7-dashboard.js', array(), the7_get_theme_version() );
+	    wp_enqueue_script( 'the7-dashboard' );
     }
 
 	/**
 	 * Enqueue styles for dashboard page.
 	 */
     public function enqueue_dashboard_styles() {
-    	wp_enqueue_style( 'the7-dashboard-icons', PRESSCORE_ADMIN_URI . '/assets/dashboard-icons.css', array(), the7_get_theme_version() );
+    	wp_enqueue_style( 'the7-dashboard-icons' );
+    }
+
+	/**
+	 * Enqueue scripts on status page.
+	 */
+    public function enqueue_status_scripts() {
+	    wp_enqueue_script( 'the7-status' );
     }
 
 	/**

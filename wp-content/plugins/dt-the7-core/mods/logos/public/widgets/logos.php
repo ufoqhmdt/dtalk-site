@@ -77,16 +77,16 @@ class Presscore_Inc_Widgets_Logos extends WP_Widget {
 
 		if ( $p_query->have_posts() ) {
 
-			echo '<ul class="logo-items slider-content"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
+			echo '<div class="logo-items slider-content  owl-carousel"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
 
 			while( $p_query->have_posts() ) { $p_query->the_post();
 
-				echo '<li>' . self::presscore_render_logo() . '</li>';
+				echo self::presscore_render_logo();
 
 			} // while have posts
 			wp_reset_postdata();
 
-			echo '</ul>', "\n";
+			echo '</div>', "\n";
 
 		} // if have posts
 

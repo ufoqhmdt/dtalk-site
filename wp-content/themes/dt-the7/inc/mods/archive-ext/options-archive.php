@@ -9,8 +9,18 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+$supported_shortcodes = array(
+	'Blog Masonry & Grid',
+	'Blog List',
+	'Portfolio Masonry & Grid',
+	'Portfolio Justified Grid',
+	'Team Masonry & Grid',
+	'Testimonials Masonry & Grid',
+	'Albums Masonry & Grid',
+	'Albums Justified Grid',
+);
 $options[] = array(
-	'desc' => _x( "Settings bellow allows you to select pages to be used as templates for your Archives and Search results (header, sidebar and footer).\nNote that Archives content and Search results will always be rendered using masonry layout.", 'theme-options', 'the7mk2' ),
+	'desc' => sprintf( _x( "Settings bellow allows you to select pages to be used as templates for your Archives and Search results. This includes header, footer, sidebar and <strong>content layout</strong> (beta feature).\nNote that Archives content and Search results appearance will be rendered in accordance with <strong>first</strong> <span class='of-tooltip'><strong>corresponding shortcode</strong><i class='tooltiptext'><b>Supported shortcodes:</b><br />%s</i></span> found on the page. Otherwise it will default to a masonry layout. Categorisation is always disabled and pagination defaults to a 'standard' mode.", 'theme-options', 'the7mk2' ), implode( '<br />', $supported_shortcodes ) ),
 	'type' => 'info',
 );
 

@@ -29,7 +29,7 @@ jQuery(document).ready(function($){
 		return selection;
 	}
 
-	$( 'body' ).on( 'click', '.rwmb-image-advanced-upload-mk2', function( e ) {
+	$( 'body' ).on( 'click', '.the7-mb-image-advanced-upload-mk2', function( e ) {
 
 		e.preventDefault();
 
@@ -38,13 +38,13 @@ jQuery(document).ready(function($){
 				frame: 'post',
 				state: 'gallery-library',
 				button: 'Add image',
-				class: 'media-frame rwmb-media-frame rwmb-media-frame-mk2'
+				class: 'media-frame the7-mb-media-frame the7-mb-media-frame-mk2'
 			},
-			$imageList = $uploadButton.siblings( '.rwmb-images' ),
+			$imageList = $uploadButton.siblings( '.the7-mb-images' ),
 			maxFileUploads = $imageList.data( 'max_file_uploads' ),
 			msg = 'You may only upload ' + maxFileUploads + ' file',
 			frame_key = _.random(0, 999999999999999999),
-			$images = $imageList.find('.rwmb-delete-file'),
+			$images = $imageList.find('.the7-mb-delete-file'),
 			ids = new Array();
 
 		if ( 1 == maxFileUploads ) {
@@ -112,7 +112,7 @@ jQuery(document).ready(function($){
 
 			// Attach attachment to field and get HTML
 			var data = {
-				action       : 'rwmb_attach_media',
+				action       : 'the7_mb_attach_media',
 				post_id      : $( '#post_ID' ).val(),
 				field_id     : $imageList.data( 'field_id' ),
 				attachments_ids  : ids,

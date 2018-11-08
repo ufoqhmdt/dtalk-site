@@ -11,39 +11,29 @@
  * the readme will list any important changes.
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
- * @author  WooThemes
  * @package WooCommerce/Templates
- * @version 2.2
+ * @version 3.4.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+defined( 'ABSPATH' ) || exit;
 
-if ( ! wc_coupons_enabled() ) {
+if ( ! wc_coupons_enabled() ) { // @codingStandardsIgnoreLine.
 	return;
 }
 
-if ( empty( WC()->cart->applied_coupons ) ) {
-	?>
-	<div class="wc-coupon-wrap">
-	<?php
-	$info_message = apply_filters( 'woocommerce_checkout_coupon_message',  ' <span class="showcoupon-tag"><i class="fa fa-tag" aria-hidden="true"></i>' . __( 'Have a coupon?', 'the7mk2' ) . '</span> <a href="#" class="showcoupon">' . __( 'Click here to enter your code', 'the7mk2' ) . '</a>' );
-	wc_print_notice( $info_message, 'notice' );
-	
-}
 ?>
+<div class="wc-coupon-wrap">
+	<?php wc_print_notice( apply_filters( 'woocommerce_checkout_coupon_message', '<span class="showcoupon-tag"><i class="fa fa-tag" aria-hidden="true"></i>' . __( 'Have a coupon?', 'woocommerce' ) . '</span> <a href="#" class="showcoupon">' . __( 'Click here to enter your code', 'woocommerce' ) . '</a>' ), 'notice' ); ?>
+    <form class="checkout_coupon woocommerce-form-coupon" method="post" style="display:none">
+        <div class="form-coupon-wrap">
+            <p><?php esc_html_e( 'If you have a coupon code, please apply it below.', 'the7mk2' ); ?></p>
 
-<form class="checkout_coupon" method="post" style="display:none">
-	<div class="form-coupon-wrap">
-		<span class="coupon">
-			<input type="text" name="coupon_code" class="input-text" placeholder="<?php esc_attr_e( 'Coupon code', 'the7mk2' ); ?>" id="coupon_code" value="" />
-		</span>
+            <span class="coupon">
+                <input type="text" name="coupon_code" class="input-text" placeholder="<?php esc_attr_e( 'Coupon code', 'the7mk2' ) ?>" id="coupon_code" value=""/>
+            </span>
 
-			<input type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Apply Coupon', 'the7mk2' ); ?>" />
-
-	</div>
-	<div class="clear"></div>
-</form>
-
-	</div>
+            <button type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Apply Coupon', 'the7mk2' ); ?>"><?php esc_html_e( 'Apply Coupon', 'the7mk2' ); ?></button>
+        </div>
+        <div class="clear"></div>
+    </form>
+</div>

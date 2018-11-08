@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 if ( !function_exists( 'dt_paginator' ) ) {
 
 function dt_paginator( $query = null, $opts = array() ) {
-	global $wp_query, $paged;
+	global $wp_query, $paged, $wp_rewrite;
 
 	if ( !is_single() ) {
 		$defaults = array(
@@ -37,10 +37,10 @@ function dt_paginator( $query = null, $opts = array() ) {
 			'page_text'         => '%PAGE_NUMBER%',
 			'first_text'        => _x( 'First', 'pagination defaults', 'the7mk2' ),
 			'last_text'         => _x( 'Last', 'pagination defaults', 'the7mk2' ),
-			'prev_text'         => '<i class="fa fa-long-arrow-left" aria-hidden="true"></i>',
-			'next_text'         => '<i class="fa fa-long-arrow-right" aria-hidden="true"></i>',
-			'no_next'			=> '<span class="nav-next disabled"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></span>',
-			'no_prev'			=> '<span class="nav-prev disabled"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></span>',
+			'prev_text'         => '<i class="fas fa-long-arrow-alt-left" aria-hidden="true"></i>',
+			'next_text'         => '<i class="fas fa-long-arrow-alt-right" aria-hidden="true"></i>',
+			'no_next'			=> '<span class="nav-next disabled"><i class="fas fa-long-arrow-alt-right" aria-hidden="true"></i></span>',
+			'no_prev'			=> '<span class="nav-prev disabled"><i class="fas fa-long-arrow-alt-left" aria-hidden="true"></i></span>',
 			'dotright_text'     => '&#8230;',
 			'dotleft_text'      => '&#8230;',
 			'num_pages'         => 5,
@@ -50,7 +50,10 @@ function dt_paginator( $query = null, $opts = array() ) {
 			'max_num_pages'		=> 0,
 			'found_posts'		=> 0,
 			'posts_per_page'	=> 0,
-			'paged'				=> 0
+			'paged'				=> 0,
+			'format'            => '',
+			'base'              => '',
+			'return'            => false,
 		);
 		$opts = wp_parse_args( $opts, $defaults );
 		$opts = apply_filters('dt_paginator_args', $opts);
@@ -61,14 +64,11 @@ function dt_paginator( $query = null, $opts = array() ) {
 			$query = $wp_query;
 		}
 
-		$posts_per_page = $opts['posts_per_page'] ? $opts['posts_per_page'] : intval(get_query_var('posts_per_page'));
-
 		$paged = $opts['paged'];
-		if ( !$paged && !$paged = intval(get_query_var('page'))) {
-			$paged = intval(get_query_var('paged'));
+		if ( ! $paged && ! $paged = (int) get_query_var( 'page' ) ) {
+			$paged = (int) get_query_var( 'paged' );
 		}
 
-		$numposts = $opts['found_posts'] ? $opts['found_posts'] : $query->found_posts;
 		$max_page = $opts['max_num_pages'] ? $opts['max_num_pages'] : $query->max_num_pages;
 		
 		if(empty($paged) || $paged == 0) {
@@ -104,30 +104,39 @@ function dt_paginator( $query = null, $opts = array() ) {
 			$start_page = 1;
 		}
 
-		if( $opts['ajaxing'] ) {
-			add_filter( 'get_pagenum_link', 'dt_ajax_paginator_filter', 10, 1);
-		}
-
 		$output = '';
 		$pages_list = '';
 
-		// add class to item wrap
 		$opts['item_wrap'] = str_replace( '%ITEM_CLASS%', $opts['item_class'], $opts['item_wrap'] );
-		// add class to global pagunator wrap and cut it into parts
-		// $opts['wrap'] = explode( '%LIST%', str_replace('%CLASS%', $opts['class'], $opts['wrap']) ); 
 
-		if ( $max_page > 1 || intval($opts['always_show']) == 1) {
+		if( $opts['ajaxing'] ) {
+			add_filter( 'get_pagenum_link', 'dt_ajax_paginator_filter', 10, 1);
+		}
+		// Setting up default values based on the current URL.
+		$pagenum_link = html_entity_decode( get_pagenum_link() );
+		remove_filter( 'get_pagenum_link', 'dt_ajax_paginator_filter', 10, 1);
+		$url_parts    = explode( '?', $pagenum_link );
 
-			//***********************************************************************************************
-			// Nex and previous buttons
-			//***********************************************************************************************
+		// Append the format placeholder to the base URL.
+		$base = $opts['base'];
+		if ( ! $base ) {
+			$base = $pagenum_link = trailingslashit( $url_parts[0] ) . '%_%';
+		}
 
-			// add some atts
+		$format = $opts['format'];
+		if ( ! $format ) {
+			// URL base depends on permalink settings.
+			$format = $wp_rewrite->using_index_permalinks() && ! strpos( $pagenum_link, 'index.php' ) ? 'index.php/' : '';
+			$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit( $wp_rewrite->pagination_base . '/%#%', 'paged' ) : '?paged=%#%';
+		}
+
+		if ( $max_page > 1 || (int) $opts['always_show'] === 1) {
 			add_filter( 'dt_next_posts_link_attributes', 'dt_paginator_add_posts_link_attr', 10, 2 );
 			add_filter( 'dt_previous_posts_link_attributes', 'dt_paginator_add_posts_link_attr', 10, 2 );
 
-			$pages_next = dt_get_next_posts_link($opts['next_text'], $max_page, 'class="' . sanitize_html_class($opts['pages_next_class']) . '"');
-			$pages_prev = dt_get_previous_posts_link($opts['prev_text'], 'class="' . sanitize_html_class($opts['pages_prev_class']) . '"');
+			$pages_next = dt_get_next_posts_link($opts['next_text'], $max_page, 'class="' . sanitize_html_class($opts['pages_next_class']) . '"', str_replace( '%_%', $format, $base ), $paged );
+			$pages_prev = dt_get_previous_posts_link($opts['prev_text'], 'class="' . sanitize_html_class($opts['pages_prev_class']) . '"', str_replace( '%_%', $paged === 2 ? '' : $format, $base ), $paged );
+
 
 			remove_filter( 'dt_next_posts_link_attributes', 'dt_paginator_add_posts_link_attr', 10, 2 );
 			remove_filter( 'dt_previous_posts_link_attributes', 'dt_paginator_add_posts_link_attr', 10, 2 );
@@ -166,10 +175,13 @@ function dt_paginator( $query = null, $opts = array() ) {
 			if( $paged > 1 || $opts['first_is_first_mode'] ) {
 
 				$act_class = $class_act = '';
-				if ( 1 == $paged ) {
+				if ( 1 === $paged ) {
 					$act_class = $opts['act_class'];
 					$class_act = 'class="' . $opts['act_class'] . '"';
 				}
+
+				$link = str_replace( '%_%', '', $base );
+				$link = str_replace( '%#%', 1, $link );
 
 				$pages_list .= str_replace(
 					array(
@@ -181,7 +193,7 @@ function dt_paginator( $query = null, $opts = array() ) {
 						'%PAGE_NUM%'
 					),
 					array(
-						esc_url( get_pagenum_link() ),
+						esc_url( $link ),
 						$opts['first_text'],
 						1,
 						$act_class,
@@ -199,6 +211,8 @@ function dt_paginator( $query = null, $opts = array() ) {
 						$class_act = $curr_class = '';
 						$pages_list .= '<div style="display: none;">';
 						for ( $i = 2; $i < $loop_start; $i++ ) {
+							$link = str_replace( '%_%', $format, $base );
+							$link = str_replace( '%#%', $i, $link );
 							$page_text = str_replace( "%PAGE_NUMBER%", number_format_i18n($i), $opts['page_text'] );
 							$pages_list .= str_replace(
 								array(
@@ -211,7 +225,7 @@ function dt_paginator( $query = null, $opts = array() ) {
 								),
 								array(
 									$opts['item_class'],
-									esc_url(get_pagenum_link($i)),
+									esc_url($link),
 									$page_text,
 									$curr_class,
 									$class_act,
@@ -244,6 +258,10 @@ function dt_paginator( $query = null, $opts = array() ) {
 					);
 					$curr_class = $class_act = '';
 				}
+
+				$link = str_replace( '%_%', 1 === $i ? '' : $format, $base );
+				$link = str_replace( '%#%', $i, $link );
+
 				$pages_list .= str_replace(
 					array(
 						'%ITEM_CLASS%',
@@ -255,7 +273,7 @@ function dt_paginator( $query = null, $opts = array() ) {
 					),
 					array(
 						$opts['item_class'],
-						get_pagenum_link($i),
+						esc_url( $link ),
 						$page_text,
 						$curr_class,
 						$class_act,
@@ -273,6 +291,8 @@ function dt_paginator( $query = null, $opts = array() ) {
 						$class_act = $curr_class = '';
 						$pages_list .= '<div style="display: none;">';
 						for ( $i = $loop_end+1; $i <= $dots_right_point; $i++ ) {
+							$link = str_replace( '%_%', $format, $base );
+							$link = str_replace( '%#%', $i, $link );
 							$page_text = str_replace( "%PAGE_NUMBER%", number_format_i18n($i), $opts['page_text'] );
 							$pages_list .= str_replace(
 								array(
@@ -285,7 +305,7 @@ function dt_paginator( $query = null, $opts = array() ) {
 								),
 								array(
 									$opts['item_class'],
-									get_pagenum_link($i),
+									esc_url( $link ),
 									$page_text,
 									$curr_class,
 									$class_act,
@@ -307,6 +327,9 @@ function dt_paginator( $query = null, $opts = array() ) {
 					$class_act = 'class="' . $opts['act_class'] . '"';
 				}
 
+				$link = str_replace( '%_%', $format, $base );
+				$link = str_replace( '%#%', $max_page, $link );
+
 				$pages_list .= str_replace(
 					array(
 						'%HREF%',
@@ -317,7 +340,7 @@ function dt_paginator( $query = null, $opts = array() ) {
 						'%PAGE_NUM%'
 					),
 					array(
-						get_pagenum_link($max_page),
+						esc_url( $link ),
 						$opts['last_text'],
 						$max_page,
 						$act_class,
@@ -340,55 +363,16 @@ function dt_paginator( $query = null, $opts = array() ) {
 				$opts['wrap'] . ( isset($opts['pages_wrap']) ? $opts['pages_wrap'] : '' )
 			);
 
+			if ( $opts['return'] ) {
+				return $output;
+			}
+
 			echo $output;
 		}
-
-		remove_filter( 'get_pagenum_link', 'dt_ajax_paginator_filter', 10, 1);
 	}
 }
 
 } // !function_exists
-
-// filter pagelink when ajaxing paginatior
-/*
-function dt_ajax_paginator_filter( $href ) {
-	$data = dt_storage( 'page_data' );
-	$first = true;
-
-	$data['cat_id'] = current($data['cat_id']);
-	if( !$data['cat_id'] ) {
-		$data['cat_id'] = 'all';
-	}
-	
-	$search = array(
-		'&paged=',
-		'?paged=',
-		'/page/'
-	);
-	
-	foreach( $search as $exp ) {
-		$str = explode( $exp, $href );
-	
-		if( isset($str[1]) ) {
-			$href = '#' . $data['cat_id'] . '/' . $str[1];
-			$first = false;
-			break;
-		}
-	}
-	
-	if( $first ) {
-		$href = '#' . $data['cat_id'] . '/' . 1;
-	}
-	
-	$href .= '/' . $data['layout'];
-
-	if( !empty($data['base_url']) ) {
-		$href = str_replace( admin_url( 'admin-ajax.php' ), $data['base_url'], $href );
-	}
-	
-	return $href;
-}
-*/
 
 function dt_ajax_paginator_filter( $result ) {
 	global $wp_rewrite;
@@ -481,28 +465,35 @@ function dt_paginator_add_posts_link_attr( $attr, $nextpage = 0 ) {
  *
  * @see get_next_posts_link
  */
-function dt_get_next_posts_link( $label = null, $max_page = 0, $attr = '' ) {
+function dt_get_next_posts_link( $label = null, $max_page = 0, $attr = '', $base = '', $current = null ) {
 	global $paged, $wp_query;
 
-	if ( !$max_page ) {
-		$max_page = $wp_query->max_num_pages;
+	if ( is_single() ) {
+		return '';
 	}
 
-	if ( !$paged ) {
-		$paged = 1;
+	$paged_origin = $paged;
+	$paged = $paged ? $paged : 1;
+	$current = $current !== null ? $current : $paged;
+	$nextpage = $current + 1;
+	$max_page = $max_page ? $max_page : $wp_query->max_num_pages;
+
+	if ( $nextpage > $max_page ) {
+		return '';
 	}
 
-	$nextpage = intval($paged) + 1;
-
-	if ( null === $label ) {
-		$label = '';
+	if ( $base ) {
+		$link = str_replace( '%#%', $nextpage, $base );
+	} else {
+		$paged = $current;
+		$link = next_posts( $max_page, false );
+		$paged = $paged_origin;
 	}
 
-	if ( !is_single() && ( $nextpage <= $max_page ) ) {
-		$attr = apply_filters( 'dt_next_posts_link_attributes', $attr, $nextpage, $max_page );
-		return '<a href="' . next_posts( $max_page, false ) . "\" $attr>" . preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label) . '</a>';
-	}
-	return '';
+	$label = $label ? $label : '';
+	$attr = apply_filters( 'dt_next_posts_link_attributes', $attr, $nextpage, $max_page );
+
+	return '<a href="' . esc_url( $link ) . '" ' . $attr . ' >' . preg_replace( '/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label ) . '</a>';
 }
 
 /**
@@ -510,23 +501,34 @@ function dt_get_next_posts_link( $label = null, $max_page = 0, $attr = '' ) {
  *
  * @see get_previous_posts_link
  */
-function dt_get_previous_posts_link( $label = null, $attr = '' ) {
+function dt_get_previous_posts_link( $label = null, $attr = '', $base = '', $current = null ) {
 	global $paged;
 
-	if ( null === $label ) {
-		$label = '';
+	if ( is_single() ) {
+		return '';
 	}
 
-	$nextpage = intval($paged) - 1;
-	if ( $nextpage < 1 ) {
-		$nextpage = 1;
+	$paged_origin = $paged;
+	$paged = $paged ? $paged : 1;
+	$current = $current !== null ? (int) $current : $paged;
+
+	if ( $current < 2 ) {
+		return '';
 	}
 
-	if ( !is_single() && $paged > 1 ) {
-		$attr = apply_filters( 'dt_previous_posts_link_attributes', $attr, $nextpage );
-		return '<a href="' . previous_posts( false ) . "\" $attr>". preg_replace( '/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label ) .'</a>';
+	$prev_page = $current - 1;
+	if ( $base ) {
+		$link = str_replace( '%#%', $prev_page, $base );
+	} else {
+		$paged = $current;
+		$link = get_previous_posts_page_link();
+		$paged = $paged_origin;
 	}
-	return '';
+
+	$label = $label ? $label : '';
+	$attr = apply_filters( 'dt_previous_posts_link_attributes', $attr, $prev_page );
+
+	return '<a href="' . esc_url( $link ) . '" ' . $attr . ' >'. preg_replace( '/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $label ) .'</a>';
 }
 
 if ( ! function_exists( 'presscore_paginator_show_all_pages_filter' ) ) :

@@ -24,9 +24,9 @@
 		// Initialize DOM elements
 		initDomElements: function()
 		{
-			this.canvas = this.$container.find( '.rwmb-map-canvas' )[0];
-			this.$coordinate = this.$container.find( '.rwmb-map-coordinate' );
-			this.$findButton = this.$container.find( '.rwmb-map-goto-address-button' );
+			this.canvas = this.$container.find( '.the7-mb-map-canvas' )[0];
+			this.$coordinate = this.$container.find( '.the7-mb-map-coordinate' );
+			this.$findButton = this.$container.find( '.the7-mb-map-goto-address-button' );
 			this.addressField = this.$findButton.val();
 		},
 
@@ -166,7 +166,7 @@
 
 	$( function()
 	{
-		$( '.rwmb-map-field' ).each( function()
+		$( '.the7-mb-map-field' ).each( function()
 		{
 			var field = new mapField( $( this ) );
 			field.init();

@@ -6,17 +6,28 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-// $current_dir = dirname( __FILE__ );
+require_once PRESSCORE_SHORTCODES_DIR . '/class-dt-vc-responsive-columns-param.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-register-button-wp-3.9.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-shortcode.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-shortcode-masonry-posts.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/puny-shortcodes-functions.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/shortcodes-animation-functions.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/shortcodes-hooks.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-the7-vc-taxonomy-autocomplete.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-the7-vc-posts-autocomplete.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/class-the7-orphaned-shortcodes-handler.php';
+require_once PRESSCORE_SHORTCODES_INCLUDES_DIR . '/shortcodes-functions.php';
 
-require_once trailingslashit( PRESSCORE_SHORTCODES_DIR ) . 'class-dt-vc-responsive-columns-param.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-register-button-wp-3.9.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-shortcode.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-shortcode-masonry-posts.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'puny-shortcodes-functions.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'shortcodes-animation-functions.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'shortcodes-hooks.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-the7-vc-taxonomy-autocomplete.php';
-require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-the7-vc-posts-autocomplete.php';
+/**
+ * Handle shortcodes outside of page content.
+ */
+$orphaned_shortcodes_handler = new The7_Orphaned_Shortcodes_Handler();
+add_action( 'admin_init', array( $orphaned_shortcodes_handler, 'add_cache_invalidation_hooks' ) );
+add_action( 'presscore_body_top', array( $orphaned_shortcodes_handler, 'add_hooks' ) );
+add_action( 'presscore_before_main_container', array( $orphaned_shortcodes_handler, 'remove_hooks' ) );
+add_action( 'dynamic_sidebar_before', array( $orphaned_shortcodes_handler, 'add_hooks' ) );
+add_action( 'dynamic_sidebar_after', array( $orphaned_shortcodes_handler, 'remove_hooks' ) );
+add_action( 'presscore_credits', array( $orphaned_shortcodes_handler, 'add_hooks' ) );
 
 /**
  * Register theme template parts dir.
@@ -67,6 +78,10 @@ $presscore_shortcodes = array(
 	'breadcrumbs',
 	'carousel',
 	'default-button',
+	'soc-icons',
+	'single-soc-icon',
+	'media-gallery-masonry',
+	'media-gallery-carousel'
 );
 
 if ( dt_is_woocommerce_enabled() ) {

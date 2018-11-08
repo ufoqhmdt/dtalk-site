@@ -3,10 +3,8 @@
 ================================================== */
 
 //Floating navigation height
-.sticky-on .masthead:not(.side-header):not(.mixed-header) .header-bar,
-.phantom-on #phantom.masthead:not(.side-header):not(.mixed-header) .header-bar,
-.sticky-on .mixed-header.side-header-h-stroke .header-bar,
-.side-header-h-stroke .ph-wrap .header-bar,
+#page .masthead.sticky-on .header-bar,
+#phantom.masthead .header-bar,
 #phantom .ph-wrap {
 	min-height: @float-menu-height;
 }
@@ -14,12 +12,12 @@
 //Branding
 #phantom .logo-box,
 #phantom .phantom-top-line-logo,
-.phantom-sticky.sticky-on .masthead:not(.side-header) .branding > a,
-.phantom-sticky.sticky-on .masthead:not(.side-header) .branding > img {
+.phantom-sticky .sticky-on.masthead:not(.side-header) .branding > a,
+.phantom-sticky .sticky-on.masthead:not(.side-header) .branding > img {
 	padding: @floating-logo-top-padding @floating-logo-right-padding @floating-logo-bottom-padding @floating-logo-left-padding;
 }
-.transparent.phantom-sticky.sticky-on .masthead .branding > a,
-.transparent.phantom-sticky.sticky-on .masthead .branding > img {
+.transparent.phantom-sticky .sticky-on.masthead .branding > a,
+.transparent.phantom-sticky .sticky-on.masthead .branding > img {
 	padding: @floating-logo-top-padding @floating-logo-right-padding @floating-logo-bottom-padding @floating-logo-left-padding;
 }
 
@@ -55,14 +53,12 @@
 }
 
 /*Bg for Sticky floating*/
-.responsive-off.phantom-sticky.sticky-on .masthead:not(.mixed-header):not(.side-header):not(.masthead-mobile),
-.responsive-off.phantom-sticky.sticky-on .mixed-header.side-header-h-stroke {
+.responsive-off.phantom-sticky .sticky-on.masthead:not(.masthead-mobile) {
 	background: @float-menu-bg !important;
 }
 
 /*Line decoration for Sticky floating*/
-.responsive-off.phantom-line-decoration.phantom-sticky.sticky-on .masthead:not(.side-header):not(.mixed-header),
-.responsive-off.phantom-line-decoration.phantom-sticky.sticky-on .mixed-header.side-header-h-stroke {
+.responsive-off.phantom-line-decoration.phantom-sticky .sticky-on.masthead {
 	border-bottom: 1px solid @float-menu-line-decoration-color;
 	-webkit-box-shadow: none !important;
 	box-shadow: none !important;

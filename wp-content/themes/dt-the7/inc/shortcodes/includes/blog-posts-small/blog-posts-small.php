@@ -60,18 +60,6 @@ class DT_Shortcode_BlogPostsSmall extends DT_Shortcode {
 			$category = array_map('trim', $category);
 		}
 
-		// vc inline dummy
-		if ( presscore_vc_is_inline() ) {
-			$terms_title = _x( 'Display categories', 'vc inline dummy', 'the7mk2' );
-			$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $category, 'taxonomy' => $this->taxonomy ) );
-
-			return $this->vc_inline_dummy( array(
-				'class' => 'dt_vc-mini_blog',
-				'title' => _x( 'Mini blog', 'vc inline dummy', 'the7mk2' ),
-				'fields' => array( $terms_title => $terms_list )
-			) );
-		}
-
 		$related_posts_args = array(
 			'exclude_current'   => false,
 			'post_type'         => $this->post_type,
@@ -113,7 +101,7 @@ class DT_Shortcode_BlogPostsSmall extends DT_Shortcode {
 		if ( $posts_list ) {
 
 			foreach ( $posts_list as $p ) {
-				$output .= sprintf( '<div class="wf-cell %s"><div class="borders">%s</div></div>', $column_class, $p );
+				$output .= sprintf( '<div class="wf-cell %s">%s</div>', $column_class, $p );
 			}
 
 			$section_class = 'items-grid wf-container';

@@ -44,25 +44,25 @@
 
 		/*- Line*/
 
-		.masthead.line-decoration:not(.side-header):not(.mixed-header) {
+		.masthead.line-decoration:not(.side-header):not(.mixed-header):not(.masthead-mobile-header) {
 			border-bottom: 1px solid @header-decoration;
 		}
-		.header-side-left .masthead.line-decoration:not(.mixed-header)  {
+		.header-side-left .masthead.line-decoration:not(.mixed-header):not(.masthead-mobile-header)  {
 			border-right: 1px solid @header-decoration;
 		}
-		.header-side-right .masthead.line-decoration:not(.mixed-header)  {
+		.header-side-right .masthead.line-decoration:not(.mixed-header):not(.masthead-mobile-header)  {
 			border-left: 1px solid @header-decoration;
 		}
 
 		/*- Line :end*/
 
 		/*- shadow*/
-		.transparent .masthead:not(.side-header),
+		.transparent .masthead,
 		.overlay-navigation .masthead.shadow-decoration:not(.mixed-header) {
 			-webkit-box-shadow: none;
 			box-shadow: none;
 		}
-		.masthead.shadow-decoration:not(.side-header-menu-icon):not(#phantom) {
+		.masthead.shadow-decoration:not(.side-header-menu-icon):not(#phantom):not(.masthead-mobile-header) {
 			-webkit-box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.07);
 			box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.07);
 		}
@@ -73,9 +73,11 @@
 
 	/* TRANSPARENT HEADER */
 
-		.transparent .masthead:not(.side-header):not(.mixed-header),
-		.transparent .mixed-header.side-header-h-stroke {
+		.transparent .masthead {
 			background: @header-transparent-bg-color;
+		}
+		.transparent .top-bar-bg {
+			background: @top-bar-transparent-bg-color;
 		}
 
 	/* TRANSPARENT HEADER:end */

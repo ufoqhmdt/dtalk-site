@@ -175,10 +175,11 @@ $teammate_fields = array(
 
 	// Position
 	array(
-		'name'	=> _x('Position:', 'backend metabox', 'dt-the7-core'),
-		'id'    => "{$prefix}position",
-		'type'  => 'textarea',
-		'std'   => '',
+		'name'                 => _x( 'Position:', 'backend metabox', 'dt-the7-core' ),
+		'id'                   => "{$prefix}position",
+		'type'                 => 'textarea',
+		'std'                  => '',
+		'exclude_from_presets' => true,
 	),
 
 );
@@ -186,16 +187,17 @@ $teammate_fields = array(
 // links fields
 foreach ( $teammate_links as $id=>$data ) {
 	$teammate_fields[] = array(
-		'name'			=> $data['desc'],
-		'id'    		=> "{$prefix}{$id}",
-		'type'  		=> 'text',
-		'std'   		=> '',
-		'top_divider'	=> true,
+		'name'                 => $data['desc'],
+		'id'                   => "{$prefix}{$id}",
+		'type'                 => 'text',
+		'std'                  => '',
+		'top_divider'          => true,
+		'exclude_from_presets' => true,
 	);
 }
 
 $DT_META_BOXES[] = array(
-	'id'		=> 'dt_page_box-testimonial_options',
+	'id'		=> 'dt_page_box-teammate_options',
 	'title' 	=> _x('Options', 'backend metabox', 'dt-the7-core'),
 	'pages' 	=> array( 'dt_team' ),
 	'context' 	=> 'side',

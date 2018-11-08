@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Divider_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Divider_Field' ) )
 {
-	class RWMB_Divider_Field
+	class THE7_RWMB_Divider_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -13,7 +13,7 @@ if ( ! class_exists( 'RWMB_Divider_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'rwmb-divider', RWMB_CSS_URL . 'divider.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-divider', THE7_RWMB_CSS_URL . 'divider.css', array(), THE7_RWMB_VER );
 		}
 
 		/**

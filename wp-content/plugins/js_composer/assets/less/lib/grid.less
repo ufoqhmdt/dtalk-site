@@ -96,6 +96,26 @@
   .vc_col(1); // kickstart it
 }
 
+.vc_float-grid-columns-rtl(@class) {
+  .vc_col-rtl(@index) when (@index = 1) {
+    // initial
+    @item: ~".rtl .vc_rtl-columns-reverse .vc_col-@{class}-@{index}";
+    .vc_col-rtl((@index + 1), @item);
+  }
+  .vc_col-rtl(@index, @list) when (@index =< @grid-columns) {
+    // general
+    @item: ~".rtl .vc_rtl-columns-reverse .vc_col-@{class}-@{index}";
+    .vc_col-rtl((@index + 1), ~"@{list}, @{item}");
+  }
+  .vc_col-rtl(@index, @list) when (@index > @grid-columns) {
+    // terminal
+    @{list} {
+      float: right;
+    }
+  }
+  .vc_col-rtl(1); // kickstart it
+}
+
 .vc_calc-grid-column(@index, @class, @type) when (@type = width) and (@index > 0) {
   .vc_col-@{class}-@{index} {
     width: percentage((@index / @grid-columns));
@@ -142,6 +162,7 @@
 // Create grid for specific class
 .vc_make-grid(@class) {
   .vc_float-grid-columns(@class);
+  .vc_float-grid-columns-rtl(@class);
   .vc_loop-grid-columns(@grid-columns, @class, width);
   .vc_loop-grid-columns(@grid-columns, @class, pull);
   .vc_loop-grid-columns(@grid-columns, @class, push);
@@ -179,3 +200,5 @@
 @media (min-width: @screen-lg-min) {
   .vc_make-grid(lg);
 }
+
+@import (less) "grid-5-cols.css";

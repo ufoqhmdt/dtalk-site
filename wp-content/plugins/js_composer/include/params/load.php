@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer shortcode attributes fields loader
+ * WPBakery WPBakery Page Builder shortcode attributes fields loader
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  *
  */
 require_once vc_path_dir( 'PARAMS_DIR', '/default_params.php' );
@@ -33,6 +33,7 @@ require_once vc_path_dir( 'PARAMS_DIR', '/custom_markup/custom_markup.php' );
 require_once vc_path_dir( 'PARAMS_DIR', '/animation_style/animation_style.php' );
 require_once vc_path_dir( 'PARAMS_DIR', '/iconpicker/iconpicker.php' );
 require_once vc_path_dir( 'PARAMS_DIR', '/el_id/el_id.php' );
+require_once vc_path_dir( 'PARAMS_DIR', '/gutenberg/gutenberg.php' );
 
 global $vc_params_list;
 $vc_params_list = array(
@@ -70,4 +71,5 @@ $vc_params_list = array(
 	'animation_style',
 	'iconpicker',
 	'el_id',
+	'gutenberg',
 );

@@ -78,20 +78,125 @@ if ( ! function_exists( 'presscore_get_the_mobile_logo' ) ) :
 
 	/**
 	 * Returns the mobile logo html.
+	 *
 	 * @since 3.0.0
 	 * @return string
 	 */
 	function presscore_get_the_mobile_logo() {
 		$config = presscore_config();
+		$show_mobile_logo = in_array(
+			'mobile',
+			array(
+				$config->get( 'header.mobile.logo.first_switch' ),
+				$config->get( 'header.mobile.logo.second_switch' ),
+			),
+			true
+		);
 
-		if ( 'mobile' === $config->get( 'header.mobile.logo.first_switch' ) || 'mobile' === $config->get( 'header.mobile.logo.second_switch' ) ) {
-			return presscore_get_logo_image( array(
-				'logo' 			=> dt_get_uploaded_logo( of_get_option( 'header-style-mobile-logo_regular', array('', 0) ) ),
-				'logo_retina'	=> dt_get_uploaded_logo( of_get_option( 'header-style-mobile-logo_hd', array('', 0) ), 'retina' ),
-			), 'mobile-logo' );
+		if ( ! $show_mobile_logo ) {
+			return '';
 		}
 
-		return '';
+		if ( presscore_header_is_transparent() && ! presscore_header_layout_is_side() ) {
+			return presscore_get_the_transparent_mobile_logo_image();
+		}
+
+		return presscore_get_the_mobile_logo_image();
+	}
+
+ endif;
+ if ( ! function_exists( 'presscore_get_the_mobile_logo_image' ) ) :
+
+	/**
+	 * Return the mobile logo image html.
+	 * @since 6.1.0
+	 *
+	 * @param string $class HTML class.
+	 *
+	 * @return string
+	 */
+	function presscore_get_the_mobile_logo_image( $class = 'mobile-logo' ) {
+		$logo = of_get_option( 'header-style-mobile-logo_regular', array( '', 0 ) );
+		$logo_retina = of_get_option( 'header-style-mobile-logo_hd', array( '', 0 ) );
+
+		return presscore_get_logo_image( array(
+			'logo'        => dt_get_uploaded_logo( $logo ),
+			'logo_retina' => dt_get_uploaded_logo( $logo_retina, 'retina' ),
+		), $class );
+	}
+
+endif;
+
+if ( ! function_exists( 'presscore_get_the_transparent_mobile_logo_image' ) ) :
+
+	/**
+	 * Return the transparent mobile logo image html.
+	 * @since 6.1.0
+	 *
+	 * @param string $class HTML class.
+	 *
+	 * @return string
+	 */
+	function presscore_get_the_transparent_mobile_logo_image( $class = 'mobile-logo' ) {
+		$logo = of_get_option( 'header-style-transparent-mobile-logo_regular', array( '', 0 ) );
+		$logo_retina = of_get_option( 'header-style-transparent-mobile-logo_hd', array( '', 0 ) );
+
+		return presscore_get_logo_image( array(
+			'logo'        => dt_get_uploaded_logo( $logo ),
+			'logo_retina' => dt_get_uploaded_logo( $logo_retina, 'retina' ),
+		), $class );
+	}
+
+endif;
+
+
+if ( ! function_exists( 'presscore_get_mobile_logos_meta' ) ) :
+
+	/**
+	 * Returns the mobile first switch logos array.
+	 * @since 6.1.0
+	 * @return array
+	 */
+	function presscore_get_mobile_logos_meta() {
+		$config = presscore_config();
+		$use_main_logo_first_switch = ( 'desktop' === $config->get( 'header.mobile.logo.first_switch' ) );
+		if ( $use_main_logo_first_switch ) {
+			$logo = $config->get( 'logo.header.regular' );
+			$hd_logo = $config->get( 'logo.header.hd' );
+		} else {
+			$logo = of_get_option( 'header-style-mobile-logo_regular', array( '', 0 ) );
+			$hd_logo = of_get_option( 'header-style-mobile-logo_hd', array( '', 0 ) );
+		}
+
+		return array(
+			'logo' 			=> dt_get_uploaded_logo( $logo ),
+			'logo_retina'	=> dt_get_uploaded_logo( $hd_logo, 'retina' ),
+		);
+	}
+
+endif;
+if ( ! function_exists( 'presscore_get_mobile_logos_meta_second' ) ) :
+
+	/**
+	 * Returns the mobile second switch logos array.
+	 * @since 6.1.0
+	 * @return array
+	 */
+	function presscore_get_mobile_logos_meta_second() {
+		$config = presscore_config();
+		$use_main_logo_second_switch = ( 'desktop' === $config->get( 'header.mobile.logo.second_switch' ) );
+		if ( $use_main_logo_second_switch ) {
+			$logo = $config->get( 'logo.header.regular' );
+			$hd_logo = $config->get( 'logo.header.hd' );
+		} else {
+			$logo = of_get_option( 'header-style-mobile-logo_regular', array( '', 0 ) );
+			$hd_logo = of_get_option( 'header-style-mobile-logo_hd', array( '', 0 ) );
+		}
+
+		return array(
+			'logo' 			=> dt_get_uploaded_logo( $logo ),
+			'logo_retina'	=> dt_get_uploaded_logo( $hd_logo, 'retina' ),
+		);
 	}
 
 endif;

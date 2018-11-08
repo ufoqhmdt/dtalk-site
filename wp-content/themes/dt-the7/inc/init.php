@@ -32,6 +32,9 @@ require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/class-image.php';
 require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/class-font.php';
 require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/interface-manager.php';
 require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/class-manager.php';
+include_once PRESSCORE_CLASSES_DIR . '/less/interface-the7-less-gradient-color-stop.php';
+include_once PRESSCORE_CLASSES_DIR . '/less/class-the7-less-gradient.php';
+include_once PRESSCORE_CLASSES_DIR . '/less/class-the7-less-gradient-color-stop.php';
 
 // utils
 require_once PRESSCORE_EXTENSIONS_DIR . '/class-presscore-simple-bag.php';
@@ -54,11 +57,6 @@ require_once PRESSCORE_CLASSES_DIR . '/template-config/presscore-config.class.ph
 
 require_once PRESSCORE_CLASSES_DIR . '/class-primary-menu.php';
 
-require_once PRESSCORE_CLASSES_DIR . '/sliders/presscore-slider.class.php';
-require_once PRESSCORE_CLASSES_DIR . '/sliders/presscore-photoscroller.class.php';
-require_once PRESSCORE_CLASSES_DIR . '/sliders/slider-swapper.class.php';
-require_once PRESSCORE_CLASSES_DIR . '/sliders/presscore-posts-slider-scroller.class.php';
-
 require_once PRESSCORE_CLASSES_DIR . '/layout/columns-layout-parser.class.php';
 require_once PRESSCORE_CLASSES_DIR . '/layout/sidebar-layout-parser.class.php';
 
@@ -68,6 +66,10 @@ require_once PRESSCORE_CLASSES_DIR . '/tags.class.php';
 require_once PRESSCORE_CLASSES_DIR . '/class-presscore-post-type-rewrite-rules-filter.php';
 require_once PRESSCORE_CLASSES_DIR . '/class-the7-image-width-calculator-config.php';
 require_once PRESSCORE_CLASSES_DIR . '/class-the7-image-bwb-width-calculator.php';
+require_once PRESSCORE_CLASSES_DIR . '/image/class-the7-image-list-width-calculator.php';
+require_once PRESSCORE_CLASSES_DIR . '/image/class-the7-image-list-width-calculator-config.php';
+require_once PRESSCORE_CLASSES_DIR . '/class-the7-avatar.php';
+require_once PRESSCORE_CLASSES_DIR . '/class-the7-slideshow-stub.php';
 
 require_once PRESSCORE_DIR . '/helpers.php';
 require_once PRESSCORE_DIR . '/template-hooks.php';
@@ -92,19 +94,22 @@ require_once PRESSCORE_ADMIN_DIR . '/class-the7-admin-dashboard-settings.php';
 The7_Admin_Dashboard_Settings::setup();
 
 require_once PRESSCORE_MODS_DIR . '/legacy/legacy.php';
+require_once PRESSCORE_ADMIN_DIR . '/admin-notices.php';
+
+require_once PRESSCORE_MODS_DIR . '/dev-tools/main-module.class.php';
+The7_DevToolMainModule::init();
+
+require_once PRESSCORE_DIR . '/deprecated-functions.php';
 
 if ( is_admin() ) {
-
-	require_once PRESSCORE_EXTENSIONS_DIR . '/class-presscore-admin-notices.php';
-
 	require_once PRESSCORE_ADMIN_DIR . '/class-the7-admin-dashboard.php';
 	$the7_admin_dashboard = new The7_Admin_Dashboard();
 	$the7_admin_dashboard->init();
-
-	require_once PRESSCORE_ADMIN_DIR . '/admin-notices.php';
 	require_once PRESSCORE_ADMIN_DIR . '/admin-functions.php';
 	require_once PRESSCORE_ADMIN_DIR . '/admin-bulk-actions.php';
 
 	include_once locate_template( 'inc/admin/load-meta-boxes.php' );
 
+	require_once PRESSCORE_EXTENSIONS_DIR . '/class-the7-theme-auto-deactivation.php';
+	The7_Theme_Auto_Deactivation::add_hooks();
 }

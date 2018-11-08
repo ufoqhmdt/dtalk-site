@@ -28,7 +28,7 @@ class Presscore_Meta_Box_Field_Template {
 		$template = self::get( $name );
 
 		if ( false === $template ) {
-			return false;
+			return array();
 		}
 
 		if ( !is_array( $template ) ) {

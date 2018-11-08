@@ -27,6 +27,7 @@ if ( ! class_exists( 'Presscore_Mod_Team', false ) ) {
 		}
 
 		private function load_dependencies() {
+			require_once plugin_dir_path( __FILE__ ) . '/team-functions.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-mod-team-admin.php';
 
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-mod-team-public.php';
@@ -68,6 +69,10 @@ if ( ! class_exists( 'Presscore_Mod_Team', false ) ) {
 
 			// add sidebars columns
 			add_filter( 'manage_edit-dt_team_columns', 'presscore_admin_add_sidebars_columns' );
+
+			// Add bulk actions.
+			add_action( 'bulk_edit_custom_box', array( $mod_admin, 'render_bulk_actions' ), 10, 2 );
+			add_action( 'save_post', array( $mod_admin, 'handle_bulk_actions' ), 10, 2 );
 		}
 
 		private function define_public_hooks() {
@@ -79,6 +84,7 @@ if ( ! class_exists( 'Presscore_Mod_Team', false ) ) {
 			add_action( 'presscore_js_composer_after_bridge_loaded', array( $mod_public, 'load_shortcodes_vc_bridge' ) );
 			add_action( 'widgets_init', array( $mod_public, 'init_widgets' ) );
 			add_action( 'presscore_config_base_init', array( $mod_public, 'init_template_config' ), 10, 2 );
+			add_filter( 'presscore_before_post_masonry-filter_taxonomy', array( $mod_public, 'filter_masonry_wrap_taxonomy' ), 10, 2 );
 		}
 	}
 

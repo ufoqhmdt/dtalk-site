@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $prefix = '_dt_blog_';
 
-$DT_META_BOXES[] = array(
+$DT_META_BOXES['dt_page_box-display_blog'] = array(
 	'id'		=> 'dt_page_box-display_blog',
 	'title' 	=> _x('Display Blog Categories', 'backend metabox', 'the7mk2'),
 	'pages' 	=> array( 'page' ),
@@ -63,7 +63,7 @@ $DT_META_BOXES[] = array(
 
 $prefix = '_dt_blog_options_';
 
-$DT_META_BOXES[] = array(
+$DT_META_BOXES['dt_page_box-blog_options'] = array(
 	'id'		=> 'dt_page_box-blog_options',
 	'title' 	=> _x('Blog Options', 'backend metabox', 'the7mk2'),
 	'pages' 	=> array( 'page' ),
@@ -249,7 +249,7 @@ $DT_META_BOXES[] = array(
 
 $prefix = '_dt_post_options_';
 
-$DT_META_BOXES[] = array(
+$DT_META_BOXES['dt_page_box-post_options'] = array(
 	'id'		=> 'dt_page_box-post_options',
 	'title' 	=> _x('Post Options', 'backend metabox', 'the7mk2'),
 	'pages' 	=> array( 'post' ),
@@ -261,15 +261,15 @@ $DT_META_BOXES[] = array(
 		Presscore_Meta_Box_Field_Template::get_as_array( 'select pages', array(
 			'name'		=> _x('Back button:', 'backend metabox', 'the7mk2'),
 			'id'		=> "{$prefix}back_button",
-			'divider'	=> 'bottom'
 		) ),
 
 		// Hide featured image on post page
 		array(
-			'name'    		=> __('Hide featured image on post page:', 'the7mk2'),
-			'id'      		=> "{$prefix}hide_thumbnail",
-			'type'    		=> 'checkbox',
-			'std'			=> 0,
+			'name'             => __( 'Hide featured image on post page:', 'the7mk2' ),
+			'id'               => "{$prefix}hide_thumbnail",
+			'type'             => 'checkbox',
+			'std'              => 0,
+			'divider'          => 'top',
 		),
 
 		// Related posts category

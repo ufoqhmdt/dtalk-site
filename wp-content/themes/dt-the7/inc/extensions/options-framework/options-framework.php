@@ -45,6 +45,10 @@ require_once OPTIONS_FRAMEWORK_DIR . 'classes/class-dependency.php';
 require_once OPTIONS_FRAMEWORK_DIR . 'classes/class-template.php';
 
 require_once OPTIONS_FRAMEWORK_DIR . 'options-custom.php';
+include_once OPTIONS_FRAMEWORK_DIR . 'fields/class-the7-option-field-spacing.php';
+include_once OPTIONS_FRAMEWORK_DIR . 'fields/class-the7-option-field-number.php';
+include_once OPTIONS_FRAMEWORK_DIR . 'fields/class-the7-option-field-gradient-picker.php';
+include_once OPTIONS_FRAMEWORK_DIR . 'fields/class-the7-option-field-icons-picker.php';
 
 /* If the user can't edit theme options, no use running this plugin */
 add_action( 'init', 'optionsframework_rolescheck', 20 );
@@ -54,7 +58,9 @@ function optionsframework_rolescheck() {
 		return;
 	}
 
-	add_action( 'wp_before_admin_bar_render', 'optionsframework_adminbar' );
+
+	add_action( 'submenu_file', 'optionsframework_empty_main_menu' );
+	add_action( 'admin_bar_menu', 'optionsframework_admin_bar_theme_options', 40 );
 
 	// If the user can edit theme options, let the fun begin!
 	add_action( 'admin_menu', 'optionsframework_add_page' );
@@ -66,6 +72,61 @@ function optionsframework_rolescheck() {
 	} else {
 		add_action( 'wp_enqueue_scripts', 'of_load_global_admin_assets' );
 	}
+
+	add_action( 'wp_ajax_save_the7_options', 'optionsframework_save_options_via_ajax' );
+	add_action( 'wp_ajax_get_the7_options_last_error', 'optionsframework_get_last_php_error_via_ajax' );
+
+	// Hide admin bar in settings preview.
+	if ( isset( $_REQUEST['the7_settings_preview'] ) ) {
+		show_admin_bar( false );
+		add_action( 'wp_enqueue_scripts', 'of_load_preload_scripts' );
+    }
+
+    // Replace default admin bar class for visual mode.
+	$plugin_page = isset( $_GET['page'] ) ? $_GET['page'] : null;
+    if ( optionsframework_get_options_files( $plugin_page ) ) {
+	    optionsframework_save_view_state();
+
+	    if ( optionsframework_is_in_visual_mode() ) {
+		    add_filter( 'wp_admin_bar_class', 'optionsframework_visual_admin_bar_class', 9999 );
+		    add_action( 'admin_bar_menu', 'optionsframework_admin_bar_visual_mode', 9999 );
+	    }
+    }
+}
+
+/**
+ * Return admin bar class for visual mode.
+ *
+ * @return string
+ */
+function optionsframework_visual_admin_bar_class() {
+    if ( ! class_exists( 'The7_Options_Visual_Admin_Bar', false ) ) {
+	    require_once OPTIONS_FRAMEWORK_DIR . 'classes/class-the7-options-visual-admin-bar.php';
+    }
+
+    return 'The7_Options_Visual_Admin_Bar';
+}
+
+function optionsframework_options_switch_invalid_nonce_notice() {
+    echo '<p>' . __( 'Cannot switch options mode: invalid nonce. Please go to another options page and try one more time.', 'the7mk2' ) . '</p>';
+}
+
+/**
+ * Empty admin menu on theme options pages in visual mode.
+ *
+ * @param $submenu_file
+ *
+ * @return mixed
+ */
+function optionsframework_empty_main_menu( $submenu_file ) {
+    global $menu, $plugin_page;
+
+    // Empty admin menu for visual mode. Less DOM elements ...
+    if ( optionsframework_get_options_files( $plugin_page ) && optionsframework_is_in_visual_mode() ) {
+        $menu = array();
+    }
+
+    return $submenu_file;
 }
 
 /**
@@ -73,7 +134,8 @@ function optionsframework_rolescheck() {
  *
  */
 function optionsframework_get_options_id() {
-	return preg_replace("/\W/", "", strtolower(wp_get_theme()->Name) );
+	$name = preg_replace("/\W/", "", strtolower(wp_get_theme()->Name));
+	return apply_filters( 'optionsframework_get_options_id', $name );
 }
 
 /**
@@ -302,6 +364,11 @@ if ( !function_exists( 'optionsframework_add_page' ) ) {
 		if ( isset( $submenu[ $main_menu_slug ] ) ) {
 			$submenu[ $main_menu_slug ][0][0] = $main_menu_item->get( 'menu_title' );
 		}
+
+		// Hide menu items from admin menu.
+        if ( ! The7_Admin_Dashboard_Settings::get( 'options-in-sidebar' ) ) {
+	        remove_menu_page( $main_menu_slug );
+        }
 	}
 
 }
@@ -309,34 +376,86 @@ if ( !function_exists( 'optionsframework_add_page' ) ) {
 /* Loads the CSS */
 
 function optionsframework_load_styles() {
+	presscore_register_scripts();
+
+	foreach ( the7_get_custom_icons_stylesheets() as $icon_css_url ) {
+	    $base_name = str_replace( '.css', '', basename( $icon_css_url ) );
+	    wp_enqueue_style( "the7-{$base_name}", $icon_css_url, array(), THE7_VERSION );
+    }
+
 	if ( ! wp_style_is( 'wp-color-picker','registered' ) ) {
-		wp_register_style('wp-color-picker', OPTIONS_FRAMEWORK_URL.'css/color-picker.min.css');
+		wp_register_style('wp-color-picker', PRESSCORE_ADMIN_URI . '/assets/vendor/wp-color-picker/color-picker.min.css');
 	}
 
-	$theme_version = wp_get_theme()->get( 'Version' );
+	wp_register_style( 'the7-select-2', PRESSCORE_ADMIN_URI . '/assets/vendor/select2/css/select2.min.css', false, THE7_VERSION );
 
-	wp_register_style( 'the7-thickbox', PRESSCORE_ADMIN_URI.'/assets/the7-thickbox.css', false, $theme_version );
-	wp_register_style( 'optionsframework-jquery-ui', OPTIONS_FRAMEWORK_URL.'css/jquery-ui.css', false, $theme_version );
-	wp_register_style( 'options-select2', OPTIONS_FRAMEWORK_URL . 'js/select2/css/select2.css', false, $theme_version );
+	the7_register_style( 'the7-options', PRESSCORE_ADMIN_URI . '/assets/css/options', array( 'thickbox', 'wp-color-picker', 'the7-select-2', 'dt-awsome-fonts' ) );
+	wp_enqueue_style( 'the7-options' );
 
-	wp_enqueue_style( 'optionsframework', OPTIONS_FRAMEWORK_URL.'css/optionsframework.css', array( 'thickbox', 'wp-color-picker', 'optionsframework-jquery-ui', 'options-select2', 'the7-thickbox' ), $theme_version );
+	if ( optionsframework_is_in_visual_mode() ) {
+	    wp_add_inline_style( 'the7-options', '
+/* Hide admin menu */
+#adminmenumain {
+	display: none !important;
+}
+
+#wpcontent,
+#wpfooter {
+	margin-left: 0;
+}
+	    ');
+    }
 }
 
 /* Loads the javascript */
 
 function optionsframework_load_scripts($hook) {
-	$theme_version = wp_get_theme()->get( 'Version' );
+	if ( ! wp_script_is( 'wp-color-picker','registered' ) ) {
+		wp_register_script('wp-color-picker', PRESSCORE_ADMIN_URI . '/assets/vendor/wp-color-picker/color-picker.min.js');
+	}
+
+    // Fix conflict with WPML.
+	wp_dequeue_script( 'wpml-select-2' );
+
+	if ( function_exists( 'wp_enqueue_code_editor' ) ) {
+		wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+	}
 
 	// Select2
-	wp_register_script( 'options-select2', OPTIONS_FRAMEWORK_URL . 'js/select2/js/select2.js', array( 'jquery' ), $theme_version, true );
+	wp_register_script( 'the7-select-2', PRESSCORE_ADMIN_URI . '/assets/vendor/select2/js/select2.min.js', array( 'jquery' ), THE7_VERSION, true );
 
-	// Enqueue custom option panel JS
-	wp_enqueue_script( 'options-custom', OPTIONS_FRAMEWORK_URL . 'js/options-custom.js', array( 'jquery', 'wp-color-picker', 'thickbox', 'options-select2', 'jquery-ui-core', 'jquery-ui-dialog', 'jquery-ui-slider', 'jquery-ui-widget', 'jquery-ui-sortable', 'jquery-form', 'jquery-ui-autocomplete' ), $theme_version, true );
+	if ( function_exists( 'wp_enqueue_media' ) ) {
+		wp_enqueue_media();
+	}
+
+	the7_register_script( 'the7-options', PRESSCORE_ADMIN_URI . '/assets/js/options', array(
+		'the7-select-2',
+		'jquery',
+		'wp-color-picker',
+		'thickbox',
+		'jquery-ui-core',
+		'jquery-ui-dialog',
+		'jquery-ui-slider',
+		'jquery-ui-widget',
+		'jquery-ui-sortable',
+		'jquery-ui-draggable',
+		'jquery-form',
+		'jquery-ui-autocomplete',
+	), false, true );
+	wp_enqueue_script( 'the7-options' );
+
+	wp_localize_script( 'the7-options', 'optionsframework_l10n', array(
+		'upload' => esc_html( __( 'Upload', 'the7mk2' ) ),
+		'remove' => esc_html( __( 'Remove', 'the7mk2' ) ),
+	) );
 
 	// Inline scripts from options-interface.php
 	add_action( 'admin_head', 'of_admin_head' );
 
 	add_action( 'optionsframework_after', 'of_localize_scripts' );
+
+	// Change admin body class.
+    add_filter( 'admin_body_class', 'of_body_class_filter' );
 }
 
 function of_localize_scripts() {
@@ -345,11 +464,28 @@ function of_localize_scripts() {
 		'optionsNonce'   => wp_create_nonce( 'options-framework-nonce' ),
 		'ajaxFontsNonce' => wp_create_nonce( 'options-framework-ajax-fonts-nonce' ),
 		'dependencies'   => optionsframework_fields_dependency()->get_all(),
+		'resetMsg'       => _x( 'Click OK to restore default settings on this page!', 'theme-options', 'the7mk2' ),
+		'serverErrorMsg' => _x( 'The application has encountered an unknown error.', 'theme-options', 'the7mk2' ),
 	);
 	$localized_vars = apply_filters( 'of_localized_vars', $localized_vars );
 
 	// Useful variables
-	wp_localize_script( 'options-custom', 'optionsframework', $localized_vars );
+	wp_localize_script( 'the7-options', 'optionsframework', $localized_vars );
+}
+
+/**
+ * Add classes to admin body.
+ *
+ * @param string $classes
+ *
+ * @return string
+ */
+function of_body_class_filter( $classes ) {
+    if ( optionsframework_is_in_visual_mode() ) {
+	    $classes .= ' the7-customizer ';
+    }
+
+    return $classes;
 }
 
 function of_admin_head() {
@@ -358,8 +494,15 @@ function of_admin_head() {
 }
 
 function of_load_global_admin_assets() {
-	wp_enqueue_style( 'optionsframework-global', OPTIONS_FRAMEWORK_URL . 'css/admin-stylesheet.css', false, wp_get_theme()->get( 'Version' ) );
+	the7_register_style( 'the7-admin-bar', PRESSCORE_ADMIN_URI . '/assets/css/admin-bar' );
+	wp_enqueue_style( 'the7-admin-bar' );
+//	wp_enqueue_style( 'the7-admin-bar', PRESSCORE_ADMIN_URI . '/assets/css/admin-bar.css', false, THE7_VERSION );
 	wp_add_inline_style( 'admin-bar', '#wpadminbar #wp-admin-bar-options-framework-parent > .ab-item:before{content: "\f111";}' );
+}
+
+function of_load_preload_scripts() {
+    the7_register_script( 'the7-options-front-end-mode', PRESSCORE_ADMIN_URI . '/assets/js/options-front-end-mode' );
+    wp_enqueue_script( 'the7-options-front-end-mode' );
 }
 
 /*
@@ -386,15 +529,15 @@ function optionsframework_page() {
 ?>
 	<div id="optionsframework-wrap" class="wrap<?php echo esc_attr( $wrap_class ); ?>">
 
-		<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-
-		<?php settings_errors( 'options-framework' ); ?>
-
         <?php if ( ! in_array( $cur_page_id, array( 'of-options-wizard', 'of-skins-menu' ) ) ): ?>
         <div class="optionsframework-search">
             <input id="optionsframework-search" type="search" name="search" placeholder="<?php echo esc_attr_x( 'Search for an option ...', 'backend', 'the7mk2' ); ?>" data-nonce="<?php echo wp_create_nonce( 'the7-options-search' ); ?>"><span id="optionsframework-search-spinner" class="spinner"></span>
         </div>
         <?php endif; ?>
+
+		<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+
+		<?php settings_errors( 'options-framework' ); ?>
 
 		<?php do_action( 'optionsframework_before_tabs' ); ?>
 
@@ -404,9 +547,10 @@ function optionsframework_page() {
 
 		<div id="optionsframework-metabox" class="metabox-holder">
 			<div id="optionsframework">
-				<form action="options.php" method="post">
+				<form id="optionsframework-form" action="options.php" method="post">
+                    <input type="hidden" name="action" value="save_the7_options">
 					<?php
-					settings_fields( 'optionsframework' );
+					wp_nonce_field( 'optionsframework-options' );
 					optionsframework_fields();
 					optionsframework_page_buttons();
 
@@ -420,6 +564,19 @@ function optionsframework_page() {
 
 	</div> <!-- / .wrap -->
 
+    <?php
+    if ( optionsframework_is_in_visual_mode() ):
+        $iframe_src = get_home_url();
+        if ( isset( $_COOKIE['the7-options-preview-url'] ) ) {
+            $cookie_url = urldecode( $_COOKIE['the7-options-preview-url'] );
+            if ( strpos( $cookie_url, get_home_url() ) === 0 && strpos( $cookie_url, get_admin_url() ) === false ) {
+                $iframe_src = $cookie_url;
+            }
+        }
+        $iframe_src = add_query_arg( 'the7_settings_preview', true, $iframe_src );
+    ?>
+    <iframe id="the7-customizer-preview" src="<?php echo esc_url( $iframe_src ) ?>" frameborder="0"></iframe>
+    <?php endif ?>
 <?php
 }
 endif;
@@ -591,8 +748,8 @@ function optionsframework_ajax_search() {
  */
 function optionsframework_page_buttons() {
 	$buttons = array(
-		'update' => '<input type="submit" class="button button-primary" name="update" value="' . esc_attr( __( 'Save Options', 'the7mk2' ) ) . '" />',
-		'reset' => '<input type="submit" class="button reset-button button-secondary" name="reset" value="' . esc_attr( __( 'Restore Defaults', 'the7mk2' ) ) .'" onclick="return confirm( \'' . esc_js( __( 'Click OK to restore default settings on this page!', 'the7mk2' ) ) . '\' );"/>',
+		'update' => '<input type="submit" class="button button-primary" name="update" value="' . esc_attr( __( 'Save Options', 'the7mk2' ) ) . '" data-busy-value="' . esc_attr( __( 'Saving Options ...', 'the7mk2' ) ) . '"/>',
+		'reset' => '<input type="submit" class="button reset-button button-secondary of-reload-page-on-click" name="reset" value="' . esc_attr( __( 'Restore Defaults', 'the7mk2' ) ) .'"  data-busy-value="' . esc_attr( __( 'Restoring Defaults ...', 'the7mk2' ) ) . '"/>',
 	);
 
 	$current_page_id = optionsframework_get_cur_page_id();
@@ -629,7 +786,10 @@ function optionsframework_validate( $input ) {
 			wp_parse_str( $_POST['_wp_http_referer'], $arr );
 			$current = current($arr);
 		}
-		return of_get_default_values( $current );
+		$options = of_get_default_values( $current );
+		do_action( 'optionsframework_after_options_reset' );
+
+		return $options;
 	}
 
 	/*
@@ -661,10 +821,15 @@ function optionsframework_validate( $input ) {
 	if ( ! is_array( $saved_options ) ) {
 		$saved_options = $used_options = array();
 	}
+	if ( empty( $saved_options['preset'] ) ) {
+		$saved_options['preset'] = apply_filters( 'options_framework_first_run_skin', '' );
+    }
 	$presets_list = optionsframework_get_presets_list();
 
+	$apply_preset = ! empty( $_POST['optionsframework_apply_preset'] );
+
 	// If there are preset option on this page - use this options instead saved
-	if ( isset( $input['preset'] ) && in_array( $input['preset'], array_keys( $presets_list ) ) ) {
+	if ( $apply_preset && isset( $input['preset'] ) && in_array( $input['preset'], array_keys( $presets_list ) ) ) {
 
 		// Get preset options
 		$preset_options = optionsframework_presets_data( $input['preset'] );
@@ -707,14 +872,14 @@ function optionsframework_validate( $input ) {
 	// If regular page
 	} else {
 
-		// Get kurrent preset options
+		// Get current preset options
 		$preset_options = optionsframework_presets_data( $saved_options['preset'] );
 
 		// Options only for current page
 		$page_id = optionsframework_get_cur_page_id();
 		$options = optionsframework_get_page_options( $page_id );
 
-		// Defune options data with which we will work
+		// Define options data with which we will work
 		$used_options = $input;
 
 		$is_preset = false;
@@ -769,10 +934,27 @@ function optionsframework_validate( $input ) {
 			continue;
 		}
 
-		// For a value to be submitted to database it must pass through a sanitization filter
-		if ( !empty( $option['sanitize'] ) && has_filter( 'of_sanitize_' . $option['sanitize'] ) ) {
-			$clean[ $id ] = apply_filters( 'of_sanitize_' . $option['sanitize'], $used_options[ $id ], $option );
-		} elseif ( has_filter( 'of_sanitize_' . $option['type'] ) ) {
+		$sanitizers = ( empty( $option['sanitize'] ) ? array() : $option['sanitize'] );
+		if ( is_string( $sanitizers ) ) {
+		    $sanitizers = array_map( 'trim', explode( ',', $sanitizers ) );
+        }
+
+		$was_sanitized = false;
+		if ( $sanitizers ) {
+		    $option_val = $used_options[ $id ];
+            foreach ( $sanitizers as $sanitizer_name ) {
+                if ( has_filter( "of_sanitize_{$sanitizer_name}" ) ) {
+	                $option_val = apply_filters( "of_sanitize_{$sanitizer_name}", $option_val, $option );
+	                $was_sanitized = true;
+                }
+            }
+
+            if ( $was_sanitized ) {
+	            $clean[ $id ] = $option_val;
+            }
+		}
+
+		if ( ! $was_sanitized && has_filter( 'of_sanitize_' . $option['type'] ) ) {
 			$clean[ $id ] = apply_filters( 'of_sanitize_' . $option['type'], $used_options[ $id ], $option );
 		}
 	}
@@ -784,7 +966,61 @@ function optionsframework_validate( $input ) {
 	// Hook to run after validation
 	do_action( 'optionsframework_after_validate', $clean, $input );
 
+	ksort( $clean );
+
 	return $clean;
+}
+
+function optionsframework_save_options_via_ajax() {
+    try {
+	    $optionsframework_settings = get_option( 'optionsframework' );
+	    $options_id = $optionsframework_settings['id'];
+
+	    if ( array_key_exists( $options_id, $_POST ) ) {
+		    update_option( $options_id, wp_unslash( $_POST[ $options_id ] ) );
+	    }
+
+	    wp_raise_memory_limit( 'admin' );
+	    register_shutdown_function( 'optionsframework_catch_last_php_error' );
+
+	    $dynamic_css = presscore_get_dynamic_stylesheets_list();
+	    presscore_regenerate_dynamic_css( $dynamic_css );
+    } catch ( Exception $e ) {
+        wp_send_json_error( array( 'msg' => $e->getMessage() ) );
+    }
+
+	wp_send_json_success( array( 'msg' => 'Options saved!' ) );
+}
+
+/**
+ * Catch last php error and store related message.
+ */
+function optionsframework_catch_last_php_error() {
+	$last_php_error = error_get_last();
+	if ( isset( $last_php_error['message'], $last_php_error['type'] ) && $last_php_error['type'] === E_ERROR ) {
+	    delete_transient( 'the7_options_errors' );
+
+		if ( strpos( $last_php_error['message'], 'Allowed memory size' ) !== false ) {
+			$error = _x( 'Theme options cannot be saved. Not enough memory available. Please try to increase <a href="http://support.dream-theme.com/knowledgebase/allowed-memory-size-error/" title="memory limit">memory limit</a>', 'theme-options', 'the7mk2' );
+			set_transient( 'the7_options_errors', $error, 30 );
+		}
+	}
+}
+
+/**
+ * Ajax callback that output last php error message that was stored by 'optionsframework_catch_last_php_error'.
+ */
+function optionsframework_get_last_php_error_via_ajax() {
+	try {
+		$error = get_transient( 'the7_options_errors' );
+		if ( $error ) {
+			wp_send_json_success( array( 'msg' => $error ) );
+		}
+	} catch ( Exception $e ) {
+		wp_send_json_error();
+	}
+
+	wp_send_json_error();
 }
 
 function optionsframework_options_saved( $state = true ) {
@@ -882,25 +1118,30 @@ function of_get_default_values( $page = null ) {
 }
 
 /**
- * Add Theme Options menu item to Admin Bar.
+ * Add "Theme Options" menu to the Toolbar.
+ *
+ * @since 6.0.0
+ *
+ * @param WP_Admin_Bar $wp_admin_bar
+ *
+ * @return void
  */
-
-function optionsframework_adminbar() {
-	global $wp_admin_bar;
+function optionsframework_admin_bar_theme_options( $wp_admin_bar ) {
+	global $plugin_page;
 
 	$menu_items = optionsframework_get_menu_items_list();
 
+	// Bail if there is no menu items to show.
 	if ( empty( $menu_items ) ) {
-		return false;
+		return;
 	}
 
 	$parent_menu_item = current( $menu_items );
 	$parent_menu_id = 'options-framework-parent';
-
 	$wp_admin_bar->add_menu( array(
 		'id'    => $parent_menu_id,
 		'title' => optionsframework_get_main_title(),
-		'href'  => admin_url( 'admin.php?page=' . urlencode( $parent_menu_item->get( 'slug' ) ) )
+		'href'  => admin_url( 'admin.php?page=' . urlencode( $parent_menu_item->get( 'slug' ) ) ),
 	));
 
 	foreach( $menu_items as $menu_item ) {
@@ -908,9 +1149,189 @@ function optionsframework_adminbar() {
 			'parent' => $parent_menu_id,
 			'id'     => $menu_item->get( 'slug' ),
 			'title'  => $menu_item->get( 'menu_title' ),
-			'href'   => admin_url( 'admin.php?page=' . urlencode( $menu_item->get( 'slug' ) ) )
+			'href'   => admin_url( 'admin.php?page=' . urlencode( $menu_item->get( 'slug' ) ) ),
 		));
 	}
+
+	// Only for theme options pages.
+	if ( optionsframework_get_options_files( $plugin_page ) ) {
+		// Add "Edit in Back-end" switcher.
+		$wp_admin_bar->add_group( array(
+			'parent' => $parent_menu_id,
+			'id'     => 'the7-options-view-controls',
+			'meta'   => array(
+				'class' => 'ab-sub-secondary',
+			),
+		) );
+		$switcher_title = _x( 'Edit in Back-end', 'admin-bar', 'the7mk2' );
+		$switcher_class = 'edit-back';
+		$next_view = 'backend';
+		if ( optionsframework_is_in_backend_mode() ) {
+			$switcher_title = _x( 'Edit in Front-end', 'admin-bar','the7mk2' );
+			$switcher_class = 'edit-front';
+			$next_view = 'frontend';
+		}
+		$wp_admin_bar->add_menu( array(
+			'parent' => 'the7-options-view-controls',
+			'id'     => 'the7-options-preview-switcher',
+			'title'  => $switcher_title,
+			'href'   => add_query_arg( array( 'page' => $plugin_page, 'view' => $next_view ), admin_url( 'admin.php' ) ),
+			'meta'   => array(
+				'class'   => $switcher_class,
+			),
+		) );
+	}
+}
+
+/**
+ * Change admin bar in visual mode.
+ *
+ * @param object $wp_admin_bar
+ *
+ * @return void
+ */
+function optionsframework_admin_bar_visual_mode( $wp_admin_bar ) {
+    // Whitelist admin bar items.
+    if ( is_a( $wp_admin_bar, 'The7_Options_Visual_Admin_Bar' ) && method_exists( $wp_admin_bar, 'set_white_list' ) ) {
+        $wp_admin_bar->set_white_list( array(
+            array(
+                'menu-toggle',
+                'wp-logo',
+                'site-name',
+                'options-framework-parent',
+                'the7-options-preview-switcher',
+                'view-controls',
+                'view',
+            ),
+            array(
+                'my-account',
+            )
+        ) );
+    }
+
+    // Options panel controls.
+    $wp_admin_bar->add_menu( array(
+        'id'    => 'view-controls',
+        'title' => sprintf(
+	        '<span class="options-show">%s</span><span class="options-hide">%s</span> %s',
+	        _x( 'Show', 'admin-bar', 'the7mk2' ),
+	        _x( 'Hide', 'admin-bar', 'the7mk2'  ),
+	        _x( 'Options Panel', 'admin-bar', 'the7mk2' )
+        ),
+        'href'  => '#',
+        'meta'  => array(
+            'onclick' => 'return false',
+            'class' => 'panel-shown',
+        ),
+    ) );
+
+    // Device controls.
+    switch ( optionsframework_get_view_device() ) {
+        case 'mobile':
+            $view_class = 'view-mobile';
+            break;
+        case 'tablet':
+            $view_class = 'view-tablet';
+            break;
+        default:
+            $view_class = 'view-desktop';
+    }
+    $wp_admin_bar->add_menu( array(
+        'id'    => 'view',
+        'title' => _x( 'View', 'admin-bar', 'the7mk2' ),
+        'meta' => array(
+            'class' => $view_class,
+        ),
+    ) );
+    $wp_admin_bar->add_menu( array(
+        'parent' => 'view',
+        'id'     => 'view-desktop',
+        'title'  => _x( 'Desktop', 'admin-bar', 'the7mk2' ),
+        'href'   => '#',
+        'meta'   => array(
+            'onclick' => 'return false',
+        ),
+    ) );
+    $wp_admin_bar->add_menu( array(
+        'parent' => 'view',
+        'id'     => 'view-tablet',
+        'title'  => _x( 'Tablet', 'admin-bar', 'the7mk2' ),
+        'href'   => '#',
+        'meta'   => array(
+            'onclick' => 'return false',
+        ),
+    ) );
+    $wp_admin_bar->add_menu( array(
+        'parent' => 'view',
+        'id'     => 'view-mobile',
+        'title'  => _x( 'Mobile', 'admin-bar', 'the7mk2' ),
+        'href'   => '#',
+        'meta'   => array(
+            'onclick' => 'return false',
+        ),
+    ) );
+
+    // Connect 'site-name' with admin dashboard.
+    $site_name_node = $wp_admin_bar->get_node( 'site-name' );
+    $site_name_node->href = admin_url( '/' );
+    $wp_admin_bar->add_menu( $site_name_node );
+
+    // Add "Dashboard" menu item.
+    $wp_admin_bar->add_menu( array(
+        'parent' => 'site-name',
+        'id'     => 'view-dashboard',
+        'title'  => _x( 'Dashboard', 'admin-bar', 'the7mk2' ),
+        'href'   => admin_url( '/' ),
+    ) );
+}
+
+/**
+ * Save options view state in db if it is changed.
+ */
+function optionsframework_save_view_state() {
+	$new_view  = ( isset( $_GET['view'] ) ? $_GET['view'] : '' );
+
+	if ( ! $new_view ) {
+	    return;
+    }
+
+	if (
+		( $new_view === 'frontend' && optionsframework_is_in_backend_mode() ) ||
+		( $new_view === 'backend' && optionsframework_is_in_visual_mode() )
+    ) {
+		update_option( 'the7_options_view_mode', $new_view );
+    }
+}
+
+/**
+ * Return true if options are in backend mode.
+ *
+ * @return bool
+ */
+function optionsframework_is_in_backend_mode() {
+    $mode = get_option( 'the7_options_view_mode' );
+
+    return ( $mode === 'backend' );
+}
+
+/**
+ * Return true if options are in visual mode.
+ *
+ * @return bool
+ */
+function optionsframework_is_in_visual_mode() {
+	$mode = get_option( 'the7_options_view_mode' );
+
+	return ( $mode !== 'backend' );
+}
+
+/**
+ * Return current view device. By default it's desktop.
+ *
+ * @return string
+ */
+function optionsframework_get_view_device() {
+	return ( isset( $_COOKIE['the7-options-preview-device'] ) ? $_COOKIE['the7-options-preview-device'] : 'desktop' );
 }
 
 /**
@@ -1018,17 +1439,10 @@ function &_optionsframework_options() {
  * @return mixed
  */
 function _optionsframework_get_clean_options() {
-	if ( false === ( $clean_options = get_transient( 'optionsframework_clean_options' ) ) ) {
-		$options =& _optionsframework_options();
-		$clean_options = array();
+	if ( false === ( $clean_options = wp_cache_get( 'optionsframework_clean_options', 'optionsframework' ) ) ) {
+		$clean_options =& _optionsframework_options();
 
-		foreach ( $options as $option ) {
-			if ( isset( $option['id'], $option['type'] ) ) {
-				$clean_options[ $option['id'] ] = $option;
-			}
-		}
-
-		set_transient( 'optionsframework_clean_options', $clean_options, 60 );
+		wp_cache_set( 'optionsframework_clean_options', $clean_options, 'optionsframework', MINUTE_IN_SECONDS );
 	}
 
 	return $clean_options;
@@ -1051,3 +1465,29 @@ function _optionsframework_get_option_default_value( $id ) {
 	$defaults = _optionsframework_get_clean_options();
 	return ( isset( $defaults[ $id ]['std'] ) ? $defaults[ $id ]['std'] : null );
 }
+
+/**
+ * Turn off autolod of unused theme options db entries.
+ *
+ * @since 6.8.1
+ */
+function optionsframework_db_autoload_options() {
+	global $wpdb;
+
+	$of_settings = get_option( 'optionsframework' );
+
+	if ( ! isset( $of_settings['id'], $of_settings['knownoptions'] ) ) {
+		return;
+	}
+
+	$current_options_id = optionsframework_get_options_id();
+	$unused_options     = array_diff( $of_settings['knownoptions'], array( $current_options_id ) );
+	if ( count( $unused_options ) === 0 ) {
+	    return;
+    }
+
+	$placeholder = implode( ', ', array_fill( 0, count( $unused_options ), '%s' ) );
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->options SET autoload = 'no' WHERE option_name IN ({$placeholder})", $unused_options ) );
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->options SET autoload = 'yes' WHERE option_name = %s", $current_options_id ) );
+}
+add_action( 'after_switch_theme', 'optionsframework_db_autoload_options' );

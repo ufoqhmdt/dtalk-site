@@ -26,7 +26,7 @@
 				options = methods._saveOptions(form, options);
 				// bind all formError elements to close on click
 				$(document).on("click", ".formError", function() {
-					$(this).fadeOut(150, function() {
+					$(this).addClass('hide-form-message').fadeOut(250, function() {
 						// remove prompt once invisible
 						$(this).closest('.formError').remove();
 					});

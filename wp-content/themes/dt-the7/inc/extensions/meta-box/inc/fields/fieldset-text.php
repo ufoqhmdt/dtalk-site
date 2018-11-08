@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Fieldset_Text_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Fieldset_Text_Field' ) )
 {
-  class RWMB_Fieldset_Text_Field
+  class THE7_RWMB_Fieldset_Text_Field
   {
     /**
      * Get field HTML
@@ -27,7 +27,7 @@ if ( ! class_exists( 'RWMB_Fieldset_Text_Field' ) )
       $before = '<fieldset><legend>'.$field['desc'].'</legend>';
       $after   = '</fieldset>';
       
-      $tpl = '<label>%s <input type="text" class="rwmb-fieldset-text" name="%s[%s][%d]" placeholder="%s" value="%s" /></label>';
+      $tpl = '<label>%s <input type="text" class="the7-mb-fieldset-text" name="%s[%s][%d]" placeholder="%s" value="%s" /></label>';
       
       for($n=0;$n<$field['rows'];$n++) {
         foreach( $field['options'] as $k => $v ) {

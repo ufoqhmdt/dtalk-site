@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Plupload_Image_Field' ) )
 {
-	class RWMB_Plupload_Image_Field extends RWMB_Image_Field
+	class THE7_RWMB_Plupload_Image_Field extends THE7_RWMB_Image_Field
 	{
 		/**
 		 * Add field actions
@@ -14,7 +14,7 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 		static function add_actions()
 		{
 			parent::add_actions();
-			add_action( 'wp_ajax_rwmb_plupload_image_upload', array( __CLASS__, 'handle_upload' ) );
+			add_action( 'wp_ajax_the7_mb_plupload_image_upload', array( __CLASS__, 'handle_upload' ) );
 		}
 
 		/**
@@ -29,7 +29,7 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 			$post_id = is_numeric( $_REQUEST['post_id'] ) ? $_REQUEST['post_id'] : 0;
 			$field_id = isset( $_REQUEST['field_id'] ) ? $_REQUEST['field_id'] : '';
 
-			check_ajax_referer( "rwmb-upload-images_{$field_id}" );
+			check_ajax_referer( "the7-mb-upload-images_{$field_id}" );
 
 			// You can use WP's wp_handle_upload() function:
 			$file       = $_FILES['async-upload'];
@@ -71,7 +71,7 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 				// Save file ID in meta field
 				add_post_meta( $post_id, $field_id, $id, false );
 
-				RW_Meta_Box::ajax_response( self::img_html( $id ), 'success' );
+				The7_RW_Meta_Box::ajax_response( self::img_html( $id ), 'success' );
 			}
 
 			exit;
@@ -86,9 +86,9 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 		{
 			// Enqueue same scripts and styles as for file field
 			parent::admin_enqueue_scripts();
-			wp_enqueue_style( 'rwmb-plupload-image', RWMB_CSS_URL . 'plupload-image.css', array( 'wp-admin' ), RWMB_VER );
-			wp_enqueue_script( 'rwmb-plupload-image', RWMB_JS_URL . 'plupload-image.js', array( 'jquery-ui-sortable', 'wp-ajax-response', 'plupload-all' ), RWMB_VER, true );
-			wp_localize_script( 'rwmb-plupload-image', 'RWMB', array( 'url' => RWMB_URL ) );
+			wp_enqueue_style( 'the7-mb-plupload-image', THE7_RWMB_CSS_URL . 'plupload-image.css', array( 'wp-admin' ), THE7_RWMB_VER );
+			wp_enqueue_script( 'the7-mb-plupload-image', THE7_RWMB_JS_URL . 'plupload-image.js', array( 'jquery-ui-sortable', 'wp-ajax-response', 'plupload-all' ), THE7_RWMB_VER, true );
+			wp_localize_script( 'the7-mb-plupload-image', 'RWMB', array( 'url' => THE7_RWMB_URL ) );
 		}
 
 		/**
@@ -106,14 +106,14 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 				$meta = ( array ) $meta;
 
 			// Filter to change the drag & drop box background string
-			$i18n_drop   = apply_filters( 'rwmb_plupload_image_drop_string', _x( 'Drop images here', 'image upload', 'rwmb' ), $field );
-			$i18n_or     = apply_filters( 'rwmb_plupload_image_or_string', _x( 'or', 'image upload', 'rwmb' ), $field );
-			$i18n_select = apply_filters( 'rwmb_plupload_image_select_string', _x( 'Select Files', 'image upload', 'rwmb' ), $field );
+			$i18n_drop   = apply_filters( 'the7_mb_plupload_image_drop_string', _x( 'Drop images here', 'image upload', 'the7mk2' ), $field );
+			$i18n_or     = apply_filters( 'the7_mb_plupload_image_or_string', _x( 'or', 'image upload', 'the7mk2' ), $field );
+			$i18n_select = apply_filters( 'the7_mb_plupload_image_select_string', _x( 'Select Files', 'image upload', 'the7mk2' ), $field );
 
 			// Uploaded images
 
 			// Check for max_file_uploads
-			$classes = array( 'rwmb-drag-drop', 'drag-drop', 'hide-if-no-js', 'new-files');
+			$classes = array( 'the7-mb-drag-drop', 'drag-drop', 'hide-if-no-js', 'new-files');
 			if ( ! empty( $field['max_file_uploads'] ) && count( $meta ) >= (int) $field['max_file_uploads']  )
 				$classes[] = 'hidden';
 
@@ -131,7 +131,7 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 				</div>',
 				$field['id'],
 				implode( ' ', $classes ),
-				wp_create_nonce( "rwmb-upload-images_{$field['id']}" ),
+				wp_create_nonce( "the7-mb-upload-images_{$field['id']}" ),
 				esc_attr( json_encode( $field['js_options'] ) ),
 				$i18n_drop,
 				$i18n_or,
@@ -183,13 +183,13 @@ if ( ! class_exists( 'RWMB_Plupload_Image_Field' ) )
 				'urlstream_upload'		=> true,
 				'filters'				=> array(
 					array(
-						'title'      => _x( 'Allowed Image Files', 'image upload', 'rwmb' ),
+						'title'      => _x( 'Allowed Image Files', 'image upload', 'the7mk2' ),
 						'extensions' => 'jpg,jpeg,gif,png',
 					),
 				),
 				'multipart_params'		=> array(
 					'field_id'	=> $field['id'],
-					'action' 	=> 'rwmb_plupload_image_upload',
+					'action' 	=> 'the7_mb_plupload_image_upload',
 				)
 			);
 			$field = parent::normalize_field( $field );

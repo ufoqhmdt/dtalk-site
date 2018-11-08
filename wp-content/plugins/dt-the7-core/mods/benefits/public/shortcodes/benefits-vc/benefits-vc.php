@@ -34,18 +34,6 @@ if ( ! class_exists( 'DT_Shortcode_Benefits_Vc', false ) ) {
 		public function shortcode( $atts, $content = null ) {
 			$this->sanitize_attributes( $atts );
 
-			// vc inline dummy
-			if ( presscore_vc_is_inline() ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
-
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-benefits',
-					'title' => _x( 'Benefits', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
-			}
 
 			if ( 'dt_benefits' == get_post_type() ) {
 				return '';
@@ -82,44 +70,46 @@ if ( ! class_exists( 'DT_Shortcode_Benefits_Vc', false ) ) {
 		}
 
 		public function render_benefit( $attributes, $content = null ) {
-
 			$image = '';
+			$image_classes = array( 'benefits-grid-ico' );
+
 			if ( $attributes['icon_code'] ) {
 				$image = wp_kses( $attributes['icon_code'], array( 'i' => array( 'class' => array() ) ) );
 			} else {
 				$default_image = null;
-				$images = array( $attributes['image'], $attributes['hd_image'] );
+				$img_width = $img_height = '';
+				$images = array( 'n' => $attributes['image'], 'r' => $attributes['hd_image'] );
+				foreach ( $images as $i => &$img ) {
+					if ( empty( $img[0] ) ) {
+						continue;
+					}
 
-				// get default logo
-				foreach ( $images as $img ) {
-					if ( $img ) { 
-						$default_image = $img; break;
+					$img[0] = dt_make_image_src_ssl_friendly( $img[0] );
+
+					if ( ! $default_image ) {
+						$default_image = $img;
+						list( , $img_width, $img_height ) = $img;
+						if ( $i === 'r' ) {
+							$img_width = ceil( $img_width / 2 );
+							$img_height = ceil( $img_height / 2 );
+						}
 					}
 				}
+				unset( $img );
 
-				if ( !empty($default_image) ) {
-					$image = dt_is_hd_device() ? $images[1] : $images[0];
-
-					if ( empty($image) ) {
-						$image = $default_image;
+				if ( $default_image ) {
+					if ( presscore_lazy_loading_enabled() ) {
+						$image = presscore_get_lazy_image( $images, $img_width, $img_height, array(
+							'alt' => $attributes['title'] ,
+						) );
+						$image_classes[] = 'layzr-bg';
+					} else {
+						$image = presscore_get_image_with_srcset( $images['n'], $images['r'], $default_image, sprintf( 'alt="%s"', esc_attr( $attributes['title'] ) ) );
 					}
-
-					// ssl support
-					$image = dt_make_image_src_ssl_friendly( $image);
-
-					$image_size = '';
-					if ( !empty($attributes['image_size']) ) {
-						$image_size = image_hwstring( $attributes['image_size'][0], $attributes['image_size'][1] );
-					}
-
-					$image = sprintf( '<img src="%s" %s alt="%s" />', $image, $image_size, esc_attr( $attributes['image_alt'] ) );
 				}
 			}
 
 			if ( $image ) {
-
-				$image_classes = array( 'benefits-grid-ico' );
-
 				if ( presscore_shortcode_animation_on( $attributes['animation'] ) ) {
 					$image_classes[] = presscore_get_shortcode_animation_html_class( $attributes['animation'] );
 				}
@@ -463,39 +453,17 @@ if ( ! class_exists( 'DT_Shortcode_Benefits_Vc', false ) ) {
 			$benefit_attr['icon_code'] = get_post_meta( $post->ID, "{$meta_prefix}icon_code", true );
 
 			if ( ! $benefit_attr['icon_code'] ) {
-				$image_id = get_post_thumbnail_id( $post->ID );
-				$image_size = array();
-				$benefit_image_alt = null;
-				$benefit_image_src = '';
-				if ( $image_id ) {
-					$benefit_image = wp_get_attachment_image_src( $image_id, 'full' );
-					if ( $benefit_image ) {
-						$benefit_image_src = $benefit_image[0];
-						$image_size = array( $benefit_image[1], $benefit_image[2] );
-						$benefit_image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-					}
+				$benefit_attr['image'] = '';
+				if ( has_post_thumbnail( $post ) ) {
+					$benefit_attr['image'] = wp_get_attachment_image_src( get_post_thumbnail_id( $post ), 'full' );
 				}
 
-				$benefit_hd_image_src = '';
-				$benefit_hd_image_array = get_post_meta( $post->ID, "{$meta_prefix}retina_image", true );
-				if ( isset( $benefit_hd_image_array[0] ) ) {
-					$image_id = $benefit_hd_image_array[0];
-					$benefit_hd_image = wp_get_attachment_image_src( $image_id, 'full' );
-					if ( $benefit_hd_image ) {
-						$benefit_hd_image_src = $benefit_hd_image[0];
-						if ( ! $image_size ) {
-							$image_size = array( ceil($benefit_hd_image[1]/2), ceil($benefit_hd_image[2]/2) );
-						}
-						if ( ! isset( $benefit_image_alt ) ) {
-							$benefit_image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-						}
-					}
+				$benefit_attr['hd_image'] = '';
+				$hd_img_id = get_post_meta( $post->ID, "{$meta_prefix}retina_image", true );
+				if ( isset( $hd_img_id[0] ) ) {
+					$hd_img_id = $hd_img_id[0];
+					$benefit_attr['hd_image'] = wp_get_attachment_image_src( $hd_img_id, 'full' );
 				}
-
-				$benefit_attr['image'] = $benefit_image_src;
-				$benefit_attr['hd_image'] = $benefit_hd_image_src;
-				$benefit_attr['image_alt'] = $benefit_image_alt;
-				$benefit_attr['image_size'] = $image_size;
 			}
 
 			$benefit_attr['image_link'] = get_post_meta( $post->ID, "{$meta_prefix}link", true );

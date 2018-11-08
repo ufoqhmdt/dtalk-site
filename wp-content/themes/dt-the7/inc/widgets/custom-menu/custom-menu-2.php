@@ -31,7 +31,7 @@ class Presscore_Inc_Widgets_CustomMenu2 extends WP_Widget {
 
 		/* Create the widget. */
 		parent::__construct(
-			'presscore-custom-menu-2',
+			'presscore-custom-menu-two',
 			DT_WIDGET_PREFIX . _x( 'Custom menu style 2', 'widget', 'the7mk2' ),
 			$widget_ops
 		);
@@ -126,6 +126,6 @@ class Presscore_Inc_Widgets_CustomMenu2 extends WP_Widget {
 	}
 
 	public static function presscore_register_widget() {
-		register_widget( get_class() );
+		register_widget( __CLASS__ );
 	}
 }

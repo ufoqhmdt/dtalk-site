@@ -42,7 +42,10 @@ if ( ! class_exists( 'Presscore_Lib_LessVars_Manager', false ) ) :
 
 		public function add_rgba_color( $var, $value, $opacity = null, $wrap = null ) {
 			$color_obj = $this->populate_color( $value );
-			$this->storage->set( $var, $color_obj->opacity( $opacity )->wrap( $wrap )->get_rgba() );
+			if ( ! is_null( $opacity ) ) {
+				$color_obj->opacity( $opacity );
+			}
+			$this->storage->set( $var, $color_obj->wrap( $wrap )->get_rgba() );
 		}
 
 		public function add_pixel_number( $var, $value, $wrap = null ) {
@@ -80,11 +83,50 @@ if ( ! class_exists( 'Presscore_Lib_LessVars_Manager', false ) ) :
 		}
 
 		public function add_keyword( $var, $value, $wrap = null ) {
-			$_value = $value;
+			$_value = (string) $value;
 			if ( $wrap ) {
-				$_value = sprintf( strval( $wrap ), $value );
+				$_value = sprintf( (string) $wrap, $_value );
 			}
-			$this->storage->set( $var, $_value );
+			$this->storage->set( $var, $_value ? $_value : '""' );
+		}
+
+		/**
+		 * Register less vars for paddings.
+		 *
+		 * @param array       $vars
+		 * @param string      $value
+		 * @param string|null $wrap
+		 * @param string      $units
+		 */
+		public function add_paddings( $vars, $value, $units = 'px', $wrap = null ) {
+			if ( ! is_array( $value ) ) {
+				$value = explode( ' ', $value );
+			}
+
+			for ( $i = 0; $i < 4; $i ++ ) {
+				$value[ $i ] = ( isset( $value[ $i ] ) ? $value[ $i ] : '0' );
+			}
+
+			$value = array_slice( $value, 0, 4 );
+
+			foreach ( $vars as $i => $var ) {
+				if ( ! isset( $value[ $i ] ) ) {
+					$this->add_keyword( $var, '~""', $wrap );
+				}
+
+				switch ( $units ) {
+					case '%|px':
+					case 'px|%':
+						$this->add_pixel_or_percent_number( $var, $value[ $i ], $wrap );
+						break;
+					case '%':
+						$this->add_percent_number( $var, $value[ $i ], $wrap );
+						break;
+					case 'px':
+					default:
+						$this->add_pixel_number( $var, $value[ $i ], $wrap );
+				}
+			}
 		}
 
 		protected function populate_color( $value ) {

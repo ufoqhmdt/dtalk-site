@@ -44,6 +44,7 @@ $DT_META_BOXES[] = array(
 			'id'          => "{$prefix}hidden_parts",
 			'type'        => 'checkbox_list',
 			'options'     => array(
+				'top_bar'       => _x( 'top bar', 'backend metabox', 'the7mk2' ),
 				'header'        => _x( 'header &amp; top bar', 'backend metabox', 'the7mk2' ),
 				'floating_menu' => _x( 'floating menu', 'backend metabox', 'the7mk2' ),
 				'content'       => _x( 'content area', 'backend metabox', 'the7mk2' ),
@@ -120,7 +121,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'MAIN LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'MAIN', 'backend metabox', 'the7mk2' ),
 			'id'   => 'main_logo_heading',
 			'type' => 'heading',
 		),
@@ -156,7 +157,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'TRANSPARENT HEADER LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'TRANSPARENT HEADER', 'backend metabox', 'the7mk2' ),
 			'id'   => 'transparent_logo_heading',
 			'type' => 'heading',
 		),
@@ -192,7 +193,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'MENU ICON, TOP LINE, SIDE LINE LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'TOP LINE / SIDE LINE / FLOATING MENU BUTTON', 'backend metabox', 'the7mk2' ),
 			'id'   => 'transparent_logo_heading',
 			'type' => 'heading',
 		),
@@ -228,7 +229,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'FLOATING NAVIGATION LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'FLOATING NAVIGATION', 'backend metabox', 'the7mk2' ),
 			'id'   => 'floating_logo_heading',
 			'type' => 'heading',
 		),
@@ -264,7 +265,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'MOBILE LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'MOBILE HEADER', 'backend metabox', 'the7mk2' ),
 			'id'   => 'transparent_logo_heading',
 			'type' => 'heading',
 		),
@@ -300,7 +301,43 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'BOTTOM LINE LOGO', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'TRANSPARENT MOBILE HEADER', 'backend metabox', 'the7mk2' ),
+			'id'   => 'transparent_logo_heading',
+			'type' => 'heading',
+		),
+
+		array(
+			'name'        => '',
+			'id'          => "{$prefix}transparent_mobile_logo_type",
+			'type'        => 'radio',
+			'std'         => 'default',
+			'options'     => array(
+				'default'  => _x( 'Default', 'backend metabox', 'the7mk2' ),
+				'custom' => _x( 'Custom', 'backend metabox', 'the7mk2' ),
+			),
+			'hide_fields'	=> array(
+				'default'	=> array("{$prefix}transparent_mobile_logo_regular", "{$prefix}transparent_mobile_logo_hd" ),
+			)
+		),
+
+		array(
+			'name'             => $logo_field_title,
+			'desc'             => _x( 'Leave empty to hide logo.', 'backend metabox', 'the7mk2' ),
+			'id'               => "{$prefix}transparent_mobile_logo_regular",
+			'type'             => 'image_advanced_mk2',
+			'max_file_uploads' => 1,
+		),
+
+		array(
+			'name'             => $logo_hd_field_title,
+			'desc'             => _x( 'Leave empty to hide logo.', 'backend metabox', 'the7mk2' ),
+			'id'               => "{$prefix}transparent_mobile_logo_hd",
+			'type'             => 'image_advanced_mk2',
+			'max_file_uploads' => 1,
+		),
+
+		array(
+			'name' => _x( 'BOTTOM BAR', 'backend metabox', 'the7mk2' ),
 			'id'   => 'bottom_logo_heading',
 			'type' => 'heading',
 		),
@@ -336,7 +373,7 @@ $DT_META_BOXES[] = array(
 		),
 
 		array(
-			'name' => _x( 'Favicon', 'backend metabox', 'the7mk2' ),
+			'name' => _x( 'FAVICON', 'backend metabox', 'the7mk2' ),
 			'id'   => 'favicon_heading',
 			'type' => 'heading',
 		),

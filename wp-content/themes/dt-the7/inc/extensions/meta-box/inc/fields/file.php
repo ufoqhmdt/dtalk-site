@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_File_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_File_Field' ) )
 {
-	class RWMB_File_Field
+	class THE7_RWMB_File_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -13,12 +13,17 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'rwmb-file', RWMB_CSS_URL . 'file.css', array(), RWMB_VER );
-			wp_enqueue_script( 'rwmb-file', RWMB_JS_URL . 'file.js', array( 'jquery', 'wp-ajax-response' ), RWMB_VER, true );
-			wp_localize_script( 'rwmb-file', 'rwmbFile', array(
-				'maxFileUploadsSingle' => __( 'You may only upload maximum %d file', 'rwmb' ),
-				'maxFileUploadsPlural' => __( 'You may only upload maximum %d files', 'rwmb' ),
-			) );
+			static $vars_localized;
+
+			wp_enqueue_style( 'the7-mb-file', THE7_RWMB_CSS_URL . 'file.css', array(), THE7_RWMB_VER );
+			wp_enqueue_script( 'the7-mb-file', THE7_RWMB_JS_URL . 'file.js', array( 'jquery', 'wp-ajax-response' ), THE7_RWMB_VER, true );
+			if ( ! $vars_localized ) {
+				wp_localize_script( 'the7-mb-file', 'the7mbFile', array(
+					'maxFileUploadsSingle' => __( 'You may only upload maximum %d file', 'the7mk2' ),
+					'maxFileUploadsPlural' => __( 'You may only upload maximum %d files', 'the7mk2' ),
+				) );
+				$vars_localized = true;
+			}
 		}
 
 		/**
@@ -32,7 +37,7 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 			add_action( 'post_edit_form_tag', array( __CLASS__, 'post_edit_form_tag' ) );
 
 			// Delete file via Ajax
-			add_action( 'wp_ajax_rwmb_delete_file', array( __CLASS__, 'wp_ajax_delete_file' ) );
+			add_action( 'wp_ajax_the7_mb_delete_file', array( __CLASS__, 'wp_ajax_delete_file' ) );
 		}
 
 		/**
@@ -59,15 +64,15 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 			$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
 			$force_delete  = isset( $_POST['force_delete'] ) ? intval( $_POST['force_delete'] ) : 0;
 
-			check_ajax_referer( "rwmb-delete-file_{$field_id}" );
+			check_ajax_referer( "the7-mb-delete-file_{$field_id}" );
 
 			delete_post_meta( $post_id, $field_id, $attachment_id );
 			$ok = $force_delete ? wp_delete_attachment( $attachment_id ) : true;
 
 			if ( $ok )
-				RW_Meta_Box::ajax_response( '', 'success' );
+				The7_RW_Meta_Box::ajax_response( '', 'success' );
 			else
-				RW_Meta_Box::ajax_response( __( 'Error: Cannot delete file', 'rwmb' ), 'error' );
+				The7_RW_Meta_Box::ajax_response( __( 'Error: Cannot delete file', 'the7mk2' ), 'error' );
 		}
 
 		/**
@@ -81,8 +86,8 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 		 */
 		static function html( $html, $meta, $field )
 		{
-			$i18n_title = apply_filters( 'rwmb_file_upload_string', _x( 'Upload Files', 'file upload', 'rwmb' ), $field );
-			$i18n_more  = apply_filters( 'rwmb_file_add_string', _x( '+ Add new file', 'file upload', 'rwmb' ), $field );
+			$i18n_title = apply_filters( 'the7_mb_file_upload_string', _x( 'Upload Files', 'file upload', 'the7mk2' ), $field );
+			$i18n_more  = apply_filters( 'the7_mb_file_add_string', _x( '+ Add new file', 'file upload', 'the7mk2' ), $field );
 
 			// Uploaded files
 			$html = self::get_uploaded_files( $meta, $field );
@@ -95,7 +100,7 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 				'<div class="%s">
 					<h4>%s</h4>
 					<div class="file-input"><input type="file" name="%s[]" /></div>
-					<a class="rwmb-add-file" href="#"><strong>%s</strong></a>
+					<a class="the7-mb-add-file" href="#"><strong>%s</strong></a>
 				</div>',
 				implode( ' ', $new_file_classes ),
 				$i18n_title,
@@ -108,8 +113,8 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 
 		static function get_uploaded_files( $files, $field )
 		{
-			$delete_nonce = wp_create_nonce( "rwmb-delete-file_{$field['id']}" );
-			$classes = array('rwmb-file', 'rwmb-uploaded');
+			$delete_nonce = wp_create_nonce( "the7-mb-delete-file_{$field['id']}" );
+			$classes = array('the7-mb-file', 'the7-mb-uploaded');
 			if ( count( $files ) <= 0  )
 				$classes[] = 'hidden';
 			$ol = '<ul class="%s" data-field_id="%s" data-delete_nonce="%s" data-force_delete="%s" data-max_file_uploads="%s" data-mime_type="%s">';
@@ -135,16 +140,16 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 
 		static function file_html( $attachment_id )
 		{
-			$i18n_delete = apply_filters( 'rwmb_file_delete_string', _x( 'Delete', 'file upload', 'rwmb' ) );
-			$i18n_edit   = apply_filters( 'rwmb_file_edit_string', _x( 'Edit', 'file upload', 'rwmb' ) );
+			$i18n_delete = apply_filters( 'the7_mb_file_delete_string', _x( 'Delete', 'file upload', 'the7mk2' ) );
+			$i18n_edit   = apply_filters( 'the7_mb_file_edit_string', _x( 'Edit', 'file upload', 'the7mk2' ) );
 			$li = '
 			<li>
-				<div class="rwmb-icon">%s</div>
-				<div class="rwmb-info">
+				<div class="the7-mb-icon">%s</div>
+				<div class="the7-mb-info">
 					<a href="%s" target="_blank">%s</a>
 					<p>%s</p>
 					<a title="%s" href="%s" target="_blank">%s</a> |
-					<a title="%s" class="rwmb-delete-file" href="#" data-attachment_id="%s">%s</a>
+					<a title="%s" class="the7-mb-delete-file" href="#" data-attachment_id="%s">%s</a>
 				</div>
 			</li>';
 
@@ -251,7 +256,7 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 				'max_file_uploads' => 0,
 				'mime_type'        => '',
 			) );
-			$field['multiple'] = true;
+			$field['multiple'] = false;
 			return $field;
 		}
 
@@ -267,7 +272,8 @@ if ( ! class_exists( 'RWMB_File_Field' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+//			$meta = The7_RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+			$meta = get_post_meta( $post_id, $field['id'], true );
 
 			if ( empty( $meta ) )
 				return array();

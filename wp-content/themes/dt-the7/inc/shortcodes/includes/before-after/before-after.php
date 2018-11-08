@@ -29,6 +29,11 @@ if ( ! class_exists( 'DT_Shortcode_Before_After', false ) ) {
 
 		public function shortcode( $atts, $content = null ) {
 			$this->atts = $this->sanitize_attributes( $atts );
+
+			if ( presscore_vc_is_inline() ) {
+				return $this->get_vc_inline_html();
+			}
+
 			return $this->get_html();
 		}
 
@@ -56,15 +61,27 @@ if ( ! class_exists( 'DT_Shortcode_Before_After', false ) ) {
 
 		protected function get_html() {
 			$output = '';
-
 			$output .= '<div class="twentytwenty-container"' . $this->get_data_atts() . '>';
-
-				$output .= $this->get_image_html( $this->atts['image_1'] );
-				$output .= $this->get_image_html( $this->atts['image_2'] );
-
+			$output .= $this->get_image_html( $this->atts['image_1'] );
+			$output .= $this->get_image_html( $this->atts['image_2'] );
 			$output .= '</div>';
 
 			return $output;
+		}
+
+		/**
+		 * Return shortcode HTML for VC frontend editor.
+		 *
+		 * @return string
+		 */
+		protected function get_vc_inline_html() {
+			return $this->vc_inline_dummy( array(
+				'class'  => 'dt_before_after_masonry',
+				'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_before_after_editor_ico.gif', 98, 104 ),
+				'title'  => _x( 'Before / After', 'vc inline dummy', 'the7mk2' ),
+
+				'style' => array( 'height' => 'auto' )
+			) );
 		}
 
 		protected function get_data_atts() {

@@ -18,54 +18,47 @@ if ( ! function_exists( 'presscore_register_scripts' ) ) :
      * @since 5.4.0
 	 */
     function presscore_register_scripts() {
-        $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
         $template_uri = get_template_directory_uri();
-
-        $register_styles = array(
-            'dt-main'         => array(
-                'src'     => "{$template_uri}/css/main{$suffix}.css",
-            ),
-            'dt-old-ie'       => array(
-                'src'     => "{$template_uri}/css/old-ie{$suffix}.css",
-            ),
-            'dt-awsome-fonts' => array(
-                'src'     => "{$template_uri}/fonts/FontAwesome/css/font-awesome{$suffix}.css",
-            ),
-            'dt-fontello'     => array(
-                'src'     => "{$template_uri}/fonts/fontello/css/fontello{$suffix}.css",
-            ),
-            'dt-arrow-icons'  => array(
-                'src'     => "{$template_uri}/fonts/icomoon-arrows-the7/style{$suffix}.css",
-            ),
-            'dt-3d-slider'    => array(
-                'src'     => "{$template_uri}/css/compatibility/3D-slider{$suffix}.css",
-            ),
-        );
+	    $register_styles = array(
+		    'dt-main'              => array(
+			    'src' => "{$template_uri}/css/main",
+		    ),
+		    'dt-fontello'          => array(
+			    'src' => "{$template_uri}/fonts/fontello/css/fontello",
+		    ),
+	    );
 
         foreach ( $register_styles as $name => $props ) {
-            wp_register_style( $name, $props['src'], array(), THE7_VERSION, 'all' );
+	        the7_register_style( $name, $props['src'] );
+        }
+
+	    if ( The7_Admin_Dashboard_Settings::get( 'fontawesome-4-compatibility' ) ) {
+	        the7_register_style( 'dt-awsome-fonts-back', "{$template_uri}/fonts/FontAwesome/back-compat" );
+	        the7_register_fontawesome_style( 'dt-awsome-fonts', array( 'dt-awsome-fonts-back' ) );
+	    } else {
+		    the7_register_fontawesome_style( 'dt-awsome-fonts' );
         }
 
         $register_scripts = array(
             'dt-above-fold' => array(
-                'src'       => "{$template_uri}/js/above-the-fold{$suffix}.js",
+                'src'       => "{$template_uri}/js/above-the-fold",
                 'deps'      => array( 'jquery' ),
                 'in_footer' => false,
             ),
             'dt-main'   => array(
-                'src'       => "{$template_uri}/js/main{$suffix}.js",
+                'src'       => "{$template_uri}/js/main",
                 'deps'      => array( 'jquery' ),
                 'in_footer' => true,
             ),
             'dt-legacy' => array(
-                'src'       => "{$template_uri}/js/legacy{$suffix}.js",
+                'src'       => "{$template_uri}/js/legacy",
                 'deps'      => array( 'jquery' ),
                 'in_footer' => true,
             ),
         );
 
         foreach ( $register_scripts as $name => $props ) {
-            wp_register_script( $name, $props['src'], $props['deps'], THE7_VERSION, $props['in_footer'] );
+	        the7_register_script( $name, $props['src'], $props['deps'], false, $props['in_footer'] );
         }
     }
 
@@ -120,6 +113,17 @@ if ( ! function_exists( 'presscore_localize_main_script' ) ):
             );
         }
 
+        $custom_error_messages_validation = of_get_option( 'custom_error_messages_validation' );
+        if ( empty( $custom_error_messages_validation ) ) {
+           $custom_error_messages_validation = _x( 'One or more fields have an error. Please check and try again.', 'feedback msg', 'the7mk2' );
+        }
+        $header_layout = of_get_option( 'header-layout' );
+        $header = 'header-' . of_get_option( 'header-layout', 'inline' ) . '-';
+        $header_height = '';
+       	if ( in_array( $header_layout, array( 'classic', 'inline', 'split' ), true ) ) {
+        	 $header_height = (int) of_get_option( "{$header}height" );
+        }
+
         $dt_local = array(
             'themeUrl' => get_template_directory_uri(),
             'passText' => __( 'To view this protected post, enter the password below:', 'the7mk2' ),
@@ -129,9 +133,9 @@ if ( ! function_exists( 'presscore_localize_main_script' ) ):
             ),
             'postID' => empty( $post->ID ) ? null : $post->ID,
             'ajaxurl' => esc_url( admin_url( 'admin-ajax.php' ) ),
-            'contactNonce' => wp_create_nonce('dt_contact_form'),
             'contactMessages' => array(
-                'required' => __( 'One or more fields have an error. Please check and try again.', 'the7mk2' ),
+	            'required' => $custom_error_messages_validation,
+	            'terms'    => esc_attr_x( 'Please accept the privacy policy.', 'feedback msg', 'the7mk2' ),
             ),
             'ajaxNonce' => wp_create_nonce('presscore-posts-ajax'),
             'pageData' => $page_data,
@@ -139,10 +143,13 @@ if ( ! function_exists( 'presscore_localize_main_script' ) ):
                 'smoothScroll' => of_get_option('general-smooth_scroll', 'on'),
                 'lazyLoading' => ( 'lazy_loading' === $config->get( 'load_style' ) ),
                 'accentColor' => $accent_color,
+                'desktopHeader' => array(
+                	'height' => $header_height,
+                ),
                 'floatingHeader' => array(
-                    'showAfter' => $config->get( 'header.floating_navigation.show_after' ),
-                    'showMenu' => ( dt_sanitize_flag( $config->get( 'header.floating_navigation.enabled' ) ) ),
-                    'height' => of_get_option( 'header-floating_navigation-height' ),
+                    'showAfter' => (int) $config->get( 'header.floating_navigation.show_after' ),
+                    'showMenu' => dt_sanitize_flag( $config->get( 'header.floating_navigation.enabled' ) ),
+                    'height' => (int) of_get_option( 'header-floating_navigation-height' ),
                     'logo' => array(
                         'showLogo'      => ( 'none' !== $config->get( 'header.floating_navigation.logo.style' ) ),
                         'html'          => presscore_get_logo_image( presscore_get_floating_menu_logos_meta() ),
@@ -150,13 +157,26 @@ if ( ! function_exists( 'presscore_localize_main_script' ) ):
                     ),
                 ),
                 'mobileHeader' => array(
-                    'firstSwitchPoint' => of_get_option( 'header-mobile-first_switch-after', 1024 ),
-                    'secondSwitchPoint' => of_get_option( 'header-mobile-second_switch-after', 200 )
+                    'firstSwitchPoint' => (int) of_get_option( 'header-mobile-first_switch-after' ),
+                    'secondSwitchPoint' => (int) of_get_option( 'header-mobile-second_switch-after' ),
+	                'firstSwitchPointHeight' => (int) of_get_option( 'header-mobile-first_switch-height'),
+	                'secondSwitchPointHeight' => (int) of_get_option( 'header-mobile-second_switch-height'),
+                ),
+                'stickyMobileHeaderFirstSwitch' => array(
+	                'logo' => array(
+		                'html' => presscore_get_logo_image( presscore_get_mobile_logos_meta() ),
+	                ),
+                ),
+                'stickyMobileHeaderSecondSwitch' => array(
+	                'logo' => array(
+		                'html' => presscore_get_logo_image( presscore_get_mobile_logos_meta_second() ),
+	                ),
                 ),
                 'content' => array(
                     'textColor' => of_get_option( 'content-primary_text_color', '#000000' ),
                     'headerColor' => of_get_option( 'content-headers_color', '#000000' )
                 ),
+                'boxedWidth'=> of_get_option('general-box_width'),
                 'stripes' => array(
                     'stripe1' => array(
                         'textColor' => of_get_option( 'stripes-stripe_1_text_color', '#000000' ),
@@ -187,8 +207,6 @@ if ( ! function_exists( 'presscore_enqueue_scripts' ) ) :
 	 * Enqueue scripts and styles.
 	 */
 	function presscore_enqueue_scripts() {
-		global $wp_styles;
-
 		// Enqueue web fonts if needed.
 		presscore_enqueue_web_fonts();
 		presscore_register_scripts();
@@ -203,18 +221,9 @@ if ( ! function_exists( 'presscore_enqueue_scripts' ) ) :
 			wp_add_inline_style( 'dt-main', presscore_get_loader_inline_css() );
 		}
 
-		wp_enqueue_style( 'dt-old-ie' );
-		$wp_styles->add_data( 'dt-old-ie', 'conditional', 'lt IE 10' );
-
 		// Enqueue fonts.
 		wp_enqueue_style( 'dt-awsome-fonts' );
         wp_enqueue_style( 'dt-fontello' );
-		wp_enqueue_style( 'dt-arrow-icons' );
-
-		// 3D slide show css.
-		if ( 'slideshow' == $config->get( 'header_title' ) && '3d' == $config->get( 'slideshow_mode' ) ) {
-			wp_enqueue_style( 'dt-3d-slider' );
-		}
 
 		// Enqueue base js.
 		wp_enqueue_script( 'dt-above-fold' );
@@ -268,26 +277,40 @@ add_action( 'wp_enqueue_scripts', 'presscore_enqueue_scripts', 15 );
  */
 add_action( 'wp_enqueue_scripts', 'presscore_enqueue_dynamic_stylesheets', 20 );
 
-if ( ! function_exists( 'presscore_enqueue_custom_css' ) ):
+/**
+ * Maybe regenerate dynamic stylesheets.
+ *
+ * @since 5.5.0
+ */
+add_action( 'wp_head', 'the7_maybe_regenerate_dynamic_css', 0 );
+
+if ( ! function_exists( 'the7_enqueue_style_css' ) ):
 
 	/**
 	 * Allow override css from theme options.
 	 *
 	 * @since 3.8.1
 	 */
-	function presscore_enqueue_custom_css() {
+	function the7_enqueue_style_css() {
 		wp_enqueue_style( 'style', get_stylesheet_uri(), array(), THE7_VERSION );
-
-		// Add custom css from theme options.
-		$custom_css = of_get_option( 'general-custom_css', '' );
-		if ( $custom_css ) {
-			wp_add_inline_style( 'style', $custom_css );
-		}
 	}
 
-	add_action( 'wp_enqueue_scripts', 'presscore_enqueue_custom_css', 30 );
+	add_action( 'wp_enqueue_scripts', 'the7_enqueue_style_css', 30 );
 
 endif;
+
+/**
+ * Print custom css from theme options.
+ *
+ * @since 6.8.0
+ */
+function the7_print_custom_css() {
+	$custom_css = of_get_option( 'general-custom_css', '' );
+	if ( $custom_css ) {
+		printf( "<style id='the7-custom-inline-css' type='text/css'>\n%s\n</style>\n", $custom_css );
+	}
+}
+add_action( 'wp_head', 'the7_print_custom_css', 9999 );
 
 if ( ! function_exists( 'presscore_print_beautiful_loading_scripts_in_footer' ) ):
 
@@ -298,10 +321,10 @@ if ( ! function_exists( 'presscore_print_beautiful_loading_scripts_in_footer' ) 
 ?>
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function(event) { 
-	var $load = document.getElementById("load");
+	var load = document.getElementById("load");
 	
 	var removeLoading = setTimeout(function() {
-		$load.className += " loader-removed";
+		load.className += " loader-removed";
 	}, 500);
 });
 </script>
@@ -403,7 +426,7 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 			$classes[] = 'header-top-line-active';
 		}
 
-		if ( presscore_header_with_bg() && ( presscore_mixed_header_with_top_line() || ! presscore_header_layout_is_side() ) ) {
+		if ( presscore_header_with_bg() &&  ! presscore_header_layout_is_side()  ) {
 
 			switch ( $config->get('header_background') ) {
 				case 'overlap':
@@ -438,12 +461,7 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 
 		} elseif ( 'slideshow' == $config->get( 'header_title' ) ) {
 			$classes[] = 'slideshow-on';
-
-			if ( '3d' == $config->get( 'slideshow_mode' ) && 'fullscreen-content' == $config->get( 'slideshow_3d_layout' ) ) {
-				$classes[] = 'threed-fullscreen';
-
-			}
-
+			
 			if ( dt_get_paged_var() > 1 && isset($classes['header_background']) ) {
 				unset($classes['header_background']);
 
@@ -476,10 +494,6 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 			case 'big_center':
 				$classes[] = 'large-hover-icons';
 				break;
-		}
-
-		if ( $config->get( 'template.images.hover.animation' ) ) {
-			$classes[] = 'click-effect-on-img';
 		}
 
 		////////////
@@ -521,28 +535,28 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 				break;
 		}
 
-		switch ( $config->get( 'header.layout' ) ) {
-			case 'slide_out':
-				$classes[] = 'sticky-header';
-				break;
-			case 'overlay':
-				$classes[] = 'overlay-navigation';
-				break;
+		if ( in_array( $config->get( 'header.layout' ), array( 'top_line', 'side_line', 'menu_icon' ) )) {
+			switch ( $config->get( 'header.navigation' ) ) {
+				case 'slide_out':
+					$classes[] = 'sticky-header';
+					break;
+				case 'overlay':
+					$classes[] = 'overlay-navigation';
+					break;
+			}
+		}
+		if ( in_array( $config->get( 'header.layout' ), array( 'top_line', 'side_line', 'menu_icon' ) ) && $config->get( 'header.navigation' ) == 'slide_out') {
+			switch ( $config->get( 'header.layout.slide_out.animation' ) ) {
+				case 'fade':
+					$classes[] = 'fade-header-animation';
+					break;
+				case 'slide':
+					$classes[] = 'slide-header-animation';
+					break;
+			}
 		}
 
-		switch ( $config->get( 'header.layout.slide_out.animation' ) ) {
-			case 'fade':
-				$classes[] = 'fade-header-animation';
-				break;
-			case 'move':
-				$classes[] = 'move-header-animation';
-				break;
-			case 'slide':
-				$classes[] = 'slide-header-animation';
-				break;
-		}
-
-		if ( 'side_line' === $config->get( 'header.mixed.view' ) ) {
+		if ( 'side_line' === $config->get( 'header.layout' ) ) {
 			$classes[] = 'header-side-line';
 
 			switch ( $config->get( 'header.mixed.view.side_line.position' ) ) {
@@ -553,10 +567,14 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 					$classes[] = 'header-under-side-line';
 					break;
 			}
-		}
-
-		if ( $config->get( 'header.layout.slide_out.x_cursor.enabled' ) ) {
-			$classes[] = 'overlay-cursor-on';
+			switch ( $config->get( 'header.mixed.view.side_line_v.position' ) ) {
+				case 'left':
+					$classes[] = 'left-side-line';
+					break;
+				case 'right':
+					$classes[] = 'right-side-line';
+					break;
+			}
 		}
 
 		//////////////////////
@@ -582,11 +600,11 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 			case '3d':
 				$classes[] = 'btn-3d';
 				break;
-			case 'material':
-				$classes[] = 'btn-material';
-				break;
 			default:
 				$classes[] = 'btn-flat';
+				break;
+			case 'shadow':
+				$classes[] = 'btn-shadow';
 				break;
 		}
 
@@ -627,27 +645,6 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 				break;
 		}
 
-
-		if ( $config->get_bool( 'header.layout.slide_out.blur.enabled' ) ) {
-			$classes[] = 'blur-page';
-		}
-
-		///////////////////////////////
-		// slideshow bullets style //
-		///////////////////////////////
-
-		switch ( $config->get( 'slideshow.bullets.style' ) ) {
-			case 'transparent':
-				$classes[] = 'semitransparent-bullets';
-				break;
-			case 'accent':
-				$classes[] = 'accent-bullets';
-				break;
-			case 'outline':
-				$classes[] = 'outlines-bullets';
-				break;
-		}
-
 		///////////////////
 		// icons style //
 		///////////////////
@@ -664,8 +661,7 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 		/////////////////////
 		// floating menu //
 		/////////////////////
-
-		if ( $config->get( 'header.floating_navigation.enabled' ) ) {
+		if ( $config->get( 'header.floating_navigation.enabled' ) && ($config->get( 'header.layout' ) == 'classic' || $config->get( 'header.layout' ) == 'inline' || $config->get( 'header.layout' ) == 'split') ) {
 
 			$classes[] = presscore_array_value( $config->get( 'header.floating_navigation.style' ), array(
 				'fade'   => 'phantom-fade',
@@ -743,6 +739,22 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 			$classes[] = 'dt-wc-custom';
 		}
 
+		if (of_get_option('contact_form_message')) {
+			$classes[] = 'popup-message-style';
+		}else{
+			$classes[] = 'inline-message-style';
+		}
+
+		if ( The7_Admin_Dashboard_Settings::get( 'fontawesome-4-compatibility' ) ) {
+		    $classes[] = 'dt-fa-compatibility';
+        }
+
+        if ( 'fullscreen' === $config->get( 'post.media.photo_scroller.layout' ) ) {
+            $classes[] = 'fullscreen-photo-scroller';
+		}
+
+        $classes[] = 'the7-ver-' . THE7_VERSION;
+
 		/////////////
 		// return //
 		/////////////
@@ -752,18 +764,6 @@ if ( ! function_exists( 'presscore_body_class' ) ) :
 	add_filter( 'body_class', 'presscore_body_class' );
 
 endif;
-
-if ( ! function_exists( 'presscore_get_blank_image' ) ) :
-
-	/**
-	 * Get blank image.
-	 *
-	 */
-	function presscore_get_blank_image() {
-		return PRESSCORE_THEME_URI . '/images/1px.gif';
-	}
-
-endif; // presscore_get_blank_image
 
 if ( ! function_exists( 'presscore_get_default_avatar' ) ) :
 
@@ -847,7 +847,7 @@ if ( ! function_exists( 'presscore_enqueue_web_fonts' ) ) :
 		$fonts = array();
 		$options = _optionsframework_get_clean_options();
 		foreach ( $options as $option ) {
-			if ( 'web_fonts' !== $option['type'] ) {
+			if ( ! isset( $option['type'] ) || 'web_fonts' !== $option['type'] ) {
 			    continue;
 			}
 

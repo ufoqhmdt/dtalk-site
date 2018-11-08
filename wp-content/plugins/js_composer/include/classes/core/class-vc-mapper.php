@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer Main manager.
+ * WPBakery WPBakery Page Builder Main manager.
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  * @since   4.2
  */
 
@@ -108,12 +108,17 @@ class Vc_Mapper {
 	 */
 	protected function callActivities() {
 		do_action( 'vc_mapper_call_activities_before' );
-		while ( $activity = each( $this->init_activity ) ) {
-			list( $object, $method, $params ) = $activity[1];
+		foreach ( $this->init_activity as $activity ) {
+			list( $object, $method, $params ) = $activity;
 			if ( 'mapper' === $object ) {
 				switch ( $method ) {
 					case 'map':
+						$currentScope = WPBMap::getScope();
+						if ( isset( $params['scope'] ) ) {
+							WPBMap::setScope( $params['scope'] );
+						}
 						WPBMap::map( $params['tag'], $params['attributes'] );
+						WPBMap::setScope( $currentScope );
 						break;
 					case 'drop_param':
 						WPBMap::dropParam( $params['name'], $params['attribute_name'] );
@@ -183,8 +188,8 @@ class Vc_Mapper {
 	public function callElementActivities( $tag ) {
 		do_action( 'vc_mapper_call_activities_before' );
 		if ( isset( $this->element_activities[ $tag ] ) ) {
-			while ( $activity = each( $this->element_activities[ $tag ] ) ) {
-				list( $method, $params ) = $activity[1];
+			foreach ( $this->element_activities[ $tag ] as $activity ) {
+				list( $method, $params ) = $activity;
 				switch ( $method ) {
 					case 'drop_param':
 						WPBMap::dropParam( $params['name'], $params['attribute_name'] );
@@ -204,6 +209,5 @@ class Vc_Mapper {
 				}
 			}
 		}
-
 	}
 }

@@ -14,6 +14,7 @@ class Color {
     private $_hex;
     private $_hsl;
     private $_rgb;
+	private $_opacity;
 
     /**
      * Auto darkens/lightens by 10% for sexily-subtle gradients.
@@ -23,23 +24,24 @@ class Color {
     const DEFAULT_ADJUST = 10;
 
     /**
-     * Instantiates the class with a HEX value
-     * @param string $hex
+     * Instantiates the class with a HEX or RGB value
+     *
+     * @param string $color
      */
-    function __construct( $hex ) {
-        // Strip # sign is present
-        $color = str_replace("#", "", $hex);
+    function __construct( $color ) {
+    	if ( self::_isRGB( $color ) ) {
+    		// rgb and rgba
+		    list( $this->_rgb, $this->_opacity ) = self::_checkRGB( $color );
+		    $this->_hex = self::rgbToHex( $this->_rgb );
+	    } else {
+    		// hex
+		    $hex = self::_checkHex( $color );
+		    $this->_hex = $hex;
+		    $this->_rgb = self::hexToRgb( $hex );
+		    $this->_opacity = 100;
+	    }
 
-        // Make sure it's 6 digits
-        if( strlen($color) === 3 ) {
-            $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
-        } else if( strlen($color) != 6 ) {
-            throw new Exception("HEX color needs to be 6 or 3 digits long");
-        }
-
-        $this->_hsl = self::hexToHsl( $color );
-        $this->_hex = $color;
-        $this->_rgb = self::hexToRgb( $color );
+        $this->_hsl = self::hexToHsl( $this->_hex );
     }
 
     // ====================
@@ -200,6 +202,7 @@ class Color {
         $hex[0] = dechex( $rgb['R'] );
         $hex[1] = dechex( $rgb['G'] );
         $hex[2] = dechex( $rgb['B'] );
+	    $hex = array_map( array( __CLASS__, 'zeropad' ), $hex );
 
         return implode( '', $hex );
 
@@ -332,7 +335,11 @@ class Color {
     public function getRgb() {
         return $this->_rgb;
     }
-    
+
+    public function getOpacity() {
+    	return $this->_opacity;
+    }
+
     /**
      * Returns the cross browser CSS3 gradient
      * @param int Optional: percentage amount to light/darken the gradient
@@ -489,10 +496,47 @@ class Color {
         if( strlen($color) == 3 ) {
             $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
         } else if( strlen($color) != 6 ) {
-            throw new Exception("HEX color needs to be 6 or 3 digits long");
+            throw new Exception("HEX color ($hex) needs to be 6 or 3 digits long");
         }
 
         return $color;
     }
 
+    private static function _checkRGB( $rgb ) {
+        $rgb_str = str_replace( array( 'rgb(', 'rgba(', ')' ), '', $rgb );
+        $rgb_arr = explode( ',', $rgb_str );
+        $rgb = array_combine( array( 'R', 'G', 'B' ) , array_slice( $rgb_arr, 0, 3 ) );
+        $rgb = array_map( 'trim', $rgb );
+        $rgb = array_map( 'intval', $rgb );
+
+        $opacity = 100;
+        if ( isset( $rgb_arr[3] ) ) {
+        	if ( $rgb_arr[3] === '0' ) {
+        		$opacity = 0;
+	        } elseif ( strpos( $rgb_arr['3'], '.' ) !== false ) {
+	            $_opacity = explode( '.', $rgb_arr[3] );
+	            $opacity_str = $_opacity[1];
+	            $opacity = intval( $opacity_str );
+
+	            // In case we have opacity like 0.x.
+	            if ( strlen( $opacity_str ) == 1 ) {
+		            $opacity *= 10;
+	            }
+            }
+        }
+
+		return array( $rgb, $opacity );
+    }
+
+    private static function _isRGB( $rgb ) {
+    	return ( strpos( $rgb, 'rgb' ) === 0 );
+    }
+
+    private static function zeropad( $num, $lim = 2 ) {
+    	while( strlen( $num ) < $lim ) {
+    		$num = "0$num";
+	    }
+
+	    return $num;
+    }
 }

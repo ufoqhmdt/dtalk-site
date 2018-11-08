@@ -17,6 +17,7 @@ class Presscore_Inc_Widgets_TestimonialsSlider extends WP_Widget {
 		'order'     	=> 'DESC',
 		'orderby'   	=> 'date',
 		'select'        => 'all',
+		'show_avatar' => '1',
 		'show'          => 6,
 		'cats'          => array(),
 		'autoslide'		=> 0,
@@ -79,28 +80,35 @@ class Presscore_Inc_Widgets_TestimonialsSlider extends WP_Widget {
 
 		if ( $p_query->have_posts() ) {
 
-			echo '<ul class="testimonials slider-content"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
-
+			echo '<div class="testimonials slider-content owl-carousel"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>', "\n";
+			// backup and reset config
+			$config = Presscore_Config::get_instance();
+			$config_backup = $config->get();
+			$this->setup_config( $instance );
 			while( $p_query->have_posts() ) { $p_query->the_post();
 
-				echo '<li>';
-					presscore_get_template_part( 'mod_testimonials', 'testimonials-post' );
-				echo '</li>';
+				presscore_get_template_part( 'mod_testimonials', 'testimonials-post' );
 
 			} // while have posts
 			wp_reset_postdata();
+			$config->reset( $config_backup );
 
-			echo '</ul>', "\n";
+			echo '</div>', "\n";
 
 		} // if have posts
 
 		echo $after_widget . "\n";
 	}
+	protected function setup_config( $instance = array() ) {
+		$config = presscore_get_config();
+
+		$config->set( 'show_avatar', $instance['show_avatar'] );
+	}
 
 	/* Update the widget settings  */
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-
+		$instance['show_avatar'] = array_key_exists( 'show_avatar', $new_instance ) ? 1 : 0;
 		$instance['title']      = strip_tags($new_instance['title']);
 		$instance['order']      = apply_filters('dt_sanitize_order', $new_instance['order']);
 		$instance['orderby']    = apply_filters('dt_sanitize_orderby', $new_instance['orderby']);
@@ -168,6 +176,10 @@ class Presscore_Inc_Widgets_TestimonialsSlider extends WP_Widget {
 
 			<?php endif; ?>
 
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'show_avatar' ); ?>"><?php echo _ex('Show image:', 'widget',  'dt-the7-core'); ?></label>
+			<input id="<?php echo $this->get_field_id( 'show_avatar' ); ?>" type="checkbox" name="<?php echo $this->get_field_name('show_avatar'); ?>[]" value="1" <?php checked( $instance['show_avatar'] ); ?> />
 		</p>
 
 		<p>

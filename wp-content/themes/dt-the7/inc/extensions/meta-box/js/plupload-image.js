@@ -1,22 +1,22 @@
 jQuery( function( $ )
 {
 	// Hide "Uploaded files" title if there are no files uploaded after deleting files
-	$( '.rwmb-images' ).on( 'click', '.rwmb-delete-file', function()
+	$( '.the7-mb-images' ).on( 'click', '.the7-mb-delete-file', function()
 	{
 		// Check if we need to show drop target
-		var $dragndrop = $( this ).parents( '.rwmb-images' ).siblings( '.rwmb-drag-drop' );
+		var $dragndrop = $( this ).parents( '.the7-mb-images' ).siblings( '.the7-mb-drag-drop' );
 
 		// After delete files, show the Drag & Drop section
 		$dragndrop.removeClass('hidden');
 	} );
 
-	$('.rwmb-drag-drop').each(function()
+	$('.the7-mb-drag-drop').each(function()
 	{
 		// Declare vars
 		var $dropArea = $( this ),
-			$imageList = $dropArea.siblings( '.rwmb-uploaded' ),
+			$imageList = $dropArea.siblings( '.the7-mb-uploaded' ),
 			uploaderData = $dropArea.data( 'js_options' ),
-			rwmbUploader = {};
+			the7mbUploader = {};
 
 		// Extend uploaderData
 		uploaderData.multipart_params = $.extend(
@@ -28,15 +28,15 @@ jQuery( function( $ )
 		);
 
 		// Create uploader
-		rwmbUploader = new plupload.Uploader( uploaderData );
-		rwmbUploader.init();
+		the7mbUploader = new plupload.Uploader( uploaderData );
+		the7mbUploader.init();
 
 		// Add files
-		rwmbUploader.bind( 'FilesAdded', function( up, files )
+		the7mbUploader.bind( 'FilesAdded', function( up, files )
 		{
 			var maxFileUploads = $imageList.data('max_file_uploads'),
 				uploaded = $imageList.children().length,
-				msg = maxFileUploads > 1 ? rwmbFile.maxFileUploadsPlural : rwmbFile.maxFileUploadsSingle;
+				msg = maxFileUploads > 1 ? the7mbFile.maxFileUploadsPlural : the7mbFile.maxFileUploadsSingle;
 
 			msg = msg.replace( '%d', maxFileUploads );
 
@@ -71,14 +71,14 @@ jQuery( function( $ )
 
 		} );
 
-		rwmbUploader.bind( 'Error', function( up, e )
+		the7mbUploader.bind( 'Error', function( up, e )
 		{
 			addLoading( up, e.file, $imageList );
 			removeError( e.file );
 			up.removeFile( e.file );
 		} );
 
-		rwmbUploader.bind( 'FileUploaded', function( up, file, response )
+		the7mbUploader.bind( 'FileUploaded', function( up, file, response )
 		{
 			var res = wpAjax.parseAjaxResponse( $.parseXML( response.response ), 'ajax-response' );
 			false === res.errors ? $( 'li#' + file.id ).replaceWith( res.responses[0].data ) : removeError( file );
@@ -97,7 +97,7 @@ jQuery( function( $ )
 	function removeError( file )
 	{
 		$( 'li#' + file.id )
-			.addClass( 'rwmb-image-error' )
+			.addClass( 'the7-mb-image-error' )
 			.delay( 1600 )
 			.fadeOut( 'slow', function()
 			{
@@ -113,7 +113,7 @@ jQuery( function( $ )
 	 */
 	function addLoading( up, file, $ul )
 	{
-		$ul.removeClass('hidden').append( "<li id='" + file.id + "'><div class='rwmb-image-uploading-bar'></div><div id='" + file.id + "-throbber' class='rwmb-image-uploading-status'></div></li>" );
+		$ul.removeClass('hidden').append( "<li id='" + file.id + "'><div class='the7-mb-image-uploading-bar'></div><div id='" + file.id + "-throbber' class='the7-mb-image-uploading-status'></div></li>" );
 	}
 
 	/**
@@ -123,6 +123,6 @@ jQuery( function( $ )
 	 */
 	function addThrobber( file )
 	{
-		$( '#' + file.id + '-throbber' ).html( "<img class='rwmb-loader' height='64' width='64' src='" + RWMB.url + "img/loader.gif'/>" );
+		$( '#' + file.id + '-throbber' ).html( "<img class='the7-mb-loader' height='64' width='64' src='" + RWMB.url + "img/loader.gif'/>" );
 	}
 } );

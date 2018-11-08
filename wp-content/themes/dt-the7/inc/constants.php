@@ -11,12 +11,14 @@ define( 'PRESSCORE_VERSION', '0.3.0' );
 define( 'PRESSCORE_THEME_NAME', 'the7' );
 
 if ( ! defined( 'PRESSCORE_DB_VERSION' ) ) {
-	define( 'PRESSCORE_DB_VERSION', '5.4.0' );
+	define( 'PRESSCORE_DB_VERSION', '7.1.0' );
 }
 
 if ( ! defined( 'PRESSCORE_STYLESHEETS_VERSION' ) ) {
-	define( 'PRESSCORE_STYLESHEETS_VERSION', '5.4.1.1.b1' );
+	define( 'PRESSCORE_STYLESHEETS_VERSION', '7.1.0' );
 }
+
+define( 'THE7_CORE_COMPATIBLE_VERSION', '1.15.0' );
 
 /* Sets the path to the parent theme directory. */
 if ( !defined( 'PRESSCORE_THEME_DIR' ) ) {
@@ -157,10 +159,10 @@ if ( !defined( 'DT_LESS_USE_PHP_VARS' ) ) {
 }
 
 // Re-define meta box path and URL
-if ( !defined( 'RWMB_URL' ) ) {
-	define( 'RWMB_URL', trailingslashit( PRESSCORE_EXTENSIONS_URI ) . 'meta-box/' );
+if ( !defined( 'THE7_RWMB_URL' ) ) {
+	define( 'THE7_RWMB_URL', trailingslashit( PRESSCORE_EXTENSIONS_URI ) . 'meta-box/' );
 }
 
-if ( !defined( 'RWMB_DIR' ) ) {
-	define( 'RWMB_DIR', trailingslashit( PRESSCORE_EXTENSIONS_DIR ) . 'meta-box/' );
+if ( !defined( 'THE7_RWMB_DIR' ) ) {
+	define( 'THE7_RWMB_DIR', trailingslashit( PRESSCORE_EXTENSIONS_DIR ) . 'meta-box/' );
 }

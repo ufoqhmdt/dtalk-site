@@ -4,17 +4,20 @@
 @page-title-font-variant: normal;
 @breadcrumbs-font-variant: normal;
 //@page-title-line-height: 1;
-.title-background-gradient (@startColor: #eee, @endColor: white, @dir: 135deg) when (iscolor(@endColor)) {
+.title-background-gradient (@startColor: #eee, @endColor: white, @dir: 135deg)  when (isstring(~"@endColor")) {
 	background: @startColor; /* Old browsers */
-	background: -webkit-linear-gradient(@dir,  @startColor,@endColor); /* Chrome10+,Safari5.1+ */
-	background: linear-gradient(@dir, @startColor,@endColor); /* W3C */
+	background: -webkit-linear-gradient(@endColor); /* Chrome10+,Safari5.1+ */
+	background: linear-gradient(@endColor); /* W3C */
 }
 /*Title background & lines -> Solid background*/
-.page-title {
+.page-title .wf-wrap {
 	min-height: @page-title-height;
-	& .wf-table {
-		height: @page-title-height;
-	}
+	padding-top: @page-title-top-padding;
+	padding-bottom: @page-title-bottom-padding;
+}
+.page-title .wf-wrap:after {
+	border-bottom: @page-title-decorative-line-height @page-title-line-style @page-title-line-color;
+		
 }
 .page-title.solid-bg {
 	background-color: @page-title-bg-color;
@@ -44,30 +47,11 @@
 }
 
 /*Title background & lines -> Content-width line/Full-width line*/
-	//.page-title .wf-container-title,
-	//.page-title.full-width-line,
-	.article-top-bar .wf-container-top {
-		border-color: @divider-color;
-	}
-	.page-title .wf-container-title {
-		border-bottom: @page-title-decorative-line-height @page-title-line-style @page-title-line-color;
-		
-	}
 
 	.page-title > .wf-wrap,
-	.article-top-bar > .wf-wrap,
 	#fancy-header > .wf-wrap {
 		width: @content-width;
 	}
-	#fancy-header.title-center > .wf-wrap,
-	#fancy-header.content-left > .wf-wrap,
-	#fancy-header.content-right > .wf-wrap {
-		max-width: @content-width;
-	}
-	.page-title .wf-table {
-		padding: @page-title-top-padding 0 @page-title-bottom-padding 0;
-	}
-
 	/*Page title -> Title color*/
 		.page-title h1,
 		.page-title h1 *,
@@ -108,13 +92,19 @@
 			color: fade(@page-title-breadcrumbs-color, 50%);
 		}
 
-
+		.fancy-header h1,
+		.fancy-header .fancy-subtitle {
+			font-family: @page-title-font-family;
+			font-style: @page-title-font-style;
+			font-variant: @page-title-font-variant;
+			font-weight: @page-title-font-weight;
+		}
 		.fancy-header .color-accent span {
 			#page & {
 				color: @accent-bg-color;
 			}
 			.accent-gradient #page & {
-				.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+				.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 			}
 		}
 .breadcrumbs {

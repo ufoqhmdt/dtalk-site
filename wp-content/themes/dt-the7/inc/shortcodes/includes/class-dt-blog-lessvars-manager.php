@@ -10,45 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DT_Blog_LessVars_Manager extends Presscore_Lib_LessVars_Manager {
 
 	/**
-	 * Register less vars for paddings.
-	 *
-	 * @param array  $vars
-	 * @param string $value
-	 * @param string|null $wrap
-	 * @param string $units
-	 */
-	public function add_paddings( $vars, $value, $units = 'px', $wrap = null ) {
-		if ( ! is_array( $value ) ) {
-			$value = explode( ' ', $value );
-		}
-
-		for ( $i = 0; $i < 4;  $i++ ) {
-			$value[ $i ] = ( isset( $value[ $i ] ) ? $value[ $i ] : '0' );
-		}
-
-		$value = array_slice( $value, 0, 4 );
-
-		foreach ( $vars as $i => $var ) {
-			if ( ! isset( $value[ $i ] ) ) {
-				$this->add_keyword( $var, '~""', $wrap );
-			}
-
-			switch ( $units ) {
-				case '%|px':
-				case 'px|%':
-					$this->add_pixel_or_percent_number( $var, $value[ $i ], $wrap );
-					break;
-				case '%':
-					$this->add_percent_number( $var, $value[ $i ], $wrap );
-					break;
-				case 'px':
-				default:
-					$this->add_pixel_number( $var, $value[ $i ], $wrap );
-			}
-		}
-	}
-
-	/**
 	 * Register font style less vars.
 	 *
 	 * @param array       $vars

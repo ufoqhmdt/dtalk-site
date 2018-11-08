@@ -55,7 +55,7 @@ class Presscore_Mod_Benefits_Admin {
 				'new_item_name'     => _x( 'New Benefit Category Name',		'backend partners', 'dt-the7-core' ),
 				'menu_name'         => _x( 'Benefit Categories',			'backend partners', 'dt-the7-core' )
 			),
-			'public'                => false,
+			'public'                => true,
 			'hierarchical'          => true,
 			'show_ui'               => true,
 			'rewrite'               => false,

@@ -37,8 +37,8 @@ $article_content_layout = presscore_get_template_image_layout( $config->get( 'la
 				}
 				break;
 			case 'slideshow':
-				$class = array( 'slider-simple' );
-				if ( 'normal' == $config->get( 'post.preview.width' ) ) {
+				$class = array( 'slider-simple', 'owl-carousel', 'dt-owl-carousel-init' );
+				if ( 'normal' === $config->get( 'post.preview.width' ) ) {
 					$class[] = 'alignleft';
 				} else {
 					$class[] = 'alignnone';

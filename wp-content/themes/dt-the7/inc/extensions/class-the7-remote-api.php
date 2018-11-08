@@ -40,6 +40,11 @@ if ( ! class_exists( 'The7_Remote_API', false ) ) {
 		protected $api_download_plugin_url = 'https://repo.the7.io/plugins/download.php';
 
 		/**
+		 * @var string
+		 */
+		protected $api_verify_purchase_code = 'https://repo.the7.io/verify-code.php';
+
+		/**
 		 * @var array
 		 */
 		protected $strings = array();
@@ -79,6 +84,10 @@ if ( ! class_exists( 'The7_Remote_API', false ) ) {
 				$this->api_download_plugin_url = DT_REMOTE_API_DOWNLOAD_PLUGIN_URL;
 			}
 
+			if ( defined( 'DT_REMOTE_API_VERIFY_PURCHASE_CODE' ) && DT_REMOTE_API_VERIFY_PURCHASE_CODE ) {
+				$this->api_verify_purchase_code = DT_REMOTE_API_VERIFY_PURCHASE_CODE;
+			}
+
 			$this->code = $code;
 
 			$this->strings['fs_unavailable'] = __('Could not access filesystem.', 'the7mk2');
@@ -92,7 +101,7 @@ if ( ! class_exists( 'The7_Remote_API', false ) ) {
 		}
 
 		/**
-		 * @return array|bool|WP_Error
+		 * @return array|WP_Error
 		 */
 		public function register_purchase_code() {
 			$args = array(
@@ -141,7 +150,7 @@ if ( ! class_exists( 'The7_Remote_API', false ) ) {
 				return new WP_Error( 'invalid_response', $error_msg );
 			}
 
-			return true;
+			return $code_check;
 		}
 
 		/**
@@ -176,6 +185,25 @@ if ( ! class_exists( 'The7_Remote_API', false ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function verify_code() {
+			$url = add_query_arg( 'code', $this->code, $this->api_verify_purchase_code );
+			$response = $this->remote_get_json( $url );
+			if ( ! is_wp_error( $response ) && array_key_exists( 'code', $response ) && $response['code'] === 'deregistered' ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		public function is_api_url( $url ) {
+			$host = @parse_url( $url, PHP_URL_HOST );
+
+			return strpos( $this->api_download_plugin_url, $host ) !== false;
 		}
 
 		/**

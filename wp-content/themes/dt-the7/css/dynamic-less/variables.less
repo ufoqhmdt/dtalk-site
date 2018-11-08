@@ -39,6 +39,8 @@
 @top-icons-bg-color-temp: escape(~"@{top-color}");
 @additional-menu-elements-color-temp: escape(~"@{additional-menu-elements-color}");
 @additional-logo-elements-color-temp:escape(~"@{additional-logo-elements-color}");
+@microwidgets-in-top-line-color-temp:escape(~"@{microwidgets-in-top-line-color}");
+@microwidgets-below-menu-color-temp:escape(~"@{microwidgets-below-menu-color}");
 
 /*divider color*/
 
@@ -86,6 +88,7 @@
 
 @accent-color: rgb(255, 255, 255); /* It's important to keep this value in quotes */
 @accent-bg-color-temp: escape(~"@{accent-bg-color}");
+
 
 
 @backgrounds-color: ~"@{h1-color}";
@@ -145,35 +148,43 @@
 @rollover-gr-color1-temp: escape(~"@{rollover-gr-color1}");
 @rollover-gr-color2-temp: escape(~"@{rollover-gr-color2}");
 
-.rgba(@colour, @alpha) {
-	@alphaColour: hsla(hue(@colour), saturation(@colour), lightness(@colour), @alpha);
-	@ieAlphaColour: argb(@alphaColour);
-	
-	background-color: @colour; // Fallback for older browsers
-	background-color: @alphaColour; 
-	
-	// IE hacks
-	zoom: 1; // hasLayout
-	background-color: transparent\9;
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=@{ieAlphaColour}, endColorstr=@{ieAlphaColour})"; // IE 8+
-        filter:  ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{ieAlphaColour}, endColorstr=@{ieAlphaColour})";  // IE 6 & 7 
-	
-}
 
+.custom-mixin-footer-color (@customColor) when (iscolor(@customColor)) {
+	color: @customColor;
+	background: none;
+}
+.custom-mixin-footer-accent-bg (@customColor, @color-opacity:100%) when (iscolor(@customColor)) {
+	background: fade(@customColor, @color-opacity);
+}
 /* !Defining basic mixins */
 
-.text-gradient (@startColor: #eee, @endColor: white) when (iscolor(@endColor)) {
-	background: -webkit-gradient(linear, left top, right top, color-stop(32%,@startColor), color-stop(100%,@endColor)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left,  @startColor 32%,@endColor 100%); /* Chrome10+,Safari5.1+ */
-
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
+.text-gradient (@startColor: #eee, @endColor: white) when not (@endColor = "") {
+	background: -webkit-linear-gradient(@endColor); /* Chrome10+,Safari5.1+ */
+		// -webkit-background-clip: text;
+		// -webkit-text-fill-color: transparent;
+	color: transparent;
+  	-webkit-background-clip: text;
+  	background-clip: text;
+  	 @media all and (-ms-high-contrast: none) {
+     	color: @startColor;
+    }
+}
+.text-gradient-text-fill (@startColor: #eee, @endColor: white) when not (@endColor = "") {
+	background: -webkit-linear-gradient(@endColor); /* Chrome10+,Safari5.1+ */
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
 }
 
-.background-gradient (@startColor: #eee, @endColor: white) when (iscolor(@endColor)) {
+.background-gradient-new (@gradient) {
+	//background: @startColor; /* Old browsers */
+	background: -webkit-linear-gradient(@gradient); /* Chrome10+,Safari5.1+ */
+	background: linear-gradient(@gradient); /* W3C */
+}
+
+.background-gradient (@startColor: #eee, @endColor: white) when (isstring(~"@endColor")) {
 	background: @startColor; /* Old browsers */
-	background: -webkit-linear-gradient(135deg,  @startColor 30%,@endColor 100%); /* Chrome10+,Safari5.1+ */
-	background: linear-gradient(135deg, @startColor 30%,@endColor 100%); /* W3C */
+	background: -webkit-linear-gradient(@endColor); /* Chrome10+,Safari5.1+ */
+	background: linear-gradient(@endColor); /* W3C */
 }
 
 .background-fade-gradient (@startColor: #eee, @endColor: white, @opacity: 30%) when (iscolor(@endColor)) {
@@ -208,7 +219,9 @@
 .fade-mixin(@bg-color, @bg-opacity) {
 	background-color: fade(@bg-color, @bg-opacity);
 }
-
+.custom-mixin-fade-color (@customColor, @opacity:100%) when (iscolor(@customColor)) {
+	color: fade(@customColor, @opacity);
+}
 /* !Border radius */
 
 .border-radius (@radius: @border-radius-size) {
@@ -257,11 +270,19 @@
 	.accent-gradient & {
 		.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
 	}
+	.footer &,
+	.accent-gradient .footer & {
+		.custom-mixin-footer-accent-bg (@widget-footer-accent-color, @color-opacity:100%);
+	}
 }
 .transparent-accent-bg-mixin(@bg-opacity) {
 	background-color: fade(@accent-bg-color, @bg-opacity);
 	.accent-gradient & {
 		.background-fade-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2, @opacity: @bg-opacity);
+	}
+	.footer &,
+	.accent-gradient .footer & {
+		.custom-mixin-footer-accent-bg (@widget-footer-accent-color, @color-opacity:@bg-opacity);
 	}
 }
 .custom-background-gradient (@startColor: #eee, @opacity: 30%) when (iscolor(@startColor)) {
@@ -289,6 +310,7 @@
 /*menu  next level indicator icons*/
 @menu-active-color-temp: escape(~"@{menu-active-color}");
 @mobile-menu-color-temp: escape(~"@{mobile-menu-color}");
+@mobile-microwidgets-color-temp: escape(~"@{mobile-microwidgets-color}");
 @mobile-menu-font-style: normal;
 @mobile-menu-font-weight: bold;
 @mobile-menu-font-size: 14px;
@@ -299,3 +321,6 @@
 
 @page-vertical-margins: 50px;
 @templates-vertical-margins: 50px;
+@accent-text-color-2: "";
+@accent-bg-filter-switch: "";
+@accent-bg-scroller-arrow: "";

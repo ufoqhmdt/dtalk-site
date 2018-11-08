@@ -38,6 +38,16 @@ class DT_Shortcode_Slideshow extends DT_Shortcode {
 		$attachments_id = array();
 		$selected_posts_titles = array();
 
+		if ( presscore_vc_is_inline() ) {
+		    return $this->vc_inline_dummy( array(
+                'class'  => 'dt_slideshow',
+                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_slideshow_editor_ico.gif', 98, 104 ),
+                'title'  => _x( 'Slideshow', 'vc inline dummy', 'dt-the7-core' ),
+
+                'style' => array( 'height' => 'auto' )
+            ) );
+		}
+
 		if ( $posts ) {
 			// get posts by slug
 			foreach ( $posts as $post_slug ) { 
@@ -114,7 +124,8 @@ class DT_Shortcode_Slideshow extends DT_Shortcode {
 				'height'    => $height,
 				'autoplay'  => $autoplay,
 				'interval'  => $interval,
-				'class'     => array( 'slider-simple', 'shortcode-photo-slider' ),
+				'class'     => array( 'slider-simple', 'shortcode-photo-slider',
+				'owl-carousel', 'dt-owl-carousel-init' ),
 				'style'     => ' style="width: 100%" data-img-mode="' . esc_attr( $scale_mode ) . '"',
 			) );
 

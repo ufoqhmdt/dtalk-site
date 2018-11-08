@@ -1,10 +1,10 @@
 jQuery( function( $ )
 {
-	$( '.rwmb-slider' ).each( function()
+	$( '.the7-mb-slider' ).each( function()
 	{
 		var $this = $( this ),
 			$input = $this.siblings( 'input' ),
-			$valueLabel = $this.siblings( '.rwmb-slider-value-label' ).find( 'span' ),
+			$valueLabel = $this.siblings( '.the7-mb-slider-value-label' ).find( 'span' ),
 			value = $input.val(),
 			options = $this.data( 'options' );
 

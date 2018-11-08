@@ -52,10 +52,6 @@ if ( ! function_exists( 'presscore_get_primary_menu_class' ) ) :
 				if ( $config->get( 'header.menu.decoration.style.other.active.line.enabled' ) ) {
 					$classes[] = 'active-line-decoration';
 				}
-
-				if ( $config->get( 'header.menu.decoration.style.other.click_decor.enabled' ) ) {
-					$classes[] = 'animate-click-decoration';
-				}
 				break;
 		}
 
@@ -99,7 +95,6 @@ if ( ! function_exists( 'presscore_get_primary_submenu_class' ) ) :
 
 		$classes[] = presscore_array_value( $config->get( 'header.menu.submenu.background.hover.style' ), array(
 			'background'          => 'hover-style-bg',
-			'animated_background' => 'hover-style-click-bg',
 		) );
 
 		if ( $config->get( 'header.menu.submenu.show_next_lvl_icons' ) ) {

@@ -4,10 +4,10 @@
  */
 jQuery( document ).ready( function( $ )
 {
-	$( ':input.rwmb-datetime' ).each( rwmb_update_datetime_picker );
-	$( '.rwmb-input' ).on( 'clone', ':input.rwmb-datetime', rwmb_update_datetime_picker );
+	$( ':input.the7-mb-datetime' ).each( the7_mb_update_datetime_picker );
+	$( '.the7-mb-input' ).on( 'clone', ':input.the7-mb-datetime', the7_mb_update_datetime_picker );
 	
-	function rwmb_update_datetime_picker()
+	function the7_mb_update_datetime_picker()
 	{
 		var $this = $( this ),
 			options = $this.data( 'options' );

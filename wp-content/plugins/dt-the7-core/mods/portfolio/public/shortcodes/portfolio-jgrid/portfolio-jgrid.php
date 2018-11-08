@@ -19,22 +19,22 @@ if ( ! class_exists( 'DT_Shortcode_Portfolio_Jgrid', false ) ) {
 			parent::setup( $atts, $content );
 
 			// vc inline dummy
-			if ( $this->vc_is_inline ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
+			if ( presscore_vc_is_inline() ) {
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-portfolio_jgrid',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_portfolio_justif_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Portfolio Justified Grid', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-portfolio_jgrid',
-					'title' => _x( 'Portfolio Justified Grid', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			return $this->shortcode_html();
 		}
 
 		protected function shortcode_html() {
+			add_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			add_filter( 'found_posts', array( $this, 'fix_pagination' ), 1, 2 );
 
 			$dt_query = $this->get_posts_by_terms( array(
 				'orderby' => $this->atts['orderby'],
@@ -43,6 +43,9 @@ if ( ! class_exists( 'DT_Shortcode_Portfolio_Jgrid', false ) ) {
 				'select' => $this->atts['select'],
 				'category' => $this->atts['category']
 			) );
+
+			remove_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			remove_filter( 'found_posts', array( $this, 'fix_pagination' ), 1 );
 
 			$output = '';
 			if ( $dt_query->have_posts() ) {
@@ -69,6 +72,39 @@ if ( ! class_exists( 'DT_Shortcode_Portfolio_Jgrid', false ) ) {
 			return $output; 
 		}
 
+		/**
+		 * Add offset to the posts query.
+		 *
+		 * @since 1.15.0
+		 *
+		 * @param WP_Query $query
+		 */
+		public function add_offset( &$query ) {
+			$offset  = (int) $this->atts['posts_offset'];
+			$ppp     = (int) $query->query_vars['posts_per_page'];
+			$current = (int) $query->query_vars['paged'];
+
+			if ( $query->is_paged ) {
+				$page_offset = $offset + ( $ppp * ( $current - 1 ) );
+				$query->set( 'offset', $page_offset );
+			} else {
+				$query->set( 'offset', $offset );
+			}
+		}
+
+		/**
+		 * Fix pagination accordingly with posts offset.
+		 *
+		 * @since 1.15.0
+		 *
+		 * @param int $found_posts
+		 *
+		 * @return int
+		 */
+		public function fix_pagination( $found_posts ) {
+			return $found_posts - (int) $this->atts['posts_offset'];
+		}
+
 		protected function post_template() {
 			presscore_populate_portfolio_config();
 
@@ -77,36 +113,36 @@ if ( ! class_exists( 'DT_Shortcode_Portfolio_Jgrid', false ) ) {
 
 		protected function sanitize_attributes( &$atts ) {
 			$default_atts = array(
-				'category' => '',
-				'order' => 'desc',
-				'orderby' => 'date',
-				'number' => '12',
-				'show_title' => '',
-				'show_excerpt' => '',
-				'show_details' => '',
-				'show_link' => '',
-				'show_zoom' => '',
-				'show_categories' => '',
-				'show_date' => '',
-				'show_author' => '',
-				'show_comments' => '',
-				'target_height' => '240',
-				'hide_last_row' => '',
-				'padding' => '20',
-				'descriptions' => 'on_hover_centered',
-				'hover_bg_color' => 'accent',
-				'bg_under_projects' => 'disabled',
-				'content_aligment' => 'left',
+				'category'                    => '',
+				'order'                       => 'desc',
+				'orderby'                     => 'date',
+				'number'                      => '12',
+				'posts_offset'                => 0,
+				'show_title'                  => '',
+				'show_excerpt'                => '',
+				'show_details'                => '',
+				'show_link'                   => '',
+				'show_zoom'                   => '',
+				'show_categories'             => '',
+				'show_date'                   => '',
+				'show_author'                 => '',
+				'show_comments'               => '',
+				'target_height'               => '240',
+				'hide_last_row'               => '',
+				'padding'                     => '20',
+				'descriptions'                => 'on_hover_centered',
+				'hover_bg_color'              => 'accent',
+				'bg_under_projects'           => 'disabled',
+				'content_aligment'            => 'left',
 				'colored_bg_content_aligment' => 'centre',
-				'hover_animation' => 'fade',
-				'bgwl_animation_effect' => '1',
-				'hover_content_visibility' => 'on_hover',
-				'loading_effect' => 'none',
-				'proportion' => '',
-				'full_width' => '',
-				'show_filter' => '',
-				'posts_per_page' => '-1'
-
+				'hover_animation'             => 'fade',
+				'bgwl_animation_effect'       => '1',
+				'hover_content_visibility'    => 'on_hover',
+				'loading_effect'              => 'none',
+				'proportion'                  => '',
+				'full_width'                  => '',
+				'show_filter'                 => '',
+				'posts_per_page'              => '-1',
 			);
 
 			$attributes = shortcode_atts( $default_atts, $atts );

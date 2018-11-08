@@ -63,11 +63,15 @@ if ( ! class_exists( 'Presscore_Lib_Options_Template', false ) ) :
 		}
 
 		protected function prefacing_dependency( $prefix, $field ) {
-			if ( isset( $field['dependency'] ) ) {
-				foreach ( $field['dependency'] as $i=>$or ) {
-					foreach ( $or as $j=>$and ) {
-						$field['dependency'][ $i ][ $j ]['field'] = $prefix . $and['field'];
-					}
+			if ( ! isset( $field['dependency'] ) ) {
+				return $field;
+			}
+
+			$field['dependency'] = optionsframework_fields_dependency()->decode_short_syntax( $field['dependency'] );
+
+			foreach ( $field['dependency'] as $i => $or ) {
+				foreach ( $or as $j => $and ) {
+					$field['dependency'][ $i ][ $j ]['field'] = $prefix . $and['field'];
 				}
 			}
 

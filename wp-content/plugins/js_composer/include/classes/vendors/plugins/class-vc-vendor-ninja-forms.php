@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.4
  */
 class Vc_Vendor_NinjaForms implements Vc_Vendor_Interface {
+	private static $ninjaCount;
 
 	/**
 	 * Implement interface, map ninja forms shortcode
@@ -17,6 +18,11 @@ class Vc_Vendor_NinjaForms implements Vc_Vendor_Interface {
 		vc_lean_map( 'ninja_form', array(
 			$this,
 			'addShortcodeSettings',
+		) );
+
+		add_filter( 'vc_frontend_editor_load_shortcode_ajax_output', array(
+			$this,
+			'replaceIds',
 		) );
 	}
 
@@ -83,5 +89,35 @@ class Vc_Vendor_NinjaForms implements Vc_Vendor_Interface {
 
 	private function is_ninja_forms_three() {
 		return ( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3.0', '<' ) || get_option( 'ninja_forms_load_deprecated', false ) );
+	}
+
+	public function replaceIds( $output ) {
+		if ( is_null( self::$ninjaCount ) ) {
+			self::$ninjaCount = 1;
+		} else {
+			self::$ninjaCount ++;
+		}
+		$patterns = array(
+			'(nf-form-)(\d+)(-cont)',
+			'(nf-form-title-)(\d+)()',
+			'(nf-form-errors-)(\d+)()',
+			'(form.id\s*=\s*\')(\d+)(\')',
+		);
+		$time = time() . self::$ninjaCount . rand( 100, 999 );
+		foreach ( $patterns as $pattern ) {
+			$output = preg_replace( '/' . $pattern . '/', '${1}' . $time . '${3}', $output );
+		}
+		$replaceTo = <<<JS
+if (typeof nfForms !== 'undefined') {
+  nfForms = nfForms.filter( function(item, index) {
+    if (item && item.id) {
+      return document.querySelector('#nf-form-' + item.id + '-cont')
+    }
+  })
+}
+JS;
+		$response = str_replace( 'var nfForms', $replaceTo . ';var nfForms', $output );
+
+		return $response;
 	}
 }

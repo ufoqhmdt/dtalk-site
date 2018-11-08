@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( !class_exists( 'RWMB_Slider_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Slider_Field' ) )
 {
-	class RWMB_Slider_Field
+	class THE7_RWMB_Slider_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -13,13 +13,13 @@ if ( !class_exists( 'RWMB_Slider_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			$url = RWMB_CSS_URL . 'jqueryui';
+			$url = THE7_RWMB_CSS_URL . 'jqueryui';
 			wp_enqueue_style( 'jquery-ui-core', "{$url}/jquery.ui.core.css", array(), '1.8.17' );
 			wp_enqueue_style( 'jquery-ui-theme', "{$url}/jquery.ui.theme.css", array(), '1.8.17' );
 			wp_enqueue_style( 'jquery-ui-slider', "{$url}/jquery.ui.slider.css", array(), '1.8.17' );
-			wp_enqueue_style( 'rwmb-slider', RWMB_CSS_URL . 'slider.css' );
+			wp_enqueue_style( 'the7-mb-slider', THE7_RWMB_CSS_URL . 'slider.css' );
 
-			wp_enqueue_script( 'rwmb-slider', RWMB_JS_URL . 'slider.js', array( 'jquery-ui-slider', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-core' ), RWMB_VER, true );
+			wp_enqueue_script( 'the7-mb-slider', THE7_RWMB_JS_URL . 'slider.js', array( 'jquery-ui-slider', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-core' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -35,8 +35,8 @@ if ( !class_exists( 'RWMB_Slider_Field' ) )
 		{
 			return sprintf(
 				'<div class="clearfix">
-					<div class="rwmb-slider" id="%s" data-options="%s"></div>
-					<span class="rwmb-slider-value-label">%s<span>%s</span>%s</span>
+					<div class="the7-mb-slider" id="%s" data-options="%s"></div>
+					<span class="the7-mb-slider-value-label">%s<span>%s</span>%s</span>
 					<input type="hidden" name="%s" value="%s" />
 				</div>',
 				$field['id'], esc_attr( json_encode( $field['js_options'] ) ),

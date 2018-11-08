@@ -20,6 +20,9 @@ if ( ! function_exists( 'presscore_render_porthole_slider_data' ) ) :
 		$slideshows = presscore_query()->get_posts( array( 'post_type' => 'dt_slideshow', 'post__in' => $slider_id, 'has_password' => false ) );
 
 		if ( !$slideshows || !$slideshows->have_posts() ) return;
+		
+		wp_enqueue_script( 'the7pt-photo-scroller' );
+		wp_enqueue_style( 'the7pt-photo-scroller' );
 
 		$slides = array();
 		foreach ( $slideshows->posts as $slideshow ) {
@@ -56,6 +59,7 @@ if ( ! function_exists( 'presscore_render_porthole_slider_data' ) ) :
 					'img_meta'	=> wp_get_attachment_image_src( $post->ID, 'full' ),
 					'img_id'	=> $post->ID,
 					'custom'	=> $img_custom,
+					'alt'       => get_post_meta( $post->ID, '_wp_attachment_image_alt', true ),
 					'echo'		=> false,
 					'wrap'		=> '<img %IMG_CLASS% %SRC% %CUSTOM% %ALT% %SIZE% />',
 				);
@@ -82,7 +86,7 @@ if ( ! function_exists( 'presscore_render_porthole_slider_data' ) ) :
 
 					if ( $video_url ) {
 						$_video_url = remove_query_arg( array('iframe', 'width', 'height'), $video_url );
-						$links .= sprintf( '<a class="rsPlayBtn dt-pswp-item video-icon" href="%s"><span class="assistive-text">%s</span></a>',
+						$links .= sprintf( '<a class="rsPlayBtn pswp-video dt-pswp-item video-icon" href="%s"><span class="assistive-text">%s</span></a>',
 								esc_url( $_video_url ),
 								__( 'video', 'dt-the7-core' )
 						);
@@ -110,63 +114,6 @@ if ( ! function_exists( 'presscore_render_porthole_slider_data' ) ) :
 
 			echo '</ul>';
 		}
-	}
-
-endif;
-
-if ( ! function_exists( 'presscore_render_3d_slider_data' ) ) :
-
-	/**
-	 * Render 3D slider.
-	 *
-	 */
-	function presscore_render_3d_slider_data() {
-		global $post;
-		$config = Presscore_Config::get_instance();
-
-		$slider_id = $config->get('slideshow_sliders');
-		$slideshows = presscore_query()->get_posts( array( 'post_type' => 'dt_slideshow', 'post__in' => $slider_id, 'has_password' => false ) );
-
-		if ( !$slideshows || !$slideshows->have_posts() ) {
-			return;
-		}
-
-		$slides = array();
-		foreach ( $slideshows->posts as $slideshow ) {
-
-			$media_items = get_post_meta( $slideshow->ID, '_dt_slider_media_items', true );
-			if ( empty($media_items) ) {
-				continue;
-			}
-
-			$slides = array_merge( $slides, $media_items );
-		}
-
-		$attachments_data = presscore_get_attachment_post_data( $slides );
-
-		$count = count($attachments_data);
-		if ( $count < 10 ) {
-
-			$chunks = array( $attachments_data, array(), array() );
-		} else {
-
-			$length = ceil( $count/3 );
-			$chunks = array_chunk( $attachments_data, $length );
-		}
-
-		$chunks = array_reverse( $chunks );
-
-		foreach ( $chunks as $layer=>$images ) {
-
-			printf( '<div id="level%d" class="plane">' . "\n", $layer + 1 );
-
-			foreach ( $images as $img ) {
-				printf( '<img src="%s" alt="%s" />' . "\n", esc_url($img['full']), esc_attr($img['description']) );
-			}
-
-			echo "</div>\n";
-		}
-
 	}
 
 endif;

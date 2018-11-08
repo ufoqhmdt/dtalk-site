@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
-/*** Visual Composer Content elements refresh ***/
+/*** WPBakery Page Builder Content elements refresh ***/
 class VcSharedLibrary {
 	// Here we will store plugin wise (shared) settings. Colors, Locations, Sizes, etc...
 	/**
@@ -96,10 +96,10 @@ class VcSharedLibrary {
 		'Bounce' => 'easeOutBounce',
 		'Elastic' => 'easeOutElastic',
 		'Back' => 'easeOutBack',
-		'Cubic' => 'easeinOutCubic',
-		'Quint' => 'easeinOutQuint',
+		'Cubic' => 'easeInOutCubic',
+		'Quint' => 'easeInOutQuint',
 		'Quart' => 'easeOutQuart',
-		'Quad' => 'easeinQuad',
+		'Quad' => 'easeInQuad',
 		'Sine' => 'easeOutSine',
 	);
 

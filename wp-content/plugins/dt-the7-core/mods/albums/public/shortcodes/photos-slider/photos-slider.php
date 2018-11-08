@@ -26,14 +26,13 @@ if ( ! class_exists( 'DT_Shortcode_Photos_Scroller', false ) ) {
 
 			// vc inline dummy
 			if ( presscore_vc_is_inline() ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
-				$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $attributes['category'], 'taxonomy' => $this->taxonomy ) );
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-photos_scroller',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_photo_carousel_editor_ico.gif', 131, 104 ),
+	                'title'  => _x( 'Photos Scroller', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-photos_scroller',
-					'title' => _x( 'Photos scroller', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array( $terms_title => $terms_list )
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			$output = '';
@@ -57,22 +56,19 @@ if ( ! class_exists( 'DT_Shortcode_Photos_Scroller', false ) ) {
 
 				// loop
 				while( $dt_query->have_posts() ) { $dt_query->the_post();
-					echo '<li class="fs-entry">';
 
 					presscore_get_template_part( 'mod_albums', 'photo-masonry/photo' );
-
-					echo '</li>';
 				}
 
 				$posts_html = ob_get_contents();
 				ob_end_clean();
 
 				// shape output
-				$output = '<div ' . $this->get_container_html_class( array( 'dt-photos-shortcode', 'slider-wrapper', 'shortcode-instagram', 'dt-gallery-container' ) ) . ' ' . $this->get_container_data_atts() . presscore_get_share_buttons_for_prettyphoto( 'photo' ) . '>';
-				$output .= '<div class="frame fullwidth-slider"><ul class="clearfix">' . $posts_html . '</ul></div>';
-				if ( $attributes['arrows'] ) {
-					$output .= '<div class="prev"><i></i></div><div class="next"><i></i></div>';
-				}
+				$output = '<div ' . $this->get_container_html_class( array( 'dt-photos-shortcode', 'slider-wrapper owl-carousel dt-owl-carousel-init ', 'shortcode-instagram', 'dt-gallery-container' ) ) . ' ' . $this->get_container_data_atts() . presscore_get_share_buttons_for_prettyphoto( 'photo' ) . '>';
+				$output .=  $posts_html ;
+				// if ( $attributes['arrows'] ) {
+				// 	$output .= '<div class="prev"><i></i></div><div class="next"><i></i></div>';
+				// }
 				$output .= '</div>';
 
 				// cleanup
@@ -141,7 +137,7 @@ if ( ! class_exists( 'DT_Shortcode_Photos_Scroller', false ) ) {
 				'show_excerpt' => '',
 				'number' => '12',
 				'orderby' => 'recent',
-				'autoslide' => '',
+				'autoslide' => '3000',
 				'loop' => '',
 				'arrows' => 'light',
 				'arrows_on_mobile' => 'on',
@@ -241,6 +237,9 @@ if ( ! class_exists( 'DT_Shortcode_Photos_Scroller', false ) ) {
 
 			if ( $this->atts['max_width'] ) {
 				$data_atts['max-width'] = $this->atts['max_width'];
+			}
+			if (  $this->atts['arrows'] ) {
+				$data_atts['arrows'] = $this->atts['arrows'] ? 'true' : 'false';
 			}
 
 			return presscore_get_inlide_data_attr( $data_atts );

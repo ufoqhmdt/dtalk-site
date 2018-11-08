@@ -1,22 +1,14 @@
 
 
-	/*-------------------------------------------------------------------------------------------*/
-
-	.custom-select(@color){
-		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='9px' height='6px' viewBox='0 0 9 6' enable-background='new 0 0 9 6' xml:space='preserve'%3E%3Cpolygon fill='%23@{color}' points='8.205,1.669 4.515,5.516 0.824,1.703 1.846,0.669 4.515,3.344 7.189,0.669 '/%3E%3C/svg%3E");
-	}
-
-	/*-------------------------------------------------------------------------------------------*/
-
 	/*****************************************************
 		!-HEADER
 	******************************************************/
 
-	.search-icon(@colour) {
-		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='16px' height='16px' viewBox='0 0 16 16' enable-background='new 0 0 16 16' xml:space='preserve'%3E%3Cpath fill='@{colour}' d='M0.5,6.689c0,3.415,2.77,6.187,6.187,6.187c1.47,0,2.822-0.518,3.883-1.375l3.807,3.806c0.257,0.259,0.511,0.161,0.771-0.098c0.256-0.26,0.418-0.578,0.162-0.835l-3.808-3.805c0.854-1.062,1.372-2.412,1.372-3.883c0-3.417-2.769-6.187-6.188-6.187C3.269,0.501,0.5,3.272,0.5,6.689z M1.653,6.703c0-2.786,2.265-5.05,5.049-5.05c2.787,0,5.05,2.263,5.05,5.05s-2.262,5.049-5.05,5.049C3.917,11.752,1.653,9.487,1.653,6.703z'/%3E%3C/svg%3E");
+	.search-icon(@colour, @size: 16px) {
+		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='@{size}' height='@{size}' viewBox='0 0 16 16' enable-background='new 0 0 16 16' xml:space='preserve'%3E%3Cpath fill='@{colour}' d='M0.5,6.689c0,3.415,2.77,6.187,6.187,6.187c1.47,0,2.822-0.518,3.883-1.375l3.807,3.806c0.257,0.259,0.511,0.161,0.771-0.098c0.256-0.26,0.418-0.578,0.162-0.835l-3.808-3.805c0.854-1.062,1.372-2.412,1.372-3.883c0-3.417-2.769-6.187-6.188-6.187C3.269,0.501,0.5,3.272,0.5,6.689z M1.653,6.703c0-2.786,2.265-5.05,5.049-5.05c2.787,0,5.05,2.263,5.05,5.05s-2.262,5.049-5.05,5.049C3.917,11.752,1.653,9.487,1.653,6.703z'/%3E%3C/svg%3E");
 	}
-	.search-icon-bold(@colour) {
-		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='16px' height='16px' viewBox='0 0 16 16' enable-background='new 0 0 16 16' xml:space='preserve'%3E%3Cpath fill='@{colour}' d='M15.376,13.75l-3.985-4c0.586-0.916,1.032-2.171,1.032-3.333c0-3.263-2.675-5.917-5.961-5.917C3.175,0.5,0.5,3.154,0.5,6.417c0,3.263,2.675,5.919,5.962,5.919c1.113,0,2.272-0.4,3.163-0.93l4.049,3.955L15.376,13.75z M2.518,6.455c0-2.179,1.785-3.953,3.981-3.953c2.195,0,3.983,1.773,3.983,3.953c0,2.18-1.788,3.952-3.983,3.952C4.304,10.407,2.518,8.635,2.518,6.455z'/%3E%3C/svg%3E");
+	.search-icon-bold(@colour, @size: 16px) {
+		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='@{size}' height='@{size}' viewBox='0 0 16 16' enable-background='new 0 0 16 16' xml:space='preserve'%3E%3Cpath fill='@{colour}' d='M15.376,13.75l-3.985-4c0.586-0.916,1.032-2.171,1.032-3.333c0-3.263-2.675-5.917-5.961-5.917C3.175,0.5,0.5,3.154,0.5,6.417c0,3.263,2.675,5.919,5.962,5.919c1.113,0,2.272-0.4,3.163-0.93l4.049,3.955L15.376,13.75z M2.518,6.455c0-2.179,1.785-3.953,3.981-3.953c2.195,0,3.983,1.773,3.983,3.953c0,2.18-1.788,3.952-3.983,3.952C4.304,10.407,2.518,8.635,2.518,6.455z'/%3E%3C/svg%3E");
 	}
 	.close-search-icon(@colour) {
 		background-image: url("data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='16px' height='16px' viewBox='0 0 16 16' enable-background='new 0 0 16 16' xml:space='preserve'%3E%3Cpath fill='@{colour}' d='M13.36,2.818L8.5,7.669L3.636,2.818c-0.226-0.224-0.59-0.224-0.816,0c-0.225,0.226-0.224,0.592,0,0.816L7.669,8.5l-4.851,4.865c-0.226,0.226-0.224,0.59,0,0.814c0.226,0.227,0.59,0.227,0.817,0L8.5,9.331l4.865,4.848c0.223,0.228,0.59,0.228,0.815,0c0.226-0.224,0.226-0.591,0-0.813L9.33,8.5l4.851-4.864c0.226-0.226,0.226-0.593,0-0.817C13.955,2.594,13.588,2.594,13.36,2.818z'/%3E%3C/svg%3E");

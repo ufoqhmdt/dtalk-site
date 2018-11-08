@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       The7 Elements
  * Description:       This plugin contains The7 custom post types and corresponding Visual Composer elements.
- * Version:           1.2.4.1
+ * Version:           1.15.0
  * Author:            Dream-Theme
  * Author URI:        http://dream-theme.com/
  * Text Domain:       dt-the7-core
@@ -51,12 +51,15 @@ if ( ! class_exists( 'The7PT_Core' ) ) :
 
 	final class The7PT_Core {
 
+		const THE7_COMPATIBLE_VERSION = '7.1.0';
+		const PLUGIN_DB_VERSION = '1.15.0';
+
 		/**
 		 * Plugin version.
 		 *
 		 * @var string
 		 */
-		private $version = '1.2.4.1';
+		private $version = '1.15.0';
 
 		/**
 		 * The single instance of the class.
@@ -97,15 +100,32 @@ if ( ! class_exists( 'The7PT_Core' ) ) :
 			$this->init_hooks();
 		}
 
+		public function after_setup_theme_action() {
+			$plugin_path = $this->plugin_path();
+
+			require_once $plugin_path . 'includes/sliders/class-the7pt-slider.php';
+			require_once $plugin_path . 'includes/sliders/class-the7pt-photo-scroller.php';
+			require_once $plugin_path . 'includes/sliders/class-the7pt-posts-scroller.php';
+
+			$this->load_plugin_textdomain();
+
+			if ( class_exists( 'The7PT_Admin' ) && The7PT_Admin::theme_is_compatible() ) {
+				The7PT_Install::init();
+			}
+		}
+
 		/**
 		 * Load plugin dependencies.
 		 *
 		 * @since 1.0.0
 		 */
 		private function load_dependencies() {
-			require_once 'includes/class-the7pt-modules.php';
-			require_once 'includes/class-the7pt-assets.php';
-			require_once 'includes/class-the7pt-admin.php';
+			$plugin_path = $this->plugin_path();
+
+			require_once $plugin_path . 'includes/class-the7pt-modules.php';
+			require_once $plugin_path . 'includes/class-the7pt-assets.php';
+			require_once $plugin_path . 'includes/class-the7pt-admin.php';
+			require_once $plugin_path . 'includes/class-the7pt-install.php';
 		}
 
 		/**
@@ -115,10 +135,24 @@ if ( ! class_exists( 'The7PT_Core' ) ) :
 		 */
 		private function init_hooks() {
 			// Do it after setup theme because some strings used before init hook.
-			add_action( 'after_setup_theme', array( $this, 'load_plugin_textdomain' ), 5 );
+			add_action( 'after_setup_theme', array( $this, 'after_setup_theme_action' ), 5 );
 			add_action( 'plugins_loaded', array( 'The7PT_Modules', 'setup' ) );
 			add_action( 'after_setup_theme', array( 'The7PT_Assets', 'setup' ), 20 );
 			add_action( 'plugins_loaded', array( 'The7PT_Admin', 'setup' ) );
+			add_filter( 'body_class', array( $this, 'plugin_version_in_body_class' ) );
+		}
+
+		/**
+		 * Output plugin version as the body class.
+		 *
+		 * @param array $class
+		 *
+		 * @return array
+		 */
+		public function plugin_version_in_body_class( $class ) {
+			$class[] = "the7-core-ver-{$this->version}";
+
+			return $class;
 		}
 
 		/**

@@ -200,7 +200,7 @@ if ( ! function_exists( 'presscore_populate_album_post_config' ) ) :
 
 		$config->set( 'post.media.featured_image.enabled', !get_post_meta( $post_id, "{$prefix}exclude_featured_image", true ), true );
 
-		if ( post_password_required( $post_id ) ) {
+		if ( post_password_required( $post_id ) || is_search() ) {
 			$open_as = 'post';
 		} else {
 			$open_as = get_post_meta( $post_id, "{$prefix}open_album", true );
@@ -224,7 +224,7 @@ if ( ! function_exists( 'presscore_populate_album_post_config' ) ) :
 			$show_title = $config->get( 'show_titles' ) && get_the_title();
 
 			// post content
-			$show_description = $config->get( 'show_excerpts' ) && apply_filters( 'the_content', get_the_content() );
+			$show_description = $config->get( 'show_excerpts' ) && get_the_content();
 
 			// mini images
 			$show_mini_images = $config->get( 'post.preview.mini_images.enabled' );

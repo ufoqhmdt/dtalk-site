@@ -3,7 +3,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Meta Box Class
-if ( ! class_exists( 'RW_Meta_Box' ) )
+if ( ! class_exists( 'The7_RW_Meta_Box' ) )
 {
 	/**
 	 * A class to rapid develop meta boxes for custom & built in content types
@@ -14,7 +14,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 	 * @license GNU GPL2+
 	 * @package RW Meta Box
 	 */
-	class RW_Meta_Box
+	class The7_RW_Meta_Box
 	{
 		/**
 		 * @var array Meta box information
@@ -43,7 +43,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		 *
 		 * @param array $meta_box Meta box definition
 		 *
-		 * @return RW_Meta_Box
+		 * @return The7_RW_Meta_Box
 		 */
 		function __construct( $meta_box )
 		{
@@ -60,8 +60,8 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			// 1st action applies to all meta boxes
 			// 2nd action applies to only current meta box
 			$show = true;
-			$show = apply_filters( 'rwmb_show', $show, $meta_box );
-			$show = apply_filters( "rwmb_show_{$this->meta_box['id']}", $show, $this->meta_box );
+			$show = apply_filters( 'the7_mb_show', $show, $meta_box );
+			$show = apply_filters( "the7_mb_show_{$this->meta_box['id']}", $show, $this->meta_box );
 			if ( !$show )
 				return;
 
@@ -111,7 +111,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			if ( 'post' != $screen->base || ! in_array( $screen->post_type, $this->meta_box['pages'] ) )
 				return;
 
-			wp_enqueue_style( 'rwmb', RWMB_CSS_URL . 'style.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb', THE7_RWMB_CSS_URL . 'style.css', array(), THE7_RWMB_VER );
 
 			// Load clone script conditionally
 			$has_clone = false;
@@ -129,17 +129,17 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			}
 
 			if ( $has_clone )
-				wp_enqueue_script( 'rwmb-clone', RWMB_JS_URL . 'clone.js', array( 'jquery' ), RWMB_VER, true );
+				wp_enqueue_script( 'the7-mb-clone', THE7_RWMB_JS_URL . 'clone.js', array( 'jquery' ), THE7_RWMB_VER, true );
 
 			if ( $this->validation )
 			{
-				wp_enqueue_script( 'jquery-validate', RWMB_JS_URL . 'jquery.validate.min.js', array( 'jquery' ), RWMB_VER, true );
-				wp_enqueue_script( 'rwmb-validate', RWMB_JS_URL . 'validate.js', array( 'jquery-validate' ), RWMB_VER, true );
+				wp_enqueue_script( 'jquery-validate', THE7_RWMB_JS_URL . 'jquery.validate.min.js', array( 'jquery' ), THE7_RWMB_VER, true );
+				wp_enqueue_script( 'the7-mb-validate', THE7_RWMB_JS_URL . 'validate.js', array( 'jquery-validate' ), THE7_RWMB_VER, true );
 			}
 
 			// Auto save
 			if ( $this->meta_box['autosave'] )
-				wp_enqueue_script( 'rwmb-autosave', RWMB_JS_URL . 'autosave.js', array( 'jquery' ), RWMB_VER, true );
+				wp_enqueue_script( 'the7-mb-autosave', THE7_RWMB_JS_URL . 'autosave.js', array( 'jquery' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -222,17 +222,17 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 
 			// Container
 			printf(
-				'<div class="rwmb-meta-box" data-autosave="%s">',
+				'<div class="the7-mb-meta-box" data-autosave="%s">',
 				$this->meta_box['autosave']  ? 'true' : 'false'
 			);
 
-			wp_nonce_field( "rwmb-save-{$this->meta_box['id']}", "nonce_{$this->meta_box['id']}" );
+			wp_nonce_field( "the7-mb-save-{$this->meta_box['id']}", "nonce_{$this->meta_box['id']}" );
 
 			// Allow users to add custom code before meta box content
 			// 1st action applies to all meta boxes
 			// 2nd action applies to only current meta box
-			do_action( 'rwmb_before' );
-			do_action( "rwmb_before_{$this->meta_box['id']}" );
+			do_action( 'the7_mb_before' );
+			do_action( "the7_mb_before_{$this->meta_box['id']}" );
 
 			foreach ( $this->fields as $field )
 			{
@@ -245,17 +245,17 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			{
 				echo '
 					<script>
-					if ( typeof rwmb == "undefined" )
+					if ( typeof the7-mb == "undefined" )
 					{
-						var rwmb = {
+						var the7-mb = {
 							validationOptions : jQuery.parseJSON( \'' . json_encode( $this->validation ) . '\' ),
-							summaryMessage : "' . __( 'Please correct the errors highlighted below and try again.', 'rwmb' ) . '"
+							summaryMessage : "' . __( 'Please correct the errors highlighted below and try again.', 'the7mk2' ) . '"
 						};
 					}
 					else
 					{
 						var tempOptions = jQuery.parseJSON( \'' . json_encode( $this->validation ) . '\' );
-						jQuery.extend( true, rwmb.validationOptions, tempOptions );
+						jQuery.extend( true, the7-mb.validationOptions, tempOptions );
 					};
 					</script>
 				';
@@ -264,8 +264,8 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			// Allow users to add custom code after meta box content
 			// 1st action applies to all meta boxes
 			// 2nd action applies to only current meta box
-			do_action( 'rwmb_after' );
-			do_action( "rwmb_after_{$this->meta_box['id']}" );
+			do_action( 'the7_mb_after' );
+			do_action( "the7_mb_after_{$this->meta_box['id']}" );
 
 			// End container
 			echo '</div>';
@@ -286,8 +286,8 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			$type = $field['type'];
 			$id   = $field['id'];
 
-			$meta = apply_filters( "rwmb_{$type}_meta", $meta, $field );
-			$meta = apply_filters( "rwmb_{$id}_meta", $meta, $field );
+			$meta = apply_filters( "the7_mb_{$type}_meta", $meta, $field );
+			$meta = apply_filters( "the7_mb_{$id}_meta", $meta, $field );
 
 			$begin = self::apply_field_class_filters( $field, 'begin_html', '', $meta );
 
@@ -295,9 +295,9 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			// 1st filter applies to all fields
 			// 2nd filter applies to all fields with the same type
 			// 3rd filter applies to current field only
-			$begin = apply_filters( 'rwmb_begin_html', $begin, $field, $meta );
-			$begin = apply_filters( "rwmb_{$type}_begin_html", $begin, $field, $meta );
-			$begin = apply_filters( "rwmb_{$id}_begin_html", $begin, $field, $meta );
+			$begin = apply_filters( 'the7_mb_begin_html', $begin, $field, $meta );
+			$begin = apply_filters( "the7_mb_{$type}_begin_html", $begin, $field, $meta );
+			$begin = apply_filters( "the7_mb_{$id}_begin_html", $begin, $field, $meta );
 
 			// Separate code for cloneable and non-cloneable fields to make easy to maintain
 
@@ -318,10 +318,10 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 					if ( $field['multiple'] )
 						$sub_field['field_name'] .= '[]';
 
-					add_filter( "rwmb_{$id}_html", array( __CLASS__, 'add_clone_buttons' ), 10, 3 );
+					add_filter( "the7_mb_{$id}_html", array( __CLASS__, 'add_clone_buttons' ), 10, 3 );
 
-					// Wrap field HTML in a div with class="rwmb-clone" if needed
-					$input_html = '<div class="rwmb-clone">';
+					// Wrap field HTML in a div with class="the7-mb-clone" if needed
+					$input_html = '<div class="the7-mb-clone">';
 
 					// Call separated methods for displaying each type of field
 					$input_html .= self::apply_field_class_filters( $sub_field, 'html', '', $meta_data );
@@ -329,8 +329,8 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 					// Apply filter to field HTML
 					// 1st filter applies to all fields with the same type
 					// 2nd filter applies to current field only
-					$input_html = apply_filters( "rwmb_{$type}_html", $input_html, $field, $meta_data );
-					$input_html = apply_filters( "rwmb_{$id}_html", $input_html, $field, $meta_data );
+					$input_html = apply_filters( "the7_mb_{$type}_html", $input_html, $field, $meta_data );
+					$input_html = apply_filters( "the7_mb_{$id}_html", $input_html, $field, $meta_data );
 
 					$input_html .= '</div>';
 
@@ -346,8 +346,8 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 				// Apply filter to field HTML
 				// 1st filter applies to all fields with the same type
 				// 2nd filter applies to current field only
-				$field_html = apply_filters( "rwmb_{$type}_html", $field_html, $field, $meta );
-				$field_html = apply_filters( "rwmb_{$id}_html", $field_html, $field, $meta );
+				$field_html = apply_filters( "the7_mb_{$type}_html", $field_html, $field, $meta );
+				$field_html = apply_filters( "the7_mb_{$id}_html", $field_html, $field, $meta );
 			}
 
 			$end = self::apply_field_class_filters( $field, 'end_html', '', $meta );
@@ -356,25 +356,25 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			// 1st filter applies to all fields
 			// 2nd filter applies to all fields with the same type
 			// 3rd filter applies to current field only
-			$end = apply_filters( 'rwmb_end_html', $end, $field, $meta );
-			$end = apply_filters( "rwmb_{$type}_end_html", $end, $field, $meta );
-			$end = apply_filters( "rwmb_{$id}_end_html", $end, $field, $meta );
+			$end = apply_filters( 'the7_mb_end_html', $end, $field, $meta );
+			$end = apply_filters( "the7_mb_{$type}_end_html", $end, $field, $meta );
+			$end = apply_filters( "the7_mb_{$id}_end_html", $end, $field, $meta );
 
 			// Apply filter to field wrapper
 			// This allow users to change whole HTML markup of the field wrapper (i.e. table row)
 			// 1st filter applies to all fields with the same type
 			// 2nd filter applies to current field only
-			$html = apply_filters( "rwmb_{$type}_wrapper_html", "{$begin}{$field_html}{$end}", $field, $meta );
-			$html = apply_filters( "rwmb_{$id}_wrapper_html", $html, $field, $meta );
+			$html = apply_filters( "the7_mb_{$type}_wrapper_html", "{$begin}{$field_html}{$end}", $field, $meta );
+			$html = apply_filters( "the7_mb_{$id}_wrapper_html", $html, $field, $meta );
 
 			// Apply filter to field before
-			$before = apply_filters( "rwmb_field_before_html", $field['before'], $field, $meta );
+			$before = apply_filters( "the7_mb_field_before_html", $field['before'], $field, $meta );
 
 			// Apply filter to field after
-			$after = apply_filters( "rwmb_field_after_html", $field['after'], $field, $meta );
+			$after = apply_filters( "the7_mb_field_after_html", $field['after'], $field, $meta );
 
 			// Display label and input in DIV and allow user-defined classes to be appended
-			$classes = array( 'rwmb-field', "rwmb-{$field['type']}-wrapper" );
+			$classes = array( 'the7-mb-field', "the7-mb-{$field['type']}-wrapper" );
 			if ( 'hidden' === $field['type'] )
 				$classes[] = 'hidden';
 			if ( !empty( $field['required'] ) )
@@ -402,13 +402,13 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		static function begin_html( $html, $meta, $field )
 		{
 			if ( empty( $field['name'] ) )
-				return '<div class="rwmb-input">';
+				return '<div class="the7-mb-input">';
 
 			return sprintf(
-				'<div class="rwmb-label">
+				'<div class="the7-mb-label">
 					<label for="%s">%s</label>
 				</div>
-				<div class="rwmb-input">',
+				<div class="the7-mb-input">',
 				$field['id'],
 				$field['name']
 			);
@@ -429,7 +429,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 
 			$button = '';
 			if ( $field['clone'] )
-				$button = '<a href="#" class="rwmb-button button-primary add-clone">' . __( '+', 'rwmb' ) . '</a>';
+				$button = '<a href="#" class="the7-mb-button button-primary add-clone">' . __( '+', 'the7mk2' ) . '</a>';
 
 			$desc = ! empty( $field['desc'] ) ? "<p id='{$id}_description' class='description'>{$field['desc']}</p>" : '';
 
@@ -441,7 +441,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 
 		/**
 		 * Callback function to add clone buttons on demand
-		 * Hooks on the flight into the "rwmb_{$field_id}_html" filter before the closing div
+		 * Hooks on the flight into the "the7_mb_{$field_id}_html" filter before the closing div
 		 *
 		 * @param string $html
 		 * @param array  $field
@@ -451,7 +451,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		 */
 		static function add_clone_buttons( $html, $field, $meta_data )
 		{
-			$button = '<a href="#" class="rwmb-button button remove-clone">' . __( '&#8211;', 'rwmb' ) . '</a>';
+			$button = '<a href="#" class="the7-mb-button button remove-clone">' . __( '&#8211;', 'the7mk2' ) . '</a>';
 
 			return "{$html}{$button}";
 		}
@@ -468,11 +468,11 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = get_post_meta( $post_id, $field['id'], !$field['multiple'] );
+			if ( ! $saved ) {
+				return $field['std'];
+			}
 
-			// Use $field['std'] only when the meta box hasn't been saved (i.e. the first time we run)
-			// $meta = ( !$saved && '' === $meta || array() === $meta ) ? $field['std'] : $meta;
-			$meta = ( '' === $meta || array() === $meta ) ? $field['std'] : $meta;
+			$meta = get_post_meta( $post_id, $field['id'], !$field['multiple'] );
 
 			// Escape attributes for non-wysiwyg fields
 			if ( 'wysiwyg' !== $field['type'] )
@@ -496,7 +496,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		{
 			// Check whether form is submitted properly
 			$id = $this->meta_box['id'];
-			if ( empty( $_POST["nonce_{$id}"] ) || !wp_verify_nonce( $_POST["nonce_{$id}"], "rwmb-save-{$id}" ) )
+			if ( empty( $_POST["nonce_{$id}"] ) || !wp_verify_nonce( $_POST["nonce_{$id}"], "the7-mb-save-{$id}" ) )
 				return;
 
 			// Autosave
@@ -507,12 +507,36 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			if ( $the_post = wp_is_post_revision( $post_id ) )
 				$post_id = $the_post;
 
+			if ( isset( $this->meta_box['only_on']['template'] ) ) {
+				$post_template = get_post_meta( $post_id, '_wp_page_template', true );
+				if ( ! in_array( $post_template, (array) $this->meta_box['only_on']['template'], true ) ) {
+					foreach ( $this->fields as $field ) {
+						delete_post_meta( $post_id, $field['id'] );
+					}
+
+					return;
+				}
+			}
+
+			if ( isset( $this->meta_box['only_on']['meta_value'] ) ) {
+				foreach ( (array) $this->meta_box['only_on']['meta_value'] as $meta_key => $meta_value ) {
+					$meta_value_to_check = isset( $_POST[ $meta_key ] ) ? $_POST[ $meta_key ] : get_post_meta( $post_id, $meta_key, true );
+					if ( $meta_value_to_check !== $meta_value ) {
+						foreach ( $this->fields as $field ) {
+							delete_post_meta( $post_id, $field['id'] );
+						}
+
+						return;
+					}
+				}
+			}
+
 			// Save post action removed to prevent infinite loops
 			remove_action( 'save_post', array( $this, 'save_post' ) );
 
 			// Before save action
-			do_action( 'rwmb_before_save_post', $post_id );
-			do_action( "rwmb_{$this->meta_box['id']}_before_save_post", $post_id );
+			do_action( 'the7_mb_before_save_post', $post_id );
+			do_action( "the7_mb_{$this->meta_box['id']}_before_save_post", $post_id );
 
 			foreach ( $this->fields as $field )
 			{
@@ -526,16 +550,16 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 				// Use filter to change field value
 				// 1st filter applies to all fields with the same type
 				// 2nd filter applies to current field only
-				$new = apply_filters( "rwmb_{$field['type']}_value", $new, $field, $old );
-				$new = apply_filters( "rwmb_{$name}_value", $new, $field, $old );
+				$new = apply_filters( "the7_mb_{$field['type']}_value", $new, $field, $old );
+				$new = apply_filters( "the7_mb_{$name}_value", $new, $field, $old );
 
 				// Call defined method to save meta value, if there's no methods, call common one
 				self::do_field_class_actions( $field, 'save', $new, $old, $post_id );
 			}
 
 			// After save action
-			do_action( 'rwmb_after_save_post', $post_id );
-			do_action( "rwmb_{$this->meta_box['id']}_after_save_post", $post_id );
+			do_action( 'the7_mb_after_save_post', $post_id );
+			do_action( "the7_mb_{$this->meta_box['id']}_after_save_post", $post_id );
 
 			// Reinstate save_post action
 			add_action( 'save_post', array( $this, 'save_post' ) );
@@ -554,12 +578,6 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		static function save( $new, $old, $post_id, $field )
 		{
 			$name = $field['id'];
-
-			if ( '' === $new || array() === $new )
-			{
-				delete_post_meta( $post_id, $name );
-				return;
-			}
 
 			if ( $field['multiple'] )
 			{
@@ -654,7 +672,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		static function get_class_name( $field )
 		{
 			$type  = ucwords( $field['type'] );
-			$class = "RWMB_{$type}_Field";
+			$class = "THE7_RWMB_{$type}_Field";
 
 			if ( class_exists( $class ) )
 				return $class;
@@ -663,7 +681,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		}
 
 		/**
-		 * Apply filters by field class, fallback to RW_Meta_Box method
+		 * Apply filters by field class, fallback to The7_RW_Meta_Box method
 		 *
 		 * @param array  $field
 		 * @param string $method_name
@@ -677,7 +695,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			$args[] = $field;
 
 			// Call:     field class method
-			// Fallback: RW_Meta_Box method
+			// Fallback: The7_RW_Meta_Box method
 			$class = self::get_class_name( $field );
 			if ( method_exists( $class, $method_name ) )
 			{
@@ -692,7 +710,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		}
 
 		/**
-		 * Call field class method for actions, fallback to RW_Meta_Box method
+		 * Call field class method for actions, fallback to The7_RW_Meta_Box method
 		 *
 		 * @param array  $field
 		 * @param string $method_name
@@ -705,7 +723,7 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 			$args[] = $field;
 
 			// Call:     field class method
-			// Fallback: RW_Meta_Box method
+			// Fallback: The7_RW_Meta_Box method
 			$class = self::get_class_name( $field );
 			if ( method_exists( $class, $method_name ) )
 			{
@@ -746,16 +764,25 @@ if ( ! class_exists( 'RW_Meta_Box' ) )
 		{
 			foreach ( $fields as $field )
 			{
-				$value = get_post_meta( $post_id, $field['id'], !$field['multiple'] );
-				if (
-					( !$field['multiple'] && '' !== $value )
-					|| ( $field['multiple'] && array() !== $value )
-				)
-				{
-					return true;
+				// Do not count decorative fields.
+				if ( self::is_decorative_field( $field ) ) {
+					continue;
 				}
+
+				return metadata_exists( 'post', $post_id, $field['id'] );
 			}
 			return false;
+		}
+
+		/**
+		 * Check if field is decorative. Decorative fields will not be saved.
+		 *
+		 * @param array $field
+		 *
+		 * @return bool
+		 */
+		static function is_decorative_field( $field ) {
+			return self::apply_field_class_filters( $field, 'is_decorative', false );
 		}
 	}
 }

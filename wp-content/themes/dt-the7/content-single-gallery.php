@@ -1,8 +1,8 @@
 <?php
 /**
- * Album singla page template.
+ * Album single page template.
  *
- * @package vogue
+ * @package The7
  * @since  1.0.0
  */
 
@@ -10,32 +10,27 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 
-<article id="post-<?php the_ID(); ?>" <?php post_class('project-post'); ?>>
+<article id="post-<?php the_ID() ?>" <?php post_class( 'project-post' ) ?>>
 
 	<?php
-	do_action('presscore_before_post_content');
+	do_action( 'presscore_before_post_content' );
 
 	switch ( presscore_config()->get( 'post.media.type' ) ) {
 		case 'photo_scroller': break;
-
 		case 'jgrid':
 		case 'masonry_grid':
 			presscore_get_template_part( 'mod_albums', 'albums-post-single-media' );
 			break;
-
 		default:
-			
-				echo '<div class="project-slider">';
-					presscore_get_template_part( 'mod_albums', 'albums-post-single-media' );
-				echo '</div>';
+            echo '<div class="project-slider">';
+            presscore_get_template_part( 'mod_albums', 'albums-post-single-media' );
+            echo '</div>';
 	}
 
 	if ( get_the_content() ) {
-
-			echo '<div class="project-content">';
-				the_content();
-			echo '</div>';
-
+        echo '<div class="project-content">';
+        the_content();
+        echo '</div>';
 	}
 
 	$post_meta = presscore_get_single_posted_on();
@@ -50,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 		'screen_reader_text' => __( 'Album navigation', 'the7mk2' ),
 	) );
 
-	do_action('presscore_after_post_content');
+	do_action( 'presscore_after_post_content' );
 	?>
 
 </article>

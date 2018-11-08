@@ -3,9 +3,39 @@
 ================================================== */
 
 /*Sidebar width*/
-.sidebar {
-	width: @sidebar-width;
+#main:not(.sidebar-none) .wf-container-main {
+	.responsive-off & {
+		grid-column-gap: @sidebar-distace-to-content;
+	}
 }
+.sidebar-right .wf-container-main {
+	.responsive-off & {
+		-ms-grid-columns: calc(100% ~'-' @sidebar-width ~'-' @sidebar-distace-to-content/2) @sidebar-distace-to-content calc(@sidebar-width ~'-' @sidebar-distace-to-content/2 );
+		grid-template-columns: calc(100% ~'-' @sidebar-width ~'-' @sidebar-distace-to-content/2) calc(@sidebar-width ~'-' @sidebar-distace-to-content/2 );
+	}
+}
+.sidebar-left .wf-container-main {
+	.responsive-off & {
+		-ms-grid-columns: calc(@sidebar-width ~'-' @sidebar-distace-to-content/2 ) @sidebar-distace-to-content calc(100% ~'-' @sidebar-width ~'-' @sidebar-distace-to-content/2);
+		grid-template-columns: calc(@sidebar-width ~'-' @sidebar-distace-to-content/2 ) calc(100% ~'-' @sidebar-width ~'-' @sidebar-distace-to-content/2);
+	}
+}
+.sidebar-left .sidebar {
+	.sidebar-divider-vertical& {
+		.responsive-off & {
+			padding-right: @sidebar-distace-to-content;
+		}
+	}
+}
+
+.sidebar-right .sidebar {
+	.sidebar-divider-vertical& {
+		.responsive-off & {
+			padding-left: @sidebar-distace-to-content;
+		}
+	}
+}
+
 /*Sidebar - > Dividers*/
 .sidebar-right .sidebar {
 	border-left: 1px solid @divider-color;

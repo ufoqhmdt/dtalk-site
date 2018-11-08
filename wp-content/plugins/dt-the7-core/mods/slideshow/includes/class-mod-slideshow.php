@@ -56,7 +56,6 @@ if ( ! class_exists( 'Presscore_Mod_Slideshow', false ) ) {
 			add_action( 'init', array( $mod_public, 'register_shortcodes' ) );
 			add_action( 'presscore_js_composer_after_bridge_loaded', array( $mod_public, 'load_shortcodes_vc_bridge' ) );
 			add_action( 'presscore_do_header_slideshow', array( $mod_public, 'do_header_slideshow' ) );
-			add_action( 'wp_enqueue_scripts', array( $mod_public, 'enqueue_3d_slider_scripts' ), 30 );
 		}
 	}
 

@@ -53,26 +53,27 @@ if ( ! function_exists( 'presscore_masonry_container_data_atts' ) ) :
 
 endif;
 
-if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
+if ( ! function_exists( 'presscore_masonry_container_classes_array' ) ) :
 
 	/**
-	 * Returns html class property based on current template settings.
-	 * 
-	 * @since 1.0.0
-	 * @param  array  $custom_class Custom class.
-	 * @return string
+	 * Return array of masonry container classes.
+	 *
+	 * @since 6.8.1
+	 * @param array $custom_class Custom class array.
+	 *
+	 * @return array Array of classes.
 	 */
-	function presscore_masonry_container_class( $custom_class = array() ) {
+	function presscore_masonry_container_classes_array( $custom_class = array() ) {
 		$_custom_class = $custom_class;
 		if ( ! is_array( $_custom_class ) ) {
 			$_custom_class = (string) $_custom_class;
 			$_custom_class = explode( ' ', $_custom_class );
 		}
 		$html_class = $_custom_class;
-		$config = presscore_config();
+		$config     = presscore_config();
 
 		// ajax class
-		if ( !in_array( $config->get( 'load_style' ), array( 'default', false ) ) ) {
+		if ( ! in_array( $config->get( 'load_style' ), array( 'default', false ) ) ) {
 			$html_class[] = 'with-ajax';
 		}
 
@@ -80,14 +81,18 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 		$html_class[] = presscore_tpl_get_load_effect_class( $config->get( 'post.preview.load.effect' ) );
 
 		// lazy loading
-		if ( 'lazy_loading' == $config->get( 'load_style' ) ) {
+		if ( 'lazy_loading' === $config->get( 'load_style' ) ) {
 			$html_class[] = 'lazy-loading-mode';
 		}
 
 		// layout
 		switch ( $config->get( 'layout' ) ) {
-			case 'grid': $html_class[] = 'iso-grid'; break;
-			case 'masonry': $html_class[] = 'iso-container'; break;
+			case 'grid':
+				$html_class[] = 'iso-grid';
+				break;
+			case 'masonry':
+				$html_class[] = 'iso-container';
+				break;
 		}
 
 		if ( $config->get( 'justified_grid' ) ) {
@@ -101,9 +106,9 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 
 		// description style
 		$description_style = $config->get( 'post.preview.description.style' );
-		if ( 'under_image' == $description_style || 'wc_btn_on_hoover' == $description_style || 'wc_btn_on_img' == $description_style ) {
+		if ( 'under_image' === $description_style || 'wc_btn_on_hoover' === $description_style || 'wc_btn_on_img' === $description_style ) {
 			$html_class[] = 'description-under-image';
-		} else if ( 'disabled' != $description_style ) {
+		} else if ( 'disabled' !== $description_style ) {
 			$html_class[] = 'description-on-hover';
 		}
 
@@ -117,7 +122,7 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 				// content align
 				$html_class[] = presscore_tpl_get_content_align_class( $config->get( 'post.preview.description.alignment' ) );
 
-				if ( 'dark' == $config->get( 'post.preview.hover.color' ) ) {
+				if ( 'dark' === $config->get( 'post.preview.hover.color' ) ) {
 					$html_class[] = 'hover-color-static';
 				}
 				break;
@@ -127,7 +132,7 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 				// content align
 				$html_class[] = presscore_tpl_get_content_align_class( $config->get( 'post.preview.description.alignment' ) );
 
-				if ( 'dark' == $config->get( 'post.preview.hover.color' ) ) {
+				if ( 'dark' === $config->get( 'post.preview.hover.color' ) ) {
 					$html_class[] = 'hover-color-static';
 				}
 				break;
@@ -138,7 +143,7 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 				// content align
 				$html_class[] = presscore_tpl_get_content_align_class( $config->get( 'post.preview.description.alignment' ) );
 
-				if ( 'always' == $config->get( 'post.preview.hover.content.visibility' ) ) {
+				if ( 'always' === $config->get( 'post.preview.hover.content.visibility' ) ) {
 					$html_class[] = 'always-show-info';
 				}
 				break;
@@ -155,20 +160,14 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 				$html_class[] = 'hover-style-two';
 				$html_class[] = presscore_tpl_get_anim_effect_class( $config->get( 'post.preview.hover.lines.animation' ) );
 
-				if ( 'dark' == $config->get( 'post.preview.hover.color' ) ) {
+				if ( 'dark' === $config->get( 'post.preview.hover.color' ) ) {
 					$html_class[] = 'hover-color-static';
 				}
 
-				if ( 'always' == $config->get( 'post.preview.hover.title.visibility' ) ) {
+				if ( 'always' === $config->get( 'post.preview.hover.title.visibility' ) ) {
 					$html_class[] = 'always-show-info';
 				}
 				break;
-		}
-
-		// @TODO: Remove this in 4.1.0
-		// round images
-		if ( 'round' == $config->get( 'image_layout' ) ) {
-			$html_class[] = 'round-images';
 		}
 
 		/**
@@ -177,7 +176,22 @@ if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
 		 * @since 1.0.0
 		 * @var array $html_class
 		 */
-		$html_class = apply_filters( 'presscore_masonry_container_class', $html_class );
+		return apply_filters( 'presscore_masonry_container_class', $html_class );
+	}
+
+endif;
+
+if ( ! function_exists( 'presscore_masonry_container_class' ) ) :
+
+	/**
+	 * Returns html class property based on current template settings.
+	 * 
+	 * @since 1.0.0
+	 * @param  array  $custom_class Custom class.
+	 * @return string
+	 */
+	function presscore_masonry_container_class( $custom_class = array() ) {
+		$html_class = presscore_masonry_container_classes_array( $custom_class );
 
 		return $html_class ? sprintf( 'class="%s"', presscore_esc_implode( ' ', array_unique( $html_class ) ) ) : '';
 	}

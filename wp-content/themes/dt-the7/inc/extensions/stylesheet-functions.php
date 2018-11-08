@@ -49,34 +49,44 @@ function dt_stylesheet_get_opacity( $opacity = 0 ) {
 }
 
 /**
- * Description here.
+ * Convert HEX color string format to rgb.
  *
+ * If $_color is array - intval will be applied to each element, no hex to int conversion.
+ * If $return_array is false (default) - rgb(x,x,x) string will be returned.
+ *
+ * @param array|string $_color Color.
+ * @param bool $return_array Return array or string.
+ *
+ * @return array|string
  */
-function dt_stylesheet_color_hex2rgb( $_color, $raw = false ) {
-    
-    if( is_array($_color) ) {
-        $rgb_array = array_map('intval', $_color);    
-    }else {
+function dt_stylesheet_color_hex2rgb( $_color, $return_array = false ) {
+	if ( is_array( $_color ) ) {
+		$rgb_array = array_map( 'intval', $_color );
+	} else {
+		$color = str_replace( '#', '', trim( $_color ) );
 
-        $color = str_replace( '#', '', trim($_color) );
+		if ( strlen( $color ) < 6 ) {
+			$color .= $color;
+		}
 
-        if ( count($color) < 6 ) {
-            $color .= $color;
-        }
+		$rgb_array = sscanf( $color, '%2x%2x%2x' );
 
-        $rgb_array = sscanf($color, '%2x%2x%2x');     
+		if ( is_array( $rgb_array ) && count( $rgb_array ) === 3 ) {
+			$rgb_array = array_map( 'absint', $rgb_array );
+		} else {
+			$rgb_array = array();
+		}
+	}
 
-        if( is_array($rgb_array) && count($rgb_array) == 3 ) {
-            $rgb_array = array_map('absint', $rgb_array);
-        }else {
-            return '';
-        }
-    }
+	if ( empty( $rgb_array ) ) {
+		return ( $return_array ? array( 0, 0, 0 ) : '' );
+	}
 
-    if ( !$raw ) {
-        return sprintf( 'rgb(%d,%d,%d)', $rgb_array[0], $rgb_array[1], $rgb_array[2] );
-    }
-    return $rgb_array;
+	if ( $return_array ) {
+		return $rgb_array;
+	}
+
+	return sprintf( 'rgb(%d,%d,%d)', $rgb_array[0], $rgb_array[1], $rgb_array[2] );
 }
 
 /**
@@ -84,7 +94,6 @@ function dt_stylesheet_color_hex2rgb( $_color, $raw = false ) {
  *
  */
 function dt_stylesheet_color_hex2rgba( $color, $opacity = 0 ) {
-
     if ( !$color ) return '';
 
     $rgb_array = dt_stylesheet_color_hex2rgb( $color, true );

@@ -39,15 +39,13 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 		}
 
 		public function __construct() {
-
 			$this->sc_name = 'dt_products_carousel';
 			$this->unique_class_base = 'products-carousel-shortcode-id';
-			//$this->taxonomy = 'category';
 			$this->post_type = 'product';
-
 
 			$this->default_atts = array(
 				'show_products' => 'all_products',
+				'order' => 'desc',
 				'orderby' => 'date',
 				'dis_posts_total' => '12',
 				'layout' => 'content_below_img',
@@ -55,6 +53,7 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				'skus' => '',
 				'category_ids'    => '',
 				'slide_to_scroll' => 'single',
+				'slides_on_wide_desk' => '4',
 				'slides_on_desk' => '3',
 				'slides_on_lapt' => '3',
 				'slides_on_h_tabs' => '3',
@@ -67,11 +66,9 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				'autoplay_speed' => "6000",
 				'product_descr' => 'n',
 				'product_rating' => 'y',
-
 				'custom_title_color' => '',
 				'custom_content_color' => '',
 				'custom_price_color' => '',
-
 				'arrows' => 'y',
 				'arrow_icon_size' => '18px',
 				'r_arrow_icon_paddings' => '0 0 0 0',
@@ -81,10 +78,12 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				'arrow_border_radius' => '500px',
 				'arrow_border_width' => '0',
 				'arrow_icon_color' => '#ffffff',
+				'arrow_icon_border' => 'y',
 				'arrow_border_color' => '',
 				'arrows_bg_show' => 'y',
 				'arrow_bg_color' => '',
 				'arrow_icon_color_hover' => 'rgba(255,255,255,0.75)',
+				'arrow_icon_border_hover' => 'y',
 				'arrow_border_color_hover' => '',
 				'arrows_bg_hover_show' => 'y',
 				'arrow_bg_color_hover' => '',
@@ -97,8 +96,8 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				'l_arrow_v_offset' => '0',
 				'l_arrow_h_offset' => '-43px',
 				'arrow_responsiveness' => 'reposition-arrows',
-				'hide_arrows_mobile_switch_width' => '768px',
-				'reposition_arrows_mobile_switch_width' => '768px',
+				'hide_arrows_mobile_switch_width' => '778px',
+				'reposition_arrows_mobile_switch_width' => '778px',
 				'l_arrows_mobile_h_position' => '10px',
 				'r_arrows_mobile_h_position' => '10px',
 				'show_bullets' => 'n',
@@ -122,9 +121,6 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 		 * Do shortcode here.
 		 */
 		protected function do_shortcode( $atts, $content = '' ) {
-			$attributes = &$this->atts;
-			global $woocommerce, $product;
-
 			$query =  new WP_Query( $this->get_query_args() );
 
 			do_action( 'presscore_before_shortcode_loop', $this->sc_name, $this->atts );
@@ -137,9 +133,11 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 
 			do_action( 'presscore_before_loop' );
 
+			presscore_remove_posts_masonry_wrap();
+
 			$this->_setup_config();
 		
-			echo '<div ' . $this->get_container_html_class( array( 'owl-carousel products-carousel-shortcode' ) ) . ' ' . $this->get_container_data_atts() . '>';
+			echo '<div ' . $this->get_container_html_class( array( 'owl-carousel products-carousel-shortcode dt-owl-carousel-call' ) ) . ' ' . $this->get_container_data_atts() . '>';
 				if ( $query->have_posts() ):
 
 					$post_class_array = array(
@@ -151,9 +149,11 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 
 						echo '<article ' . $this->post_class( $post_class_array ) . ' >';
 
+						// Quick fix to prevent errors on page save when YoastSEO is active.
+						if ( ! empty( $GLOBALS['product'] ) ) {
 							woocommerce_show_product_loop_sale_flash();
-							
 							dt_woocommerce_template_product_desc_under();
+						}
 
 						echo '</article>';
 
@@ -175,7 +175,6 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 		}
 		
 		protected function get_container_html_class( $class = array() ) {
-			$attributes = &$this->atts;
 			$el_class = $this->atts['el_class'];
 
 			// Unique class.
@@ -192,7 +191,7 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 			};
 
 
-			switch ( $attributes['bullets_style'] ) {
+			switch ( $this->atts['bullets_style'] ) {
 				case 'scale-up':
 					$class[] = 'bullets-scale-up';
 					break;
@@ -212,7 +211,7 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 					$class[] = 'bullets-etefu';
 					break;
 			};
-			switch ( $attributes['arrow_responsiveness'] ) {
+			switch ( $this->atts['arrow_responsiveness'] ) {
 				case 'hide-arrows':
 					$class[] = 'hide-arrows';
 					break;
@@ -225,6 +224,16 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				$class[] = 'arrows-bg-on';
 			}else{
 				$class[] = 'arrows-bg-off';
+			};
+			if($this->atts['arrow_icon_border'] === 'y'){
+				$class[] = 'dt-arrow-border-on';
+			}
+			if($this->atts['arrow_icon_border_hover'] === 'y'){
+				$class[] = 'dt-arrow-hover-border-on';
+			}
+			
+			if ( $this->get_att( 'arrow_bg_color' ) === $this->get_att( 'arrow_bg_color_hover' ) ) {
+				$class[] = 'disable-arrows-hover-bg';
 			};
 
 			if($this->atts['arrows_bg_hover_show'] === 'y'){
@@ -267,6 +276,7 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 		protected function get_container_data_atts() {
 			$data_atts = array(
 				'scroll-mode' => ($this->atts['slide_to_scroll'] == "all") ? 'page' : '1',
+				'wide-col-num' => $this->atts['slides_on_wide_desk'],
 				'col-num' => $this->atts['slides_on_desk'],
 				'laptop-col' => $this->atts['slides_on_lapt'],
 				'h-tablet-columns-num' => $this->atts['slides_on_h_tabs'],
@@ -391,35 +401,30 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 		 * @return string
 		 */
 		protected function get_vc_inline_html() {
+
 			return $this->vc_inline_dummy( array(
-				'class' => 'dt_products_carousel',
-				'title' => _x( 'Products Carousel', 'vc inline dummy', 'the7mk2' ),
+				'class'  => 'dt_products_carousel',
+				'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_product_carousel_editor_ico.gif', 131, 104 ),
+				'title'  => _x( 'Products Carousel', 'vc inline dummy', 'the7mk2' ),
+
+				'style' => array( 'height' => 'auto' )
 			) );
 		}
 	
 		protected function get_query_args() {
-			$attributes = &$this->atts;
 			global $woocommerce;
 			$show_products_attd = $this->get_att( 'show_products' );
-			$orderby = '';
 			$post_count = $this->get_att( 'dis_posts_total', '-1' );
-			$meta_query = $tax_query = '';
-			if(!isset($order)): $order = 'desc'; endif;
-			if(!isset($category)): $category = ''; endif;
-			if(!isset($ids)): $ids = ''; endif;
-			switch ( $attributes['orderby'] ) {
-				case 'date':
-					$orderby = 'date';
-					break;
-				case 'id':
-					$orderby = 'ID';
-					break;
-				case 'author':
-					$orderby = 'author';
-					break;
+
+			$order = $this->get_att( 'order' );
+			$orderby = $this->get_att( 'orderby' );
+			if ( 'id' === $orderby ) {
+				$orderby = 'ID';
+			} elseif ( 'menu_order' === $orderby ) {
+				$order = 'asc';
 			}
 
-
+			$meta_query = $tax_query = '';
 			if($show_products_attd == "featured_products"){
 				$meta_query  = WC()->query->get_meta_query();
 				$tax_query   = WC()->query->get_tax_query();
@@ -450,16 +455,16 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 				case 'all_products':
 					$meta_query  = WC()->query->get_meta_query();
 					$tax_query   = WC()->query->get_tax_query();
-					if ( ! empty( $attributes['skus'] ) ) {
+					if ( ! empty( $this->atts['skus'] ) ) {
 						$query_args['meta_query'][] = array(
 							'key'     => '_sku',
-							'value'   => array_map( 'trim', explode( ',', $attributes['skus'] ) ),
+							'value'   => array_map( 'trim', explode( ',', $this->atts['skus'] ) ),
 							'compare' => 'IN',
 						);
 					}
 
-					if ( ! empty( $attributes['ids'] ) ) {
-						$query_args['post__in'] = array_map( 'trim', explode( ',', $attributes['ids'] ) );
+					if ( ! empty( $this->atts['ids'] ) ) {
+						$query_args['post__in'] = array_map( 'trim', explode( ',', $this->atts['ids'] ) );
 					}
 					break;
 				case 'sale_products':
@@ -478,8 +483,8 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 					break;
 				case 'categories_products':
 
-					if ( ! empty( $attributes['category_ids'] ) ) {
-						$ids        = array_filter( array_map( 'trim', explode( ',', $attributes['category_ids'] ) ) );
+					if ( ! empty( $this->atts['category_ids'] ) ) {
+						$ids        = array_filter( array_map( 'trim', explode( ',', $this->atts['category_ids'] ) ) );
 						$query_args['tax_query'] = array(
 							array(
 								'taxonomy' 	 => 'product_cat',
@@ -495,7 +500,9 @@ if ( ! class_exists( 'DT_Shortcode_Products_Carousel', false ) ) :
 					}
 					break;
 			}
-			
+
+			$query_args['tax_query'] = the7_product_visibility_tax_query( $query_args['tax_query'] );
+
 			return $query_args;
 		}
 	}

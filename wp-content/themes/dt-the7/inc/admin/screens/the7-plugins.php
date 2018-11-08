@@ -5,16 +5,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @var The7_TGMPA $tgmpa
+ * @var The7_TGMPA $the7_tgmpa
  */
-global $tgmpa;
+global $the7_tgmpa;
 
-// If there is another $tgmpa registered.
-if ( ! is_a( $tgmpa, 'The7_TGMPA' ) ) {
-    $tgmpa_file = __( 'cannot find class file', 'the7mk2' );
+// If there is another $the7_tgmpa registered.
+if ( ! is_a( $the7_tgmpa, 'The7_TGMPA' ) ) {
+    $the7_tgmpa_file = __( 'cannot find class file', 'the7mk2' );
     if ( class_exists( 'ReflectionClass', false ) ) {
-	    $tgmpaReflection = new ReflectionClass( get_class( $tgmpa ) );
-	    $tgmpa_file = str_replace( ABSPATH, '', $tgmpaReflection->getFileName() );
+	    $the7_tgmpaReflection = new ReflectionClass( get_class( $the7_tgmpa ) );
+	    $the7_tgmpa_file = str_replace( ABSPATH, '', $the7_tgmpaReflection->getFileName() );
     }
 ?>
 <div id="the7-dashboard" class="wrap">
@@ -22,7 +22,7 @@ if ( ! is_a( $tgmpa, 'The7_TGMPA' ) ) {
     <div class="the7-postbox">
         <p><?php
 	        /* translators: 1: file. */
-            echo wp_kses_post( sprintf( __( 'There is a conflict with external TGM_Plugin_Activation class %s. Please turn off plugin that uses TGM_Plugin_Activation or contact our support.', 'the7mk2' ), "<code>{$tgmpa_file}</code>" ) );
+            echo wp_kses_post( sprintf( __( 'There is a conflict with external TGM_Plugin_Activation class %s. Please turn off plugin that uses TGM_Plugin_Activation or contact our support.', 'the7mk2' ), "<code>{$the7_tgmpa_file}</code>" ) );
             ?></p>
     </div>
 </div>
@@ -32,14 +32,14 @@ if ( ! is_a( $tgmpa, 'The7_TGMPA' ) ) {
 }
 
 if ( isset( $_POST['just_install'] ) ) {
-    $tgmpa->is_automatic = false;
+    $the7_tgmpa->is_automatic = false;
 }
 
 // Store new instance of plugin table in object.
 $plugin_table = new The7_Plugins_List_Table();
 
 // Return early if processing a plugin installation action.
-if ( ( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $tgmpa->public_do_plugin_install() ) {
+if ( ( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $the7_tgmpa->public_do_plugin_install() ) {
 	return;
 }
 
@@ -53,7 +53,7 @@ wp_clean_plugins_cache( false );
         <?php $plugin_table->views(); ?>
 
         <form id="tgmpa-plugins" action="" method="post">
-            <input type="hidden" name="tgmpa-page" value="<?php echo esc_attr( $tgmpa->menu ); ?>" />
+            <input type="hidden" name="tgmpa-page" value="<?php echo esc_attr( $the7_tgmpa->menu ); ?>" />
             <input type="hidden" name="plugin_status" value="<?php echo esc_attr( $plugin_table->view_context ); ?>" />
             <?php $plugin_table->display(); ?>
         </form>

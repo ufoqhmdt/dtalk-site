@@ -21,16 +21,14 @@ if ( ! class_exists( 'DT_Shortcode_Albums', false ) ) {
 			parent::setup( $atts, $content );
 
 			// vc inline dummy
-			if ( $this->vc_is_inline ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
+			if ( presscore_vc_is_inline() ) {
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-albums_masonry',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_album_masonry_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Albums Masonry & Grid', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-albums_masonry',
-					'title' => _x( 'Albums Masonry & Grid', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			return $this->shortcode_html(); 
@@ -45,6 +43,15 @@ if ( ! class_exists( 'DT_Shortcode_Albums', false ) ) {
 				'select' => $this->atts['select'],
 				'category' => $this->atts['category']
 			) );
+			// miniatures style
+			switch ( presscore_config()->get( 'post.preview.mini_images.style' ) ) {
+				case 'style_1':
+					$classes = 'album-minuatures-style-1';
+					break;
+				case 'style_2':
+					$classes = 'album-minuatures-style-2';
+					break;
+			}
 
 			$output = '';
 			if ( $dt_query->have_posts() ) {
@@ -54,7 +61,7 @@ if ( ! class_exists( 'DT_Shortcode_Albums', false ) ) {
 				$this->setup_config();
 
 				$loop_args = array(
-					'masonry_container_class' => array( 'wf-container', 'dt-albums-shortcode' ),
+					'masonry_container_class' => array( 'wf-container', 'dt-albums-shortcode', $classes ),
 					'masonry_container_data' => array(),
 					'post_template_callback' => array( $this, 'post_template' ),
 					'query' => $dt_query,

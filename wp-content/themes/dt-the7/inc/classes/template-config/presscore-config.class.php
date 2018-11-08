@@ -173,8 +173,8 @@ class Presscore_Config implements Presscore_Config_Interface{
 
 	}
 
-	protected function get_option( $name, $default = null ) {
-		return of_get_option( $name, $default );
+	protected function get_option( $name ) {
+		return of_get_option( $name );
 	}
 }
 

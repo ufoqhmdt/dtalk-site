@@ -8,14 +8,56 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-add_action( 'wp_head', 'dt_core_detect_retina_script', 1 );
+add_action( 'get_header', 'presscore_template_config_init', 9 );
+add_action( 'wp_head', 'presscore_tracking_code_in_header_action', 9999 );
+add_filter( 'presscore_get_attachment_post_data-attachment_data', 'presscore_filter_attachment_data', 15 );
+add_filter( 'dt_get_thumb_img-args', 'presscore_add_default_meta_to_images', 15 );
+add_filter( 'presscore_post_edit_link', 'presscore_wrap_edit_link_in_p', 15 );
+add_filter( 'presscore_get_category_list-args', 'presscore_filter_categorizer_hash_arg', 15 );
+add_action( 'parse_query', 'presscore_parse_query_for_front_page_categorizer' );
+add_action('init', 'presscore_react_on_categorizer', 15);
+add_filter( 'post_class', 'presscore_add_post_format_classes' );
+add_filter( 'the_excerpt', 'presscore_add_password_form_to_excerpts', 99 );
+add_filter( 'excerpt_more', 'presscore_excerpt_more_filter' );
+add_filter( 'teammate_thumbnail_args', 'presscore_set_image_width_based_on_column_width', 15 );
+add_filter( 'dt_get_thumb_img-args', 'presscore_add_preload_me_class_to_images', 15 );
+add_action( 'presscore_before_loop', 'presscore_page_masonry_controller', 25 );
+add_action( 'presscore_before_shortcode_loop', 'presscore_page_masonry_controller', 25 );
+add_action( 'presscore_after_loop', 'presscore_remove_posts_masonry_wrap', 15 );
+add_action( 'presscore_after_shortcode_loop', 'presscore_remove_posts_masonry_wrap', 15 );
+add_action('presscore_after_main_container', 'presscore_add_footer_widgetarea', 15);
+add_action('presscore_after_content', 'presscore_add_sidebar_widgetarea', 15);
+add_action('presscore_before_main_container', 'presscore_fancy_header_controller', 15);
+add_action( 'presscore_before_main_container', 'presscore_page_title_controller', 16 );
+add_filter( 'post_class', 'presscore_post_class_filter' );
+add_filter( 'presscore_get_category_list', 'presscore_add_sorting_for_category_list', 15 );
+add_filter( 'presscore_get_category_list', 'presscore_add_wrap_for_catgorizer', 16, 2 );
+add_filter( 'dt_portfolio_thumbnail_args', 'presscore_setup_image_proportions', 15 );
+add_filter( 'dt_post_thumbnail_args', 'presscore_setup_image_proportions', 15 );
+add_filter( 'dt_album_title_image_args', 'presscore_setup_image_proportions', 15 );
+add_filter( 'dt_media_image_args', 'presscore_setup_image_proportions', 15 );
+add_filter( 'presscore_get_images_gallery_hoovered-title_img_args', 'presscore_setup_image_proportions', 15 );
+add_action( 'presscore_body_top', 'presscore_render_fullscreen_overlay' );
+add_action('presscore_before_main_container', 'presscore_slideshow_controller', 15);
+add_action( 'wp_head', 'the7_site_icon', 98 );
+add_action( 'presscore_get_filtered_posts', 'presscore_update_post_thumbnail_cache' );
+add_filter( 'presscore_get_header_elements_list-near_logo_left', 'presscore_empty_classic_header_microwidgets_exception_filter' );
+add_filter( 'presscore_get_header_elements_list-near_logo_right', 'presscore_empty_classic_header_microwidgets_exception_filter' );
+add_filter( 'presscore_get_header_elements_list-side_top_line', 'presscore_empty_top_line_microwidgets_exception_filter' );
+add_action( 'presscore_before_loop', 'presscore_add_masonry_lazy_load_attrs' );
+add_action( 'presscore_before_shortcode_loop', 'presscore_add_masonry_lazy_load_attrs' );
+add_action( 'presscore_after_loop', 'presscore_remove_masonry_lazy_load_attrs' );
+add_action( 'presscore_after_shortcode_loop', 'presscore_remove_masonry_lazy_load_attrs' );
+add_action( 'wp_head', 'presscore_opengraph_tags' );
+add_action( 'wp_head', 'presscore_pingback_header' );
+add_action( 'presscore_body_top', 'the7_version_comment', 0 );
+add_filter( 'dt_get_resized_img-options', 'the7_setup_speed_img_resize' );
 
 if ( ! function_exists( 'presscore_template_config_init' ) ) :
 
 	function presscore_template_config_init() {
 		presscore_config_base_init();
 	}
-	add_action( 'get_header', 'presscore_template_config_init', 9 );
 
 endif;
 
@@ -31,8 +73,6 @@ if ( ! function_exists( 'presscore_tracking_code_in_header_action' ) ) :
 			echo of_get_option( 'general-tracking_code' );
 		}
 	}
-
-	add_action( 'wp_head', 'presscore_tracking_code_in_header_action', 9999 );
 
 endif;
 
@@ -88,9 +128,6 @@ if ( ! function_exists( 'presscore_filter_attachment_data' ) ) :
 
 endif;
 
-add_filter( 'presscore_get_attachment_post_data-attachment_data', 'presscore_filter_attachment_data', 15 );
-
-
 if ( ! function_exists( 'presscore_add_default_meta_to_images' ) ) :
 
 	/**
@@ -133,9 +170,6 @@ if ( ! function_exists( 'presscore_add_default_meta_to_images' ) ) :
 
 endif;
 
-add_filter( 'dt_get_thumb_img-args', 'presscore_add_default_meta_to_images', 15 );
-
-
 if ( ! function_exists( 'presscore_wrap_edit_link_in_p' ) ) :
 
 	/**
@@ -150,8 +184,6 @@ if ( ! function_exists( 'presscore_wrap_edit_link_in_p' ) ) :
 	}
 
 endif;
-
-add_filter( 'presscore_post_edit_link', 'presscore_wrap_edit_link_in_p', 15 );
 
 if ( ! function_exists( 'presscore_filter_categorizer_hash_arg' ) ) :
 
@@ -173,9 +205,6 @@ if ( ! function_exists( 'presscore_filter_categorizer_hash_arg' ) ) :
 	}
 
 endif;
-
-add_filter( 'presscore_get_category_list-args', 'presscore_filter_categorizer_hash_arg', 15 );
-
 
 if ( ! function_exists( 'presscore_parse_query_for_front_page_categorizer' ) ) :
 
@@ -205,8 +234,6 @@ if ( ! function_exists( 'presscore_parse_query_for_front_page_categorizer' ) ) :
 	}
 
 endif;
-
-add_action( 'parse_query', 'presscore_parse_query_for_front_page_categorizer' );
 
 if ( ! function_exists( 'presscore_filter_categorizer_current_arg' ) ) :
 
@@ -240,40 +267,40 @@ if ( ! function_exists( 'presscore_react_on_categorizer' ) ) :
 	 *
 	 */
 	function presscore_react_on_categorizer() {
-
-		if ( !isset($_REQUEST['term'], $_REQUEST['order'], $_REQUEST['orderby']) ) {
+		if ( ! isset( $_REQUEST['term'] ) ) {
 			return;
 		}
 
-		$config = Presscore_Config::get_instance();
+		$config = presscore_config();
 
 		// sanitize
 		if ( '' == $_REQUEST['term'] ) {
 			$display = array();
 		} else if ( 'none' == $_REQUEST['term'] ) {
-			$display = array( 'terms_ids' => array(0), 'select' => 'except' );
+			$display = array( 'terms_ids' => array( 0 ), 'select' => 'except' );
 		} else {
-			$display = array( 'terms_ids' => array( absint($_REQUEST['term']) ), 'select' => 'only' );
+			$display = array( 'terms_ids' => array( absint( $_REQUEST['term'] ) ), 'select' => 'only' );
+		}
+		$config->set( 'request_display', $display );
+
+		if ( isset( $_REQUEST['order'] ) ) {
+			$order = strtolower( $_REQUEST['order'] );
+			if ( in_array( $order, array( 'asc', 'desc' ) ) ) {
+				$config->set( 'order', $order );
+			}
 		}
 
-		$order = esc_attr($_REQUEST['order']);
-		if ( in_array( $order, array( 'ASC', 'asc', 'DESC', 'desc' ) ) ) {
-			$config->set('order', $order);
+		if ( isset( $_REQUEST['orderby'] ) ) {
+			$orderby = strtolower( $_REQUEST['orderby'] );
+			if ( in_array( $orderby, array( 'name', 'date' ) ) ) {
+				$config->set( 'orderby', $orderby );
+			}
 		}
-
-		$orderby = esc_attr($_REQUEST['orderby']);
-		if ( in_array( $orderby, array( 'name', 'date' ) ) ) {
-			$config->set('orderby', $orderby);
-		}
-
-		$config->set('request_display', $display);
 
 		add_filter( 'presscore_get_category_list-args', 'presscore_filter_categorizer_current_arg', 15 );
 	}
 
 endif;
-
-add_action('init', 'presscore_react_on_categorizer', 15);
 
 if ( ! function_exists( 'presscore_post_navigation_controller' ) ) :
 
@@ -339,8 +366,6 @@ if ( ! function_exists( 'presscore_add_post_format_classes' ) ) :
 
 endif;
 
-add_filter( 'post_class', 'presscore_add_post_format_classes' );
-
 if ( ! function_exists( 'presscore_add_password_form_to_excerpts' ) ) :
 
 	/**
@@ -358,8 +383,6 @@ if ( ! function_exists( 'presscore_add_password_form_to_excerpts' ) ) :
 
 endif;
 
-add_filter( 'the_excerpt', 'presscore_add_password_form_to_excerpts', 99 );
-
 if ( ! function_exists( 'presscore_excerpt_more_filter' ) ) :
 
 	/**
@@ -372,8 +395,6 @@ if ( ! function_exists( 'presscore_excerpt_more_filter' ) ) :
 	}
 
 endif;
-
-add_filter( 'excerpt_more', 'presscore_excerpt_more_filter' );
 
 if ( ! function_exists( 'presscore_add_more_anchor' ) ) :
 
@@ -451,9 +472,6 @@ if ( ! function_exists( 'presscore_set_image_width_based_on_column_width' ) ) :
 
 endif;
 
-add_filter( 'teammate_thumbnail_args', 'presscore_set_image_width_based_on_column_width', 15 );
-
-
 if ( ! function_exists( 'presscore_add_preload_me_class_to_images' ) ) :
 
 	/**
@@ -474,8 +492,6 @@ if ( ! function_exists( 'presscore_add_preload_me_class_to_images' ) ) :
 	}
 
 endif;
-
-add_filter( 'dt_get_thumb_img-args', 'presscore_add_preload_me_class_to_images', 15 );
 
 if ( ! function_exists( 'presscore_before_post_masonry' ) ) :
 
@@ -501,23 +517,17 @@ endif;
 
 if ( ! function_exists( 'presscore_page_masonry_controller' ) ) :
 
-	add_action('presscore_before_loop', 'presscore_page_masonry_controller', 25);
-	add_action('presscore_before_shortcode_loop', 'presscore_page_masonry_controller', 25);
-
 	/**
 	 * Page masonry controller.
 	 *
 	 * Filter classes used in post masonry wrap.
 	 */
 	function presscore_page_masonry_controller() {
-		$config = Presscore_Config::get_instance();
+		$config = presscore_config();
 
-		// add masonry wrap
-		if ( in_array( $config->get('layout'), array('masonry', 'grid') ) ) {
-
-			add_action('presscore_before_post', 'presscore_before_post_masonry', 15);
-			add_action('presscore_after_post', 'presscore_after_post_masonry', 15);
-
+		if ( in_array( $config->get( 'layout' ), array( 'masonry', 'grid' ), true ) ) {
+			add_action( 'presscore_before_post', 'presscore_before_post_masonry', 15 );
+			add_action( 'presscore_after_post', 'presscore_after_post_masonry', 15 );
 		}
 	}
 
@@ -525,17 +535,14 @@ endif;
 
 if ( ! function_exists( 'presscore_remove_posts_masonry_wrap' ) ) :
 
-	add_action('presscore_after_loop', 'presscore_remove_posts_masonry_wrap', 15);
-	add_action('presscore_after_shortcode_loop', 'presscore_remove_posts_masonry_wrap', 15);
-
 	/**
 	 * Removes posts masonry wrap
 	 *
 	 * @since 5.0.0
 	 */
 	function presscore_remove_posts_masonry_wrap() {
-		remove_action('presscore_before_post', 'presscore_before_post_masonry', 15);
-		remove_action('presscore_after_post', 'presscore_after_post_masonry', 15);
+		remove_action( 'presscore_before_post', 'presscore_before_post_masonry', 15 );
+		remove_action( 'presscore_after_post', 'presscore_after_post_masonry', 15 );
 	}
 
 endif;
@@ -546,12 +553,12 @@ if ( ! function_exists( 'presscore_add_footer_widgetarea' ) ) :
 	 * Add footer widgetarea.
 	 */
 	function presscore_add_footer_widgetarea() {
+		do_action( 'the7_before_footer_widgets_output' );
 		get_sidebar( 'footer' );
+		do_action( 'the7_after_footer_widgets_output' );
 	}
 
 endif;
-
-add_action('presscore_after_main_container', 'presscore_add_footer_widgetarea', 15);
 
 if ( ! function_exists( 'presscore_add_sidebar_widgetarea' ) ) :
 
@@ -559,12 +566,12 @@ if ( ! function_exists( 'presscore_add_sidebar_widgetarea' ) ) :
 	 * Add sidebar widgetarea.
 	 */
 	function presscore_add_sidebar_widgetarea() {
+	    do_action( 'the7_before_sidebar_widgets_output' );
 		get_sidebar();
+		do_action( 'the7_after_sidebar_widgets_output' );
 	}
 
 endif;
-
-add_action('presscore_after_content', 'presscore_add_sidebar_widgetarea', 15);
 
 if ( ! function_exists( 'presscore_get_page_content_before' ) ) :
 
@@ -573,11 +580,20 @@ if ( ! function_exists( 'presscore_get_page_content_before' ) ) :
 	 * Used in presscore_page_content_controller
 	 */
 	function presscore_get_page_content_before() {
+	    static $doing_action = false;
+
+	    // Prevent loops.
+	    if ( $doing_action ) {
+	        return;
+        }
+
+		$doing_action = true;
 		if ( get_the_content() && ! post_password_required() ) {
 			echo '<div class="page-info">';
 			the_content();
 			echo '</div>';
 		}
+		$doing_action = false;
 	}
 
 endif;
@@ -589,11 +605,20 @@ if ( ! function_exists( 'presscore_get_page_content_after' ) ) :
 	 * Used in presscore_page_content_controller
 	 */
 	function presscore_get_page_content_after() {
+		static $doing_action = false;
+
+		// Prevent loops.
+	    if ( $doing_action ) {
+	        return;
+        }
+
+		$doing_action = true;
 		if ( get_the_content() ) {
 			echo '<div>';
 			the_content();
 			echo '</div>';
 		}
+		$doing_action = false;
 	}
 
 endif;
@@ -608,31 +633,29 @@ if ( ! function_exists( 'presscore_page_content_controller' ) ) :
 	function presscore_page_content_controller() {
 		global $post;
 
-		// if is not page - return
-		if ( !is_page() ) {
+		// If is not page - return.
+		if ( ! is_page() ) {
 			return;
 		}
 
-		$display_content = get_post_meta( $post->ID, '_dt_content_display',  true );
+		$display_content = get_post_meta( $post->ID, '_dt_content_display', true );
 
-		// if content hidden - return
-		if ( !$display_content || 'no' == $display_content ) {
+		// If content hidden - return.
+		if ( ! $display_content || 'no' === $display_content ) {
 			return;
 		}
 
-		// only for first page
-		if ( 'on_first_page' == $display_content && dt_get_paged_var() > 1 ) {
+		// Only for first page.
+		if ( 'on_first_page' === $display_content && dt_get_paged_var() > 1 ) {
 			return;
 		}
 
-		$content_position = get_post_meta( $post->ID, '_dt_content_position',  true );
+		$content_position = get_post_meta( $post->ID, '_dt_content_position', true );
 
-		if ( 'before_items' == $content_position ) {
-
-			add_action('presscore_before_loop', 'presscore_get_page_content_before', 20);
+		if ( 'before_items' === $content_position ) {
+			add_action( 'presscore_before_loop', 'presscore_get_page_content_before', 20 );
 		} else {
-
-			add_action('presscore_after_loop', 'presscore_get_page_content_after', 20);
+			add_action( 'presscore_after_loop', 'presscore_get_page_content_after', 20 );
 		}
 	}
 
@@ -661,17 +684,23 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 		$custom_title = ( 'generic' == $config->get('fancy_header.title.mode') ) ? presscore_get_page_title() : $config->get('fancy_header.title');
 		if ( $custom_title ) {
 
-			$title_class = presscore_get_font_size_class( $config->get('fancy_header.title.font.size') );
+			// $title_class = presscore_get_font_size_class( $config->get('fancy_header.title.font.size') );
+			$title_size = $config->get('fancy_header.title.font.size');
+			$title_line_height = $config->get('fancy_header.title.line.height');
+			$title_capitalize = $config->get('fancy_header.title.capitalize') ? 'uppercase' : 'none';
+			$title_class= '';
 			if ( 'accent' == $config->get('fancy_header.title.color.mode') ) {
 				$title_class .= ' color-accent';
 			}
 
 			$title_style = '';
 			if ( 'color' == $config->get('fancy_header.title.color.mode') ) {
-				$title_style = ' style="color: ' . esc_attr( $config->get('fancy_header.title.color') ) . '"';
+				$title_style = ' style="color: ' . esc_attr( $config->get('fancy_header.title.color') ) . '; font-size: ' . $title_size . 'px; line-height: ' . $title_line_height .'px; text-transform: '. $title_capitalize .';"';
+			}else{
+				$title_style .= ' style=" font-size: ' . $title_size . 'px; line-height: ' . $title_line_height .'px; text-transform: '. $title_capitalize .';"';
 			}
 
-			$custom_title = '<h1 class="fancy-title entry-title ' . $title_class . '"' . $title_style . '><span>' . strip_tags( $custom_title ) . '</span></h1>';
+			$custom_title = '<h1 class="fancy-title entry-title' . $title_class . '"' . $title_style . ' ><span>' . strip_tags( $custom_title ) . '</span></h1>';
 
 			$title .= apply_filters( 'presscore_page_title', $custom_title );
 
@@ -685,7 +714,10 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 		$sybtitle = $config->get( 'fancy_header.subtitle' );
 		if ( $sybtitle ) {
 
-			$subtitle_class = presscore_get_font_size_class( $config->get('fancy_header.subtitle.font.size') );
+			$subtitle_class = "";
+			$subtitle_size = $config->get('fancy_header.subtitle.font.size');
+			$subtitle_line_height = $config->get('fancy_header.subtitle.line.height');
+			$subtitle_capitalize = $config->get('fancy_header.subtitle.capitalize') ? 'uppercase' : 'none';
 			if ( 'accent' == $config->get('fancy_header.subtitle.color.mode') ) {
 				$subtitle_class .= ' color-accent';
 			}
@@ -693,7 +725,9 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 			$title .= sprintf( '<h2 class="fancy-subtitle %s"', $subtitle_class );
 
 			if ( 'color' == $config->get('fancy_header.subtitle.color.mode') ) {
-				$title .= ' style="color: ' . esc_attr( $config->get('fancy_header.subtitle.color') ) . '"';
+				$title .= ' style="color: ' . esc_attr( $config->get('fancy_header.subtitle.color') ) . '; font-size: ' . $subtitle_size . 'px; line-height: '. $subtitle_line_height .'px; text-transform: '. $subtitle_capitalize .';"';
+			}else{
+				$title .= ' style="font-size: ' . $subtitle_size . 'px; line-height: '. $subtitle_line_height .'px; text-transform: '. $subtitle_capitalize .';"';
 			}
 
 			$title .= '><span>' . strip_tags( $sybtitle ) . '</span></h2>'; 
@@ -704,7 +738,7 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 		$container_classes = array( 'fancy-header' );
 
 		if ( $title ) {
-			$title = '<div class="wf-td hgroup">' . $title . '</div>';
+			$title = '<div class="fancy-title-head hgroup">' . $title . '</div>';
 
 		// if title and subtitle empty
 		} else {
@@ -720,8 +754,8 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 		if ( 'enabled' == $config->get( 'fancy_header.breadcrumbs' ) ) {
 
 			$breadcrumbs_args = array(
-				'beforeBreadcrumbs' => '<div class="wf-td">',
-				'afterBreadcrumbs' => '</div>'
+				'beforeBreadcrumbs' => '',
+				'afterBreadcrumbs' => ''
 			);
 
 			$breadcrumbs_class = 'breadcrumbs text-small';
@@ -776,7 +810,7 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 
 		$data_attr = array();
 		$parallax_speed = $config->get('fancy_header.parallax.speed');
-		if ( $parallax_speed ) {
+		if ( $parallax_speed && 'parallax' == $config->get('fancy_header.bg.fixed' )) {
 			$container_classes[] = 'fancy-parallax-bg';
 
 			$data_attr[] = 'data-prlx-speed="' . $parallax_speed . '"';
@@ -787,6 +821,7 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 		///////////////////////
 
 		$container_style = array();
+		$overlay_transparent_bg_color = '';
 		if ( $config->get('fancy_header.bg.color') ) {
 			$container_style[] = 'background-color: ' . $config->get('fancy_header.bg.color');
 		}
@@ -816,7 +851,7 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 				$position_y = $config->get('fancy_header.bg.position.y');
 				$container_style[] = "background-position: {$position_x} {$position_y}";
 
-				if ( $config->get('fancy_header.bg.fixed') ) {
+				if ( 'fixed' == $config->get('fancy_header.bg.fixed') ) {
 
 					$container_style[] = 'background-attachment: fixed';
 
@@ -825,37 +860,36 @@ if ( ! function_exists( 'presscore_fancy_header_controller' ) ) :
 			}
 
 		}
+		if ( $config->get('fancy_header.bg.overlay') ) {
+			$overlay_transparent_bg_color = dt_stylesheet_color_hex2rgba( $config->get( 'fancy_header.bg.overlay.color' ), $config->get( 'fancy_header.bg.overlay.opacity' ) );
+			//$container_sub_style[] = 'background-color: ' . esc_attr( $overlay_transparent_bg_color ) . ';" ';
+		}
 
 		/////////////////////
 		// header height //
 		/////////////////////
 
 		$min_h_height = ' style="min-height: ' . $config->get('fancy_header.height') . 'px;"';
-		$wf_table_height = ' style="height: ' . $config->get('fancy_header.height') . 'px;"';
-		$container_style[] = 'min-height: ' . $config->get('fancy_header.height') . 'px';
-
+		$container_style[] = 'padding-top: ' . $config->get('fancy_header.padding.top') . '';
+		$container_style[] = 'padding-bottom: ' . $config->get('fancy_header.padding.bottom') . '';
 		//////////////
 		// output //
 		//////////////
 
 		printf(
 			'<header id="fancy-header" class="%1$s" style="%2$s" %3$s>
-			<div class="wf-wrap">
-				<div class="wf-table"%5$s>%4$s</div>
-			</div>
+			<div class="wf-wrap"%5$s>%4$s</div>
+			<span class="fancy-header-overlay" style="background-color: ' . esc_attr( $overlay_transparent_bg_color ) . ';"></span>
 			</header>',
 			esc_attr( implode( ' ', $container_classes ) ),
 			esc_attr( implode( '; ', $container_style ) ),
 			implode( ' ', $data_attr ),
 			$content,
-			$wf_table_height,
 			$min_h_height
 		);
 	}
 
 endif;
-
-add_action('presscore_before_main_container', 'presscore_fancy_header_controller', 15);
 
 if ( ! function_exists( 'presscore_page_title_controller' ) ) :
 
@@ -890,42 +924,35 @@ if ( ! function_exists( 'presscore_page_title_controller' ) ) :
 		?>
 		<div <?php echo presscore_get_page_title_wrap_html_class( 'page-title' ), $page_title_wrap_attrs; ?>>
 			<div class="wf-wrap">
-				<div class="wf-container-title">
-					<div class="wf-table">
 
-						<?php
-						// get page title
-						if ( $config->get( 'page_title.enabled' ) ) {
-							$page_title = '<div class="wf-td hgroup"><h1 ' . presscore_get_page_title_html_class() . '>' . presscore_get_page_title() . '</h1></div>';
-						} else {
-							$page_title = '';
-						}
-						$page_title = apply_filters( 'presscore_page_title', $page_title );
+				<?php
+				// get page title
+				if ( $config->get( 'page_title.enabled' ) ) {
+					$page_title = '<div class="page-title-head hgroup"><h1 ' . presscore_get_page_title_html_class() . '>' . presscore_get_page_title() . '</h1></div>';
+				} else {
+					$page_title = '';
+				}
+				$page_title = apply_filters( 'presscore_page_title', $page_title );
 
-						// get breadcrumbs
-						if ( $config->get( 'page_title.breadcrumbs.enabled' ) ) {
-							$breadcrumbs = presscore_get_page_title_breadcrumbs();
-						} else {
-							$breadcrumbs = '';
-						}
+				// get breadcrumbs
+				if ( $config->get( 'page_title.breadcrumbs.enabled' ) ) {
+					$breadcrumbs = presscore_get_page_title_breadcrumbs();
+				} else {
+					$breadcrumbs = '';
+				}
 
-						// output
-						if ( 'right' == $config->get( 'page_title.align' ) ) {
-							echo $breadcrumbs, $page_title;
-						} else {
-							echo $page_title, $breadcrumbs;
-						}
-						?>
-
-					</div>
-				</div>
+				// output
+				if ( 'right' == $config->get( 'page_title.align' ) ) {
+					echo $breadcrumbs, $page_title;
+				} else {
+					echo $page_title, $breadcrumbs;
+				}
+				?>
 			</div>
 		</div>
 
 		<?php
 	}
-
-	add_action( 'presscore_before_main_container', 'presscore_page_title_controller', 16 );
 
 endif;
 
@@ -938,16 +965,17 @@ if ( ! function_exists( 'presscore_post_class_filter' ) ) :
 		global $post;
 
 		// All public taxonomies for posts filter.
-		$taxonomies = get_taxonomies( array( 'public' => true ) );
-		foreach ( (array) $taxonomies as $taxonomy ) {
-			if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
-				foreach ( (array) get_the_terms( $post->ID, $taxonomy ) as $term ) {
-					if ( empty( $term->slug ) || 'post_tag' == $taxonomy ) {
-						continue;
-					}
-
-					$classes[] = sanitize_html_class( $taxonomy . '-' . $term->term_id );
+		$taxonomy = 'category';
+        if ( $post->post_type !== 'post' ) {
+	        $taxonomy = $post->post_type . '_category';
+        }
+		if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
+			foreach ( (array) get_the_terms( $post->ID, $taxonomy ) as $term ) {
+				if ( empty( $term->slug ) ) {
+					continue;
 				}
+
+				$classes[] = sanitize_html_class( $taxonomy . '-' . $term->term_id );
 			}
 		}
 
@@ -1004,8 +1032,6 @@ if ( ! function_exists( 'presscore_post_class_filter' ) ) :
 
 endif;
 
-add_filter( 'post_class', 'presscore_post_class_filter' );
-
 if ( ! function_exists( 'presscore_add_sorting_for_category_list' ) ) :
 
 	/**
@@ -1016,8 +1042,6 @@ if ( ! function_exists( 'presscore_add_sorting_for_category_list' ) ) :
 	}
 
 endif;
-
-add_filter( 'presscore_get_category_list', 'presscore_add_sorting_for_category_list', 15 );
 
 if ( ! function_exists( 'presscore_add_wrap_for_catgorizer' ) ) :
 
@@ -1039,8 +1063,6 @@ if ( ! function_exists( 'presscore_add_wrap_for_catgorizer' ) ) :
 	}
 
 endif;
-
-add_filter( 'presscore_get_category_list', 'presscore_add_wrap_for_catgorizer', 16, 2 );
 
 if ( ! function_exists( 'presscore_add_thumbnail_class_for_masonry' ) ) :
 
@@ -1071,33 +1093,21 @@ if ( ! function_exists( 'presscore_setup_image_proportions' ) ) :
 		$config = presscore_config();
 		$thumb_proportions = $config->get( 'thumb_proportions' );
 
-		if ( 'resize' == $config->get( 'image_layout' ) && $thumb_proportions ) {
+		if ( ! $thumb_proportions || 'resize' !== $config->get( 'image_layout' ) ) {
+			return $args;
+		}
 
-			if ( is_array( $thumb_proportions ) ) {
-				$thumb_proportions = wp_parse_args( $thumb_proportions, array(
-                    'width' => 1,
-                    'height' => 1,
-                ) );
-
-				$width = max( absint( $thumb_proportions['width'] ), 1 );
-				$height = max( absint( $thumb_proportions['height'] ), 1 );
-
-				$args['prop'] = $width / $height;
-			} else {
-				$args['prop'] = presscore_meta_boxes_get_images_proportions( $thumb_proportions );
-			}
+		if ( is_array( $thumb_proportions ) ) {
+			$thumb_proportions = wp_parse_args( $thumb_proportions, array( 'width' => 1, 'height' => 1 ) );
+			$args['prop'] = the7_get_image_proportion( $thumb_proportions['width'], $thumb_proportions['height'] );
+		} else {
+			$args['prop'] = presscore_meta_boxes_get_images_proportions( $thumb_proportions );
 		}
 
 		return $args;
 	}
 
 endif;
-
-add_filter( 'dt_portfolio_thumbnail_args', 'presscore_setup_image_proportions', 15 );
-add_filter( 'dt_post_thumbnail_args', 'presscore_setup_image_proportions', 15 );
-add_filter( 'dt_album_title_image_args', 'presscore_setup_image_proportions', 15 );
-add_filter( 'dt_media_image_args', 'presscore_setup_image_proportions', 15 );
-add_filter( 'presscore_get_images_gallery_hoovered-title_img_args', 'presscore_setup_image_proportions', 15 );
 
 if ( ! function_exists( 'presscore_render_fullscreen_overlay' ) ) :
 
@@ -1126,8 +1136,6 @@ if ( ! function_exists( 'presscore_render_fullscreen_overlay' ) ) :
 
 		}
 	}
-
-	add_action( 'presscore_body_top', 'presscore_render_fullscreen_overlay' );
 
 endif;
 
@@ -1180,49 +1188,35 @@ if ( ! function_exists( 'presscore_slideshow_controller' ) ) :
 
 		do_action( 'presscore_do_header_slideshow', $config->get( 'slideshow_mode' ) );
 	}
-	add_action('presscore_before_main_container', 'presscore_slideshow_controller', 15);
 
 endif;
 
-if ( ! function_exists( 'presscore_remove_wp_site_icon' ) ) :
 
-	/**
-	 * Remove wp_site_icon hook if favicons set in theme options.
-	 * @since 2.3.1
-	 */
-	function presscore_remove_wp_site_icon() {
-		if ( presscore_get_favicon() || presscore_get_device_icons() ) {
-			remove_action( 'wp_head', 'wp_site_icon', 99 );
-		}
-	}
-
-	add_action( 'init', 'presscore_remove_wp_site_icon' );
-
-endif;
-
-if ( ! function_exists( 'presscore_site_icon' ) ) :
+if ( ! function_exists( 'the7_site_icon' ) ) :
 
 	/**
 	 * Display site icon.
 	 *
-	 * @since 2.2.1
+	 * @since 6.5.0
 	 */
-	function presscore_site_icon() {
+	function the7_site_icon() {
 		if ( is_customize_preview() ) {
 			return;
 		}
 
-		// display favicon
-		echo presscore_get_favicon();
+		$icons = presscore_get_device_icons();
+		if ( ! $icons ) {
+		    return;
+        }
 
-		$meta_tags = presscore_get_device_icons();
+		echo $icons;
 
-		foreach ( $meta_tags as $meta_tag ) {
-			echo "$meta_tag\n";
-		}
+		if ( is_admin() ) {
+			remove_action( 'admin_head', 'wp_site_icon' );
+        } else {
+			remove_action( 'wp_head', 'wp_site_icon', 99 );
+        }
 	}
-
-	add_action( 'wp_head', 'presscore_site_icon', 99 );
 
 endif;
 
@@ -1238,8 +1232,6 @@ if ( ! function_exists( 'presscore_update_post_thumbnail_cache' ) ) :
 			update_post_thumbnail_cache( $query );
 		}
 	}
-
-	add_action( 'presscore_get_filtered_posts', 'presscore_update_post_thumbnail_cache' );
 
 endif;
 
@@ -1260,9 +1252,6 @@ if ( ! function_exists( 'presscore_empty_classic_header_microwidgets_exception_f
 		return $elements;
 	}
 
-	add_filter( 'presscore_get_header_elements_list-near_logo_left', 'presscore_empty_classic_header_microwidgets_exception_filter' );
-	add_filter( 'presscore_get_header_elements_list-near_logo_right', 'presscore_empty_classic_header_microwidgets_exception_filter' );
-
 endif;
 
 if ( ! function_exists( 'presscore_empty_top_line_microwidgets_exception_filter' ) ) :
@@ -1281,8 +1270,6 @@ if ( ! function_exists( 'presscore_empty_top_line_microwidgets_exception_filter'
 		}
 		return $elements;
 	}
-
-	add_filter( 'presscore_get_header_elements_list-side_top_line', 'presscore_empty_top_line_microwidgets_exception_filter' );
 
 endif;
 
@@ -1339,9 +1326,6 @@ if ( ! function_exists( 'presscore_add_masonry_lazy_load_attrs' ) ) :
 		}
 	}
 
-	add_action( 'presscore_before_loop', 'presscore_add_masonry_lazy_load_attrs' );
-	add_action( 'presscore_before_shortcode_loop', 'presscore_add_masonry_lazy_load_attrs' );
-
 endif;
 
 if ( ! function_exists( 'presscore_remove_masonry_lazy_load_attrs' ) ) :
@@ -1352,9 +1336,6 @@ if ( ! function_exists( 'presscore_remove_masonry_lazy_load_attrs' ) ) :
 	function presscore_remove_masonry_lazy_load_attrs() {
 		remove_filter( 'dt_get_thumb_img-output', 'presscore_masonry_lazy_loading', 10, 2 );
 	}
-
-	add_action( 'presscore_after_loop', 'presscore_remove_masonry_lazy_load_attrs' );
-	add_action( 'presscore_after_shortcode_loop', 'presscore_remove_masonry_lazy_load_attrs' );
 
 endif;
 
@@ -1383,6 +1364,18 @@ if ( ! function_exists( 'presscore_masonry_lazy_loading' ) ) :
 
 endif;
 
+
+if ( ! function_exists( 'presscore_pingback_header' ) ) :
+	/**
+	 * Add a pingback url auto-discovery header for singularly identifiable articles.
+	 */
+    function presscore_pingback_header() {
+        if ( is_singular() && pings_open() ) {
+            printf( '<link rel="pingback" href="%s">' . "\n", get_bloginfo( 'pingback_url' ) );
+        }
+    }
+endif;
+
 if ( ! function_exists( 'presscore_opengraph_tags' ) ) :
 
 	/**
@@ -1392,9 +1385,17 @@ if ( ! function_exists( 'presscore_opengraph_tags' ) ) :
 	 */
 	function presscore_opengraph_tags() {
 		// Stop if wordpress-seo plugin is active.
-		if ( ! class_exists( 'The7_OpenGraph' ) || defined( 'WPSEO_VERSION' ) ) {
+		if ( defined( 'WPSEO_VERSION' ) || ! class_exists( 'The7_OpenGraph' ) ) {
 			return;
 		}
+
+		global $post;
+		if ( ! $post || is_home() ) {
+		    return;
+        }
+
+        // Fix warnings in php 7.2.x.
+        setup_postdata( $post );
 
 		The7_OpenGraph::site_name();
 		The7_OpenGraph::title();
@@ -1403,8 +1404,6 @@ if ( ! function_exists( 'presscore_opengraph_tags' ) ) :
 		The7_OpenGraph::url();
 		The7_OpenGraph::type();
 	}
-	
-	add_action( 'wp_head', 'presscore_opengraph_tags' );
 
 endif;
 
@@ -1417,11 +1416,8 @@ if ( ! function_exists( 'the7_version_comment' ) ) :
      * @since 5.3.0
 	 */
     function the7_version_comment() {
-        $theme_ver = wp_get_theme( get_template() )->get( 'Version' );
-        echo "<!-- The7 {$theme_ver} -->\n";
+        echo "<!-- The7 " . THE7_VERSION .  " -->\n";
     }
-
-    add_action( 'presscore_body_top', 'the7_version_comment', 0 );
 
 endif;
 
@@ -1442,5 +1438,4 @@ if ( ! function_exists( 'the7_setup_speed_img_resize' ) ) {
         return $args;
     }
 
-    add_filter( 'dt_get_resized_img-options', 'the7_setup_speed_img_resize' );
 }

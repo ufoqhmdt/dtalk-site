@@ -45,7 +45,7 @@
 			.accent-gradient & {
 				&:hover,
 				&.act {
-					.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+					.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 				}
 			}
 		}
@@ -53,16 +53,19 @@
 			&:not(.act):hover {
 				color: @accent-bg-color;
 			}
+			&:after {
+				display: none;
+			}
 			.accent-gradient & {
 				&:not(.act):hover {
-					.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+					.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 				}
 			}
 			&.act {
 				color: #fff;
 			}
 			.border-radius(@filter-border-radius);
-			&.act:after {
+			&.act {
 				.accent-bg-mixin;
 				.border-radius(@filter-border-radius);
 			}
@@ -80,11 +83,11 @@
 		background-color: fade(@accent-bg-color, 20%);
 	}
 	.accent-gradient #page & {
-		.background-fade-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2, @opacity: 20%);
+		.background-gradient(  @startColor: fade(@accent-bg-color,20% ), @endColor: @accent-bg-filter-switch );
 	}
 }
 
-.filter .filter-categories a.act:after,
+.filter:not(.filter-bg-decoration) .filter-categories a.act:after,
 .filter-switch-toggle {
 	background-color: @accent-bg-color;
 	.accent-gradient & {
@@ -128,6 +131,7 @@
 	.text-big;
 	.header-color;
 	&:after {
-		.accent-bg-mixin;
+		//.accent-bg-mixin;
+		.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
 	}
 }

@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Textarea_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Textarea_Field' ) )
 {
-	class RWMB_Textarea_Field
+	class THE7_RWMB_Textarea_Field
 	{
 		/**
 		 * Get field HTML
@@ -18,7 +18,7 @@ if ( ! class_exists( 'RWMB_Textarea_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			return sprintf(
-				'<textarea class="rwmb-textarea large-text" name="%s" id="%s" cols="%s" rows="%s">%s</textarea>',
+				'<textarea class="the7-mb-textarea large-text" name="%s" id="%s" cols="%s" rows="%s">%s</textarea>',
 				$field['field_name'],
 				$field['id'],
 				$field['cols'],

@@ -1,19 +1,24 @@
 /* #Shortcode scroller
 ================================================== */
-.slider-wrapper.arrows-accent .prev i,
-.slider-wrapper.arrows-accent .next i {
-	background-color: fade(@accent-bg-color, 90%);
-	.accent-gradient & {
-		.background-fade-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2, @opacity: 90%);
+
+.owl-prev i,
+.owl-next i {
+	.slider-wrapper.arrows-accent & {
+		background-color: fade(@accent-bg-color, 90%);
+		.accent-gradient & {
+            .background-gradient(  @startColor: fade(@accent-bg-color,90% ), @endColor: @accent-bg-scroller-arrow );
+		}
 	}
 }
-.slider-wrapper.arrows-accent .prev:hover i,
-.slider-wrapper.arrows-accent .next:hover i {
-	.accent-bg-mixin;
+.owl-prev:hover i,
+.owl-next:hover i {
+	.slider-wrapper.arrows-accent & {
+		.accent-bg-mixin;
+	}
 }
 //apply bg to :before for responsive height
 
-.fs-entry .post.bg-on {
+.dt-owl-item .post.bg-on {
 
 	.box-shadow (none);
 	&:before {

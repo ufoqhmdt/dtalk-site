@@ -83,177 +83,93 @@
 							onclick : function() {
 
 								var attr = [
-										'link=""',
-										'target_blank="false"',
-										'button_alignment="default"',
-										'animation="fadeIn"',
-										'size="medium"',
-										'style="default"',
-										'bg_color_style="custom"',
-										'bg_color="#333333"',
-										'bg_hover_color_style="custom"',
-										'bg_hover_color="#444444"',
-										'text_color_style="custom"',
-										'text_color="#ffffff"',
-										'text_hover_color_style="custom"',
-										'text_hover_color="#dddddd"',
-										'icon="fa fa-chevron-circle-right"',
-										'icon_align="left"'
+                                        'link=""',
+                                        'button_alignment="default"',
+                                        'animation="fadeIn"',
+                                        'size="medium"',
+                                        'default_btn_bg_color="#333333"',
+                                        'bg_hover_color="#444444"',
+                                        'text_color="#ffffff"',
+                                        'text_hover_color="#dddddd"',
+                                        'icon_type="html"',
+                                        'icon="fa fa-chevron-circle-right"',
+                                        'icon_align="left"',
+                                        'smooth_scroll="n"',
+                                        'btn_width="btn_auto_width"',
+                                        'custom_btn_width="200px"',
+                                        'el_class=""',
+                                        'css=""',
 									],
 									attr_str = attr.join(' ');
 
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
+								editor.insertContent( '[dt_default_button ' + attr_str + ']BUTTON_NAME[/dt_default_button]' );
 							}
 						},
 
-						{
-							text : 'Default style',
+                        {
+							text : 'Large button',
 							onclick : function() {
 
 								var attr = [
 										'link=""',
-										'target_blank="false"',
 										'button_alignment="default"',
 										'animation="fadeIn"',
-										'size="medium"',
-										'style="default"',
-										'bg_color_style="default"',
-										'bg_hover_color_style="default"',
-										'text_color_style="default"',
-										'text_hover_color_style="default"',
+										'size="big"',
+                                        'default_btn_bg_color=""',
+                                        'bg_hover_color=""',
+                                        'text_color=""',
+                                        'text_hover_color=""',
 										'icon="fa fa-chevron-circle-right"',
 										'icon_align="left"',
 									],
 									attr_str = attr.join(' ');
 
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
+								editor.insertContent( '[dt_default_button ' + attr_str + ']BUTTON_NAME[/dt_default_button]' );
 							}
 						},
-
-						{
-							text : 'Outline with background',
+                        {
+							text : 'Medium button',
 							onclick : function() {
 
 								var attr = [
 										'link=""',
-										'target_blank="false"',
 										'button_alignment="default"',
 										'animation="fadeIn"',
 										'size="medium"',
-										'style="outline_with_bg"',
-										'bg_color_style="custom"',
-										'bg_color="#333333"',
-										'bg_hover_color_style="custom"',
-										'bg_hover_color="#333333"',
-										'text_color_style="custom"',
-										'text_color="#333333"',
-										'text_hover_color_style="custom"',
-										'text_hover_color="#ffffff"',
+                                        'default_btn_bg_color=""',
+                                        'bg_hover_color=""',
+                                        'text_color=""',
+                                        'text_hover_color=""',
 										'icon="fa fa-chevron-circle-right"',
 										'icon_align="left"',
 									],
 									attr_str = attr.join(' ');
 
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
+								editor.insertContent( '[dt_default_button ' + attr_str + ']BUTTON_NAME[/dt_default_button]' );
 							}
 						},
-
-						{
-							text : 'Outline',
+                        {
+							text : 'Small button',
 							onclick : function() {
 
 								var attr = [
 										'link=""',
-										'target_blank="false"',
 										'button_alignment="default"',
 										'animation="fadeIn"',
-										'size="medium"',
-										'style="outline"',
-										'bg_color_style="custom"',
-										'bg_color="rgba(51,51,51,0.25)"',
-										'bg_hover_color_style="custom"',
-										'bg_hover_color="#333333"',
-										'text_color_style="custom"',
-										'text_color="rgba(51,51,51,0.3)"',
-										'text_hover_color_style="custom"',
-										'text_hover_color="#333333"',
+										'size="small"',
+                                        'default_btn_bg_color=""',
+                                        'bg_hover_color=""',
+                                        'text_color=""',
+                                        'text_hover_color=""',
 										'icon="fa fa-chevron-circle-right"',
 										'icon_align="left"',
 									],
 									attr_str = attr.join(' ');
 
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
+								editor.insertContent( '[dt_default_button ' + attr_str + ']BUTTON_NAME[/dt_default_button]' );
 							}
 						},
-
-						{
-							text : 'Light with background',
-							onclick : function() {
-
-								var attr = [
-										'link=""',
-										'target_blank="false"',
-										'button_alignment="default"',
-										'animation="fadeIn"',
-										'size="medium"',
-										'style="light_with_bg"',
-										'bg_hover_color_style="accent"',
-										'text_color_style="context"',
-										'text_hover_color_style="custom"',
-										'text_hover_color="#ffffff"',
-										'icon="fa fa-chevron-circle-right"',
-										'icon_align="left"',
-									],
-									attr_str = attr.join(' ');
-
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
-							}
-						},
-
-						{
-							text : 'Light',
-							onclick : function() {
-
-								var attr = [
-										'link=""',
-										'target_blank="false"',
-										'button_alignment="default"',
-										'animation="fadeIn"',
-										'size="medium"',
-										'style="light"',
-										'text_color_style="context"',
-										'text_hover_color_style="accent"',
-										'icon="fa fa-chevron-circle-right"',
-										'icon_align="left"',
-									],
-									attr_str = attr.join(' ');
-
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
-							}
-						},
-
-						{
-							text : 'Link',
-							onclick : function() {
-
-								var attr = [
-										'link=""',
-										'target_blank="false"',
-										'button_alignment="default"',
-										'animation="fadeIn"',
-										'size="medium"',
-										'style="link"',
-										'text_color_style="context"',
-										'text_hover_color_style="accent"',
-										'icon="fa fa-chevron-circle-right"',
-										'icon_align="left"',
-									],
-									attr_str = attr.join(' ');
-
-								editor.insertContent( '[dt_button ' + attr_str + ']BUTTON_NAME[/dt_button]' );
-							}
-						}
-					]
+				]
 				},
 
 				// Tooltip

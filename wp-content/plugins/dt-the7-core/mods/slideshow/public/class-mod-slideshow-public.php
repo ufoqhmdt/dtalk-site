@@ -69,7 +69,7 @@ class Presscore_Mod_Slideshow_Public {
 					wp_reset_postdata();
 				}
 
-				$photo_scroller = new Presscore_PhotoScroller( $slides, array(
+				$photo_scroller = new The7pt_Photo_Scroller( $slides, array(
 					'wrap_class' => ( 'fullscreen' == $config->get( 'slideshow.photo_scroller.layout' ) ) ? 'fullscreen-scroller' : '',
 
 					'background_color' => $config->get( 'slideshow.photo_scroller.background.color' ),
@@ -111,53 +111,6 @@ class Presscore_Mod_Slideshow_Public {
 				}
 
 				break;
-
-			case '3d':
-
-				$class = '';
-				$data_attr = '';
-				$slider_layout = $config->get('slideshow_3d_layout');
-
-				if ( in_array( $slider_layout, array( 'prop-fullwidth', 'prop-content-width' ) ) ) {
-
-					$class = ('prop-fullwidth' == $slider_layout) ? 'class="fixed-height" ' : 'class="fixed" ';
-
-					$width = $config->get('slideshow_3d_slider_width');
-					$height = $config->get('slideshow_3d_slider_height');
-					$data_attr = sprintf( ' data-width="%d" data-height="%d"',
-						$width ? absint($width) : 2500,
-						$height ? absint($height) : 1200
-					);
-				}
-
-				printf( '<div id="main-slideshow" %s><div class="three-d-slider"%s><span id="loading">0</span></div></div>',
-					$class,
-					$data_attr
-				);
-
-				add_action( 'wp_footer', 'presscore_render_3d_slider_data', 15 );
-
-				break;
-
 		} // switch
-	}
-	
-	public function enqueue_3d_slider_scripts() {
-		$config = presscore_config();
-
-		if ( 'slideshow' !== $config->get('header_title') ) {
-			return;
-		}
-
-		if ( dt_get_paged_var() > 1 ) {
-			return;
-		}
-
-		if ( '3d' !== $config->get( 'slideshow_mode' ) ) {
-			return;
-		}
-
-		wp_enqueue_style( 'the7-3d-slideshow', trailingslashit( get_template_directory_uri() ) . 'css/compatibility/3D-slider.css' );
-		wp_enqueue_script( 'the7-3d-slideshow', trailingslashit( get_template_directory_uri() ) . 'js/3d-slideshow.js', array(), false, true );
 	}
 }

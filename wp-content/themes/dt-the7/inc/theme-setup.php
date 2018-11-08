@@ -19,24 +19,12 @@ if ( ! function_exists( 'presscore_load_theme_modules' ) ) :
 	 */
 	function presscore_load_theme_modules() {
 		$supported_modules = get_theme_support( 'presscore-modules' );
-		if ( ! empty( $supported_modules[0] ) ) {
+		if ( empty( $supported_modules[0] ) ) {
+			return;
+		}
 
-			$modules_white_list = array(
-				'admin-icons-bar',
-				'archive-ext',
-				'compatibility',
-				'mega-menu',
-				'theme-update',
-				'tgmpa',
-				'options-wizard',
-				'demo-content',
-				'bundled-content',
-			);
-			$supported_modules[0] = array_intersect( $supported_modules[0], $modules_white_list );
-
-			foreach ( $supported_modules[0] as $module ) {
-				locate_template( "inc/mods/{$module}/{$module}.php", true );
-			}
+		foreach ( $supported_modules[0] as $module ) {
+			locate_template( "inc/mods/{$module}/{$module}.php", true );
 		}
 	}
 
@@ -98,11 +86,6 @@ if ( ! function_exists( 'presscore_setup' ) ) :
 		add_theme_support( 'title-tag' );
 
 		/**
-		 * Enable support for Post Formats.
-		 */
-		add_theme_support( 'post-formats', array( 'aside', 'image', 'video', 'quote', 'link', 'gallery', 'status' ) );
-
-		/**
 		 * Enable support for various theme modules.
 		 */
 		presscore_enable_theme_modules();
@@ -121,6 +104,8 @@ if ( ! function_exists( 'presscore_setup' ) ) :
 		 * Register theme template parts dir.
 		 */
 		presscore_template_manager()->add_path( 'theme', 'template-parts' );
+
+		wp_cache_add_non_persistent_groups( array( 'the7-tmp' ) );
 	}
 
 	add_action( 'after_setup_theme', 'presscore_setup', 5 );
@@ -169,9 +154,14 @@ if ( ! function_exists( 'presscore_enable_theme_modules' ) ) :
 			'mega-menu',
 			'theme-update',
 			'tgmpa',
-			'options-wizard',
 			'demo-content',
 			'bundled-content',
+		    'posts-defaults',
+			'dev-mode',
+			'options-wizard',
+			'dev-tools',
+			'remove-customizer',
+			'custom-fonts',
 		);
 
 		$pt_modules = array(
@@ -191,6 +181,13 @@ if ( ! function_exists( 'presscore_enable_theme_modules' ) ) :
 				$modules[] = $module_name;
 			}
 		}
+
+		/**
+		 * Allow to manage theme active modules.
+		 *
+		 * @since 6.4.1
+		 */
+		$modules = apply_filters( 'the7_active_modules', $modules );
 
 		add_theme_support( 'presscore-modules', $modules );
 	}
@@ -318,9 +315,10 @@ if ( ! function_exists( 'optionsframework_get_presets_list' ) ) :
 			'wizard01',
 			'wizard02',
 			'wizard03',
-			'wizard04',
 			'wizard05',
-			'wizard06',
+			'wizard07',
+			'wizard08',
+			'wizard09',
 		);
 
 		$presets = array();

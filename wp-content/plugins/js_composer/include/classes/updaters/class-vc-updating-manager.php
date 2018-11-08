@@ -38,7 +38,7 @@ class Vc_Updating_Manager {
 	 * Link to download VC.
 	 * @var string
 	 */
-	protected $url = 'http://bit.ly/vcomposer';
+	protected $url = 'http://go.wpbakery.com/wpb-buy';
 
 	/**
 	 * Initialize a new instance of the WordPress Auto-Update class
@@ -93,6 +93,7 @@ class Vc_Updating_Manager {
 			$obj = new stdClass();
 			$obj->slug = $this->slug;
 			$obj->new_version = $remote_version;
+			$obj->plugin = $this->plugin_slug;
 			$obj->url = '';
 			$obj->package = vc_license()->isActivated();
 			$obj->name = vc_updater()->title;
@@ -140,7 +141,33 @@ class Vc_Updating_Manager {
 	 * @return string $remote_version
 	 */
 	public function getRemote_version() {
-		$request = wp_remote_get( $this->update_path );
+		if ( defined( 'JS_COMPOSER_THEME_ACTIVATED_URL' ) && class_exists( 'Presscore_Modules_TGMPAModule' ) ) {
+
+			foreach ( Presscore_Modules_TGMPAModule::get_plugins_list_cache() as $plugin ) {
+				if ( $plugin['slug'] === $this->slug ) {
+					return $plugin['version'];
+				}
+			}
+
+			return false;
+		}
+
+		// FIX SSL SNI
+		$filter_add = true;
+		if ( function_exists( 'curl_version' ) ) {
+			$version = curl_version();
+			if ( version_compare( $version['version'], '7.18', '>=' ) ) {
+				$filter_add = false;
+			}
+		}
+		if ( $filter_add ) {
+			add_filter( 'https_ssl_verify', '__return_false' );
+		}
+		$request = wp_remote_get( $this->update_path, array( 'timeout' => 30 ) );
+
+		if ( $filter_add ) {
+			remove_filter( 'https_ssl_verify', '__return_false' );
+		}
 		if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 			return $request['body'];
 		}
@@ -154,7 +181,22 @@ class Vc_Updating_Manager {
 	 * @return bool|object
 	 */
 	public function getRemote_information() {
-		$request = wp_remote_get( $this->update_path.'information.json' );
+		// FIX SSL SNI
+		$filter_add = true;
+		if ( function_exists( 'curl_version' ) ) {
+			$version = curl_version();
+			if ( version_compare( $version['version'], '7.18', '>=' ) ) {
+				$filter_add = false;
+			}
+		}
+		if ( $filter_add ) {
+			add_filter( 'https_ssl_verify', '__return_false' );
+		}
+		$request = wp_remote_get( $this->update_path . 'information.json', array( 'timeout' => 30 ) );
+
+		if ( $filter_add ) {
+			remove_filter( 'https_ssl_verify', '__return_false' );
+		}
 		if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 			return json_decode( $request['body'] );
 		}
@@ -171,7 +213,7 @@ class Vc_Updating_Manager {
 			$url = esc_url( vc_updater()->getUpdaterUrl() );
 			$redirect = sprintf( '<a href="%s" target="_blank">%s</a>', $url, __( 'settings', 'js_composer' ) );
 
-			echo sprintf( ' ' . __( 'To receive automatic updates license activation is required. Please visit %s to activate your Visual Composer.', 'js_composer' ), $redirect ) . sprintf( ' <a href="http://go.wpbakery.com/faq-update-in-theme" target="_blank">%s</a>', __( 'Got Visual Composer in theme?', 'js_composer' ) );
+			echo sprintf( ' ' . __( 'To receive automatic updates license activation is required. Please visit %s to activate your WPBakery Page Builder.', 'js_composer' ), $redirect ) . sprintf( ' <a href="http://go.wpbakery.com/faq-update-in-theme" target="_blank">%s</a>', __( 'Got WPBakery Page Builder in theme?', 'js_composer' ) );
 		}
 	}
 }

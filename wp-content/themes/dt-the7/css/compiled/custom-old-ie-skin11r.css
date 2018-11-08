@@ -3,7 +3,7 @@
   background: #ffffff none repeat  center top;
 }
 .old-ie #header .soc-ico a {
-  color: #a3a4aa;
+  color: #a6a7ad;
 }
 .old-ie #header .soc-ico a:hover {
   color: #ffffff;
@@ -17,7 +17,7 @@
 .old-ie .sub-nav > ul,
 .old-ie #header .mini-search .field,
 .old-ie .shopping-cart-inner {
-  background-color: #1a1c20;
+  background-color: #ffffff;
 }
 .old-ie .single .entry-tags a:hover {
   color: #fff;

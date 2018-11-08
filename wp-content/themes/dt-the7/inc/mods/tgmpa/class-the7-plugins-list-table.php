@@ -5,7 +5,7 @@ if ( ! class_exists( 'The7_Plugins_List_Table' ) ) {
 	/**
 	 * List table class for handling plugins.
 	 */
-	class The7_Plugins_List_Table extends TGMPA_List_Table {
+	class The7_Plugins_List_Table extends The7_TGMPA_List_Table {
 
 		/**
 		 * Categorize the plugins which have open actions into views for the TGMPA page.
@@ -315,8 +315,8 @@ if ( ! class_exists( 'The7_Plugins_List_Table' ) ) {
 				unset( $slug, $name, $source );
 
 				// Create a new instance of TGMPA_Bulk_Installer.
-				$installer = new TGMPA_Bulk_Installer(
-					new TGMPA_Bulk_Installer_Skin(
+				$installer = new The7_TGMPA_Bulk_Installer(
+					new The7_TGMPA_Bulk_Installer_Skin(
 						array(
 							'url'          => esc_url_raw( $this->tgmpa->get_tgmpa_url() ),
 							'nonce'        => 'bulk-' . $this->_args['plural'],

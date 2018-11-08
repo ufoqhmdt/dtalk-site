@@ -35,10 +35,11 @@ textarea,
 .wpcf7-number {
 	
 	color: @input-color;
+	border-width: @input-border-width;
 	border-color: @input-border-color;
 	background-color: @input-bg-color;
 	border-radius: @input-border-radius;
-	#page & {
+	.content & {
 		font-size: @base-font-size;
 		line-height: @base-line-height;
 		.mixin-float-line-height (@base-line-height, @input-height)
@@ -90,7 +91,7 @@ select {
 		}
 	}
 }
-input[type="submit"]:not([name="update_cart"]),
+input[type="submit"]:not([name="update_cart"]):not(.woocommerce-widget-layered-nav-dropdown__submit),
 .post-password-form input[type="submit"],
 .mc4wp-form input[type="submit"],
 div.mc4wp-form button[type="submit"],
@@ -109,12 +110,38 @@ div.mc4wp-form button[type="submit"],
 		line-height: @input-height - 2px;
 	}
 }
-.parentFormundefined {
-	background: @accent-bg-color;
-	.accent-gradient & {
+.parentFormundefined,
+.wpcf7-mail-sent-ok,
+.wpcf7-validation-errors {
+	.popup-message-style &,
+	.inline-message-style &  {
+		background: @accent-bg-color;
+	}
+	.popup-message-style.accent-gradient &,
+	.inline-message-style.accent-gradient & {
 		.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
 	};
 	& .formErrorContent {
 		font: @base-font-style @base-font-variant @text-big~"/"@text-big-line-height @base-font-family;
 	}
+	#page &,
+	.popup-message-style &,
+	.inline-message-style &  {
+		background: @message-bg-color;
+		color: @message-color !important;
+		border: none;
+		& .formErrorContent,
+		& .formErrorContent a,
+		& .close-message
+		& a {
+			color: @message-color;
+		}
+		&:before {
+			color: @message-color;
+		}
+	}
+}
+.comment-form-cookies-consent label,
+.form-terms-text {
+	.text-small;
 }

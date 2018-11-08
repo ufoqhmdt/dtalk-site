@@ -38,13 +38,21 @@ if ( ! class_exists( 'DT_Shortcode_BlogPosts', false ) ) {
 			if ( $this->vc_is_inline ) {
 				$terms_title = _x( 'Display categories', 'vc inline dummy', 'the7mk2' );
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-blog_masonry',
-					'title' => _x( 'Blog Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
+				// return $this->vc_inline_dummy( array(
+				// 	'class' => 'dt_vc-blog_masonry',
+				// 	'title' => _x( 'Blog Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
+				// 	'fields' => array(
+				// 		$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
+				// 	)
+				// ) );
+
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-blog_masonry',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_blog_masonry_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Blog Masonry & Grid (old)', 'vc inline dummy', 'the7mk2' ),
+
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			return $this->shortcode_html();

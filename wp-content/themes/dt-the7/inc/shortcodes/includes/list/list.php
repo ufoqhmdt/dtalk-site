@@ -85,17 +85,17 @@ if ( ! class_exists( 'DT_Shortcode_List', false ) ) {
 
 		public function shortcode_item( $atts, $content = null ) {
 			extract( shortcode_atts( array(
-				'image'         => '',
+				'image' => '',
 			), $atts ) );
-			
-			$image = esc_url($image);
-			
-			if ( isset(self::$atts['style']) && '3' == self::$atts['style'] ) {
+
+			$image = esc_url( $image );
+
+			if ( isset( self::$atts['style'] ) && '3' == self::$atts['style'] ) {
 
 				$content = '<div>' . $content . '</div>';
-				
+
 				if ( $image ) {
-					$content = sprintf( '<div><img src="%s" class="list-img" alt="" /></div>%s', $image, $content );
+					$content = sprintf( '<div><img src="%s" class="list-img" alt="%s" /></div>%s', $image, esc_attr( __( 'List item image', 'the7mk2' ) ), $content );
 				}
 
 				$content = '<div class="wf-table">' . $content . '</div>';
@@ -103,7 +103,7 @@ if ( ! class_exists( 'DT_Shortcode_List', false ) ) {
 
 			$output = sprintf( '<li>%s</li>', presscore_remove_wpautop( $content, true ) );
 
-			return $output; 
+			return $output;
 		}
 
 	}

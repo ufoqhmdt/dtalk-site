@@ -22,7 +22,7 @@ if ( ! class_exists( 'Presscore_Modules_MegaMenu_Admin', false ) ) :
 			add_action( 'wp_update_nav_menu_item', array( $this, 'update_custom_nav_fields' ), 10, 2 );
 
 			// replace menu walker
-			add_filter( 'wp_edit_nav_menu_walker', array( $this, 'replace_walker_class' ), 90, 2 );
+			add_filter( 'wp_edit_nav_menu_walker', array( $this, 'replace_walker_class' ), 90 );
 
 			// add menu item custom fields
 			add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'wp_nav_menu_item_custom_fields' ), 99, 4 );
@@ -130,11 +130,19 @@ if ( ! class_exists( 'Presscore_Modules_MegaMenu_Admin', false ) ) :
 
 		/**
 		 * Replace Walker_Nav_Menu_Edit with custom one.
+         *
+         * @param string $walker
+         *
+         * @return string
 		 */
-		function replace_walker_class( $walker, $menu_id ) {
+		function replace_walker_class( $walker ) {
+            $walkers_to_replace = array(
+                'Walker_Nav_Menu_Edit', // WP walker
+                'ACF_Walker_Nav_Menu_Edit', // ACF Pro walker
+            );
 
-			if ( 'Walker_Nav_Menu_Edit' == $walker ) {
-				$walker = 'Presscore_Modules_MegaMenu_EditMenuWalker';
+			if ( in_array( $walker, $walkers_to_replace, true ) ) {
+				return 'Presscore_Modules_MegaMenu_EditMenuWalker';
 			}
 
 			return $walker;

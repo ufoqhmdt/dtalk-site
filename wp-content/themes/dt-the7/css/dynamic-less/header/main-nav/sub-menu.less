@@ -60,6 +60,9 @@ li:not(.dt-mega-menu) .sub-nav {
 			margin: @submenu-item-margin-top @submenu-item-margin-right @submenu-item-margin-bottom @submenu-item-margin-left;
 			padding: @submenu-item-padding-top @submenu-item-padding-right @submenu-item-padding-bottom @submenu-item-padding-left;
 		}
+		.sub-nav li:not(:first-child) .sub-nav {
+			top: -(@submenu-item-margin-top + @submenu-item-padding-top);
+		}
 		.top-header .sub-nav > li.dt-mega-parent > a {
 			margin-bottom: @submenu-item-margin-bottom + 10;
 		}
@@ -115,20 +118,21 @@ li:not(.dt-mega-menu) .sub-nav {
 			#bottom-bar .sub-nav li.has-children:not(.act):hover > a:after {
 				.standard-arrow-ico(@submenu-hover-color-temp);
 			}
-		.top-header .sub-nav.hover-style-bg li:not(.dt-mega-parent):hover > a,
-		.top-header .hover-style-click-bg li:not(.dt-mega-parent):hover > a,
-		.top-header .hover-style-click-bg li:not(.dt-mega-parent) > a .rippleAnimate {
-			background-color: fade(@submenu-hover-color, 7%);
+		
+		.top-header .sub-nav.hover-style-bg li:not(.dt-mega-parent):not(.act):hover > a,
+		.top-header .sub-nav.gradient-hover.hover-style-bg li:not(.dt-mega-parent):not(.act):hover > a {
+			background-color: @submenu-hover-bg;
+			.background-gradient (@startColor: @submenu-hover-bg, @endColor: @submenu-hover-bg-2);
 		}
-		.top-header .sub-nav.gradient-hover.hover-style-bg li:not(.dt-mega-parent):hover > a,
-		.top-header .gradient-hover.hover-style-click-bg li:not(.dt-mega-parent):hover > a,
-		.top-header .gradient-hover.hover-style-click-bg li:not(.dt-mega-parent) > a .rippleAnimate {
-			.background-fade-gradient (@startColor: @submenu-hover-color, @endColor: @submenu-hover-color-2, @opacity: 7%);
+		.top-header .sub-nav.hover-style-bg li:not(.dt-mega-parent).act > a,
+		.top-header .sub-nav.gradient-hover.hover-style-bg li:not(.dt-mega-parent).act > a {
+			background-color: @submenu-active-bg;
+			.background-gradient (@startColor: @submenu-active-bg, @endColor: @submenu-active-bg-2);
 		}
 
 		/*Active font color*/
 		.sub-nav > li.act:not(.dt-mega-parent):not(.wpml-ls-item):not(.wpml-ls-item) > a,
-		.sub-nav > li.act:not(.dt-mega-parent):not(.wpml-ls-item) > a .fa,
+		.sub-nav > li.act:not(.dt-mega-parent):not(.wpml-ls-item) > a i[class^="fa"],
 		.sub-nav > li.dt-mega-parent.current-menu-item:not(.wpml-ls-item) > a {
 			.main-nav &,
 			.mini-nav & {
@@ -155,17 +159,17 @@ li:not(.dt-mega-menu) .sub-nav {
 	
 		.masthead:not(.sub-downwards) .sub-nav .sub-nav,
 		.mini-nav .sub-nav .sub-nav {
-			left: @submenu-width - 9 !important;
+			left: @submenu-width + 1 !important;
 			.rtl & {
-				right: @submenu-width - 9;
+				right: @submenu-width + 1;
 				left: auto !important;
 			}
 		}
 		.masthead:not(.sub-downwards) .sub-nav .sub-nav.right-overflow,
 		.mini-nav .sub-nav .sub-nav.right-overflow {
-			left: -(@submenu-width + 11) !important;
+			left: -(@submenu-width - 1) !important;
 			.rtl & {
-				right: -(@submenu-width + 11);
+				right: -(@submenu-width - 1);
 				left: auto !important
 			}
 		}
@@ -177,5 +181,12 @@ li:not(.dt-mega-menu) .sub-nav {
 	.sub-downwards .sub-nav.level-arrows-on li.has-children.act > a:after,
 	.sub-downwards .sub-nav .next-level-button {
 		@header-side-sub-plus(fade(@menu-color, 27%));
+	}
+
+	.sub-downwards .main-nav.level-arrows-on > li.has-children > a {
+		max-width: calc(100% ~'-' 30px  ~'-' @menu-item-margin-right  ~'-' @menu-item-margin-left);
+	}
+	.sub-downwards .sub-nav.level-arrows-on > li.has-children > a {
+		max-width: calc(100% ~'-' 30px  ~'-' @submenu-item-margin-right  ~'-' @submenu-item-margin-left);
 	}
 	/* SUB MENU:end */

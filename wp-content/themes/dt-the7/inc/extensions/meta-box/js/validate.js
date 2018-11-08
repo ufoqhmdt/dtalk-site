@@ -6,7 +6,7 @@ jQuery( document ).ready( function( $ )
 	$.each( rwmb.validationOptions.rules, function( k, v )
 	{
 		if ( v['required'] )
-			$( '#' + k ).parent().siblings( '.rwmb-label' ).addClass( 'required' ).append( '<span>*</span>' );
+			$( '#' + k ).parent().siblings( '.the7-mb-label' ).addClass( 'required' ).append( '<span>*</span>' );
 	} );
 
 	rwmb.validationOptions.invalidHandler = function( form, validator )

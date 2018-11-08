@@ -270,10 +270,10 @@
         <custom-field action="copy">_dt_microsite_hidden_parts</custom-field>
         <custom-field action="copy">_dt_microsite_page_layout</custom-field>
         <custom-field action="copy">_dt_microsite_page_loading</custom-field>
-        <custom-field action="copy">_dt_microsite_primary_menu</custom-field>
-        <custom-field action="copy">_dt_microsite_split_left_menu</custom-field>
-        <custom-field action="copy">_dt_microsite_split_right_menu</custom-field>
-        <custom-field action="copy">_dt_microsite_mobile_menu</custom-field>
+        <custom-field action="copy-once">_dt_microsite_primary_menu</custom-field>
+        <custom-field action="copy-once">_dt_microsite_split_left_menu</custom-field>
+        <custom-field action="copy-once">_dt_microsite_split_right_menu</custom-field>
+        <custom-field action="copy-once">_dt_microsite_mobile_menu</custom-field>
         <custom-field action="copy">_dt_portfolio_display</custom-field>
         <custom-field action="copy">_dt_portfolio_options_bg_under_list_posts</custom-field>
         <custom-field action="copy">_dt_portfolio_options_bg_under_masonry_posts</custom-field>
@@ -425,6 +425,8 @@
             <key name="header-elements-text" />
             <key name="header-elements-text-2" />
             <key name="header-elements-text-3" />
+            <key name="header-elements-text-4" />
+            <key name="header-elements-text-5" />
             <key name="header-elements-login-url" />
             <key name="header-elements-logout-caption" />
             <key name="header-elements-login-caption" />
@@ -495,6 +497,9 @@
             <key name="social_buttons-photo-button_title" />
             <key name="social_buttons-page-button_title" />
             <key name="social_buttons-product-button_title" />
+            <key name="custom_error_messages_validation" />
+            <key name="custom_error_messages" />
+            <key name="custom_success_messages" />
         </key>
     </admin-texts>
 </wpml-config>

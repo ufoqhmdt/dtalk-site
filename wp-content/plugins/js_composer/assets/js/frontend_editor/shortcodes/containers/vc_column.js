@@ -40,10 +40,14 @@
 			}
 		},
 		setColumnClasses: function () {
-			var offset = this.getParam( 'offset' ) || '',
-				width = this.getParam( 'width' ) || '1/1',
-				$content = this.$el.find( '> .wpb_column' );
-			this.css_class_width = this.convertSize( width ).replace( /[^\d]/g, '' );
+			var offset, width, $content;
+			offset = this.getParam( 'offset' ) || '';
+			width = this.getParam( 'width' ) || '1/1';
+			$content = this.$el.find( '> .wpb_column' );
+			this.css_class_width = this.convertSize( width );
+			if ( this.css_class_width !== width ) {
+				this.css_class_width = this.css_class_width.replace( /[^\d]/g, '' );
+			}
 			$content.removeClass( 'vc_col-sm-' + this.css_class_width );
 			if ( ! offset.match( /vc_col\-sm\-\d+/ ) ) {
 				this.$el.addClass( 'vc_col-sm-' + this.css_class_width );
@@ -93,16 +97,21 @@
 			this.$el.removeClass( 'vc_col-sm-' + old_width ).addClass( 'vc_col-sm-' + this.css_class_width );
 		},
 		convertSize: function ( width ) {
-			var prefix = 'vc_col-sm-',
-				numbers = width ? width.split( '/' ) : [
-					1,
-					1
-				],
-				range = _.range( 1, 13 ),
-				num = ! _.isUndefined( numbers[ 0 ] ) && 0 <= _.indexOf( range,
-					parseInt( numbers[ 0 ], 10 ) ) ? parseInt( numbers[ 0 ], 10 ) : false,
-				dev = ! _.isUndefined( numbers[ 1 ] ) && 0 <= _.indexOf( range,
-					parseInt( numbers[ 1 ], 10 ) ) ? parseInt( numbers[ 1 ], 10 ) : false;
+			var prefix, numbers, range, num, dev;
+			prefix = 'vc_col-sm-';
+			numbers = width ? width.split( '/' ) : [
+				1,
+				1
+			];
+			range = _.range( 1, 13 );
+			num = ! _.isUndefined( numbers[ 0 ] ) && 0 <= _.indexOf( range,
+				parseInt( numbers[ 0 ], 10 ) ) ? parseInt( numbers[ 0 ], 10 ) : false;
+			dev = ! _.isUndefined( numbers[ 1 ] ) && 0 <= _.indexOf( range,
+				parseInt( numbers[ 1 ], 10 ) ) ? parseInt( numbers[ 1 ], 10 ) : false;
+			// Custom fix for 5 columns grid
+			if ( '5' === numbers[ 1 ] ) {
+				return width;
+			}
 			if ( false !== num && false !== dev ) {
 				return prefix + (12 * num / dev);
 			}

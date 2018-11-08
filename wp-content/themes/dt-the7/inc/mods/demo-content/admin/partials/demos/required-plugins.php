@@ -30,6 +30,6 @@ $plugins_to_install = $this->plugins_checker()->get_plugins_to_install();
             ?>
         </ol>
         <input type="hidden" name="plugins_to_install" value="<?php echo esc_attr( implode( ',', array_keys( $plugins_to_install ) ) ); ?>">
-        <input type="hidden" name="plugins_to_activate" value="<?php echo esc_attr( esc_attr( implode( ',', array_keys( $inactive_plugins ) ) ) ); ?>">
+        <input type="hidden" name="plugins_to_activate" value="<?php echo esc_attr( implode( ',', array_keys( $inactive_plugins ) ) ); ?>">
     </div>
 </div>

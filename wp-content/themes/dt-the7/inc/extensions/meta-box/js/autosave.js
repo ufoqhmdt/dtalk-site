@@ -4,7 +4,7 @@ jQuery( function( $ )
 	{
 		if ( -1 != s.data.indexOf( 'action=autosave' ) )
 		{
-			$( '.rwmb-meta-box').each( function()
+			$( '.the7-mb-meta-box').each( function()
 			{
 				var $meta_box = $( this );
 				if ( $meta_box.data( 'autosave' ) == true )

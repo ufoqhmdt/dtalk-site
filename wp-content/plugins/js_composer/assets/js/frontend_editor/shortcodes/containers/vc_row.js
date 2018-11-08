@@ -71,9 +71,9 @@
 			if ( ! layout ) {
 				return false;
 			}
-			var column_params, new_model,
-				columns_contents = [],
-				columns = this.convertToWidthsArray( layout );
+			var column_params, new_model, columns_contents, columns;
+			columns_contents = [];
+			columns = this.convertToWidthsArray( layout );
 			vc.layout_change_shortcodes = [];
 			vc.layout_old_columns = vc.shortcodes.where( { parent_id: this.model.get( 'id' ) } );
 			_.each( vc.layout_old_columns, function ( column ) {

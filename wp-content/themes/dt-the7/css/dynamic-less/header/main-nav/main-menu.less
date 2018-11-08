@@ -23,6 +23,14 @@
 	margin: -@menu-item-padding-top -@menu-item-padding-right -@menu-item-padding-bottom -@menu-item-padding-left;
 	padding: @menu-item-padding-top @menu-item-padding-right @menu-item-padding-bottom @menu-item-padding-left;
 }
+.main-nav {
+	.side-header.dividers:not(.surround) & {
+		margin: -(@menu-item-padding-top + @menu-item-margin-top) 0 -(@menu-item-padding-bottom + @menu-item-margin-bottom) 0;
+	}
+	.side-header:not(.dividers) & {
+		margin: -(@menu-item-padding-top + @menu-item-margin-top) 0 -(@menu-item-margin-bottom + @menu-item-padding-bottom) 0;
+	}
+}
 > li:first-child > a {
 	.top-header .outside-item-double-margin.main-nav & {
 		margin-left: @menu-item-margin-left*2;
@@ -45,9 +53,9 @@
 		margin-right: 0;
 	}
 }
-.sub-downwards.dt-parent-menu-clickable .main-nav > li:not(.has-children) > a {
-	margin-right: @menu-item-margin-right + 30;
-}
+// .sub-downwards.dt-parent-menu-clickable .main-nav > li:not(.has-children) > a {
+// 	margin-right: @menu-item-margin-right + 30;
+// }
 
 .sub-downwards .main-nav > li > .next-level-button {
 	left: -@menu-item-margin-right;
@@ -55,6 +63,9 @@
 
 .sub-downwards .main-nav > li > .sub-nav:last-child {
 	margin-bottom: @menu-item-padding-bottom + @menu-item-margin-bottom;
+}
+.sub-downwards .main-nav > li:last-child > .sub-nav:last-child {
+	margin-bottom: 0;
 }
 .side-header.dividers .main-nav > li:before,
 .side-header.dividers.surround .main-nav > li:last-child:after {
@@ -119,13 +130,13 @@
 	}
 
 	/*icon size*/
-	.main-nav > .menu-item > a .fa {
+	.main-nav > .menu-item > a i[class^="fa"] {
 		font-size: @main-menu-icon-size;
 	}
-	#main-nav > .menu-item > a .fa {
+	#main-nav > .menu-item > a i[class^="fa"] {
 		line-height: @main-menu-icon-size;
 	}
-	.main-nav .sub-nav .fa {
+	.main-nav .sub-nav i[class^="fa"] {
 		font-size: @sub-menu-icon-size;
 	}
 

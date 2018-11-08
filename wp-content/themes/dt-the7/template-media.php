@@ -4,15 +4,16 @@
 /**
  * Media Gallery template. Uses dt_gallery post type and dt_gallery_category taxonomy.
  *
- * @package vogue
+ * @package The7
  * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-$config = Presscore_Config::get_instance();
-
+$config = presscore_config();
 $config->set( 'template', 'media' );
 
 // add page content controller
@@ -32,9 +33,7 @@ if ( presscore_is_content_visible() ): ?>
 
 					if ( post_password_required() ) {
 						the_content();
-
 					} else {
-
 						// backup config
 						$config_backup = $config->get();
 
@@ -43,10 +42,6 @@ if ( presscore_is_content_visible() ): ?>
 
 						// masonry container open
 						echo '<div ' . presscore_masonry_container_class( array( 'wf-container', 'dt-gallery-container' ) ) . presscore_masonry_container_data_atts() . presscore_get_share_buttons_for_prettyphoto( 'photo' ) . '>';
-
-							//////////////////////
-							// Custom loop //
-							//////////////////////
 
 							if ( function_exists( 'presscore_mod_albums_get_photos' ) ) {
 
@@ -66,15 +61,10 @@ if ( presscore_is_content_visible() ): ?>
 						// fullwidth wrap close
 						if ( $config->get( 'full_width' ) ) { echo '</div>'; }
 
-						/////////////////////
-						// Pagination //
-						/////////////////////
-
 						presscore_complex_pagination( $page_query );
 
 						// restore config
 						$config->reset( $config_backup );
-
 					}
 
 					do_action( 'presscore_after_loop' );

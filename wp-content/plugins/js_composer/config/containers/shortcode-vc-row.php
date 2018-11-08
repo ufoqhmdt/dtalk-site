@@ -76,6 +76,13 @@ return array(
 			'value' => array( __( 'Yes', 'js_composer' ) => 'yes' ),
 		),
 		array(
+			'type' => 'checkbox',
+			'heading' => __( 'Reverse columns in RTL', 'js_composer' ),
+			'param_name' => 'rtl_reverse',
+			'description' => __( 'If checked columns will be reversed in RTL.', 'js_composer' ),
+			'value' => array( __( 'Yes', 'js_composer' ) => 'yes' ),
+		),
+		array(
 			'type' => 'dropdown',
 			'heading' => __( 'Content position', 'js_composer' ),
 			'param_name' => 'content_placement',

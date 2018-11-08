@@ -4,7 +4,7 @@
 .branding > a,
 .branding > img {
 	padding: @main-logo-top-padding @main-logo-right-padding @main-logo-bottom-padding @main-logo-left-padding;
-	.transparent .masthead:not(.side-header):not(.mixed-header) & {
+	.transparent .masthead & {
 		padding: @transparent-logo-top-padding @transparent-logo-right-padding @transparent-logo-bottom-padding @transparent-logo-left-padding;
 	}
 	.side-header-h-stroke &,
@@ -26,36 +26,102 @@
 }
 
 /* SEARCH  */
+.mini-search input.field,
+.overlay-search-microwidget input[type=text] {
+	font: @mw-search-font-style @mw-search-font-family-font-variant @mw-search-font-weight @mw-search-font-size~"/"@mw-search-font-size+4 @mw-search-font-family;
+	min-height: @mw-search-bg-height;
+	height: auto;
+	line-height:  @mw-search-bg-height;
+	width: @mw-search-bg-width;
+	border-width: @mw-search-border-width;
+	border-color: @mw-search-border-color;
+	border-radius: @mw-search-border-radius;
+	background: @mw-search-bg-color;
+	padding: 0 @mw-search-right-padding 0 @mw-search-left-padding;
+}
+input.field {
+	.overlay-search-microwidget .searchform:not(.search-icon-disabled) &,
+	.mini-search .searchform:not(.search-icon-disabled) & {
+		padding-right: @mw-search-right-padding + @mw-search-icon-size;
+	}
+}
+.animate-search-width .search-icon {
+	width: @mw-search-icon-size;
+}
+.animate-search-width input.field:focus,
+.animate-search-width input.field:active,
+.animate-search-width:hover input.field {
+	width: @mw-search-bg-active-width;
+}
+.mini-search .search-icon i,
+.overlay-search-microwidget .search-icon i {
+	color: @mw-search-color;
+}
+.searchform input[type=text],
+.mini-search .field::placeholder,
+.overlay-search-microwidget .field::placeholder {
+	color: @mw-search-color;
+}
+.popup-search .field::placeholder {
+	color: @mw-search-color !important;
+}
+.overlay-search-microwidget .search-icon,
+.mini-search .search-icon {
+	right: @mw-search-right-padding; 
+	& i {
+		font-size: @mw-search-icon-size;
+	}
+}
+.popup-search .search-icon {
+	right: @mw-search-right-padding + 10px; 
+}
+.popup-search .submit,
+.overlay-search .submit {
+	& i {
+		font-size: @mw-search-custom-icon-size;
+	}
+	&.default-icon:before {
+		width: @mw-search-custom-icon-size;
+		height: @mw-search-custom-icon-size;
+	}
+	&.default-icon {
+		padding-left: @mw-search-custom-icon-size;
+	}
+}
+.overlay-search-microwidget {
+	background: @mw-search-overlay-bg;
+	.background-gradient (@startColor: @mw-search-overlay-bg, @endColor: @mw-search-overlay-bg-2);
+}
 
-.mini-search .field {
+.popup-search .popup-search-wrap {
+	background: @mw-search-popup-bg;
+	&:before {
+		border-bottom-color: @mw-search-popup-bg;
+	}
+	&:before {
+		.side-header:not(.masthead-mobile-header) &,
+		.dt-mobile-header & {
+			border-top-color: @mw-search-popup-bg;
+		}
+	}
+	&.bottom-overflow:before {
+		border-top-color: @mw-search-popup-bg;
+	}
 	.masthead & {
-		top: @additional-menu-elements-font-size + 14;
-	}
-	.masthead .top-bar & {
-		top: @top-bar-font-size + @top-bar-padding-bottom + 6;
-	}
-	.masthead &,
-	.dt-mobile-header & {
-		width: @submenu-width;
-		color: @submenu-color !important;
-		background:  @submenu-bg-color !important;
-		-webkit-text-fill-color: @submenu-color !important;
-		font: @submenu-font-style @submenu-font-variant @submenu-font-weight @submenu-font-size~"/"@submenu-font-size+4 @submenu-font-family !important;
-		text-transform: @submenu-text-transform;
-		line-height: (@submenu-font-size+4)*1.5;
+		top: calc(100% ~'+' 10px);
 	}
 	.dt-mobile-header & {
 		width: 100%;
 	}
 	.masthead.side-header .mini-widgets & {
 		top: auto;
-		bottom: @additional-menu-elements-font-size + 4;
+		bottom: calc(100% ~'+' 10px);
 	}
 }
-.mini-search .field.bottom-overflow {
+.popup-search .popup-search-wrap.bottom-overflow {
 	.masthead .mini-widgets & {
 		top: auto;
-		bottom: @additional-menu-elements-font-size + 14;
+		bottom: calc(100% ~'+' 10px);
 	}
 }
 .masthead .mini-search input[type="text"]::-moz-placeholder {
@@ -65,89 +131,109 @@
 .mini-search .submit {
 	font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 	color: @additional-menu-elements-color;
+	&:hover {
+		opacity: 1;
+		.custom-mixin-fade-color (@additional-menu-elements-color, @opacity:70%);
+	}
+	&:hover:before {
+		opacity: 0.7;
+	}
 	
-	.branding &,
-	.mixed-header &,
-	.classic-header .mobile-mini-widgets & {
+	.branding & {
 		font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 		color: @additional-logo-elements-color;
+		&:hover {
+			.custom-mixin-fade-color (@additional-logo-elements-color, @opacity:70%);
+		}
+	}
+	.mixed-header & {
+		font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+		color: @microwidgets-in-top-line-color;
+		&:hover {
+			.custom-mixin-fade-color (@microwidgets-in-top-line-color, @opacity:70%);
+		}
 	}
 	.dt-mobile-header & {
 		font: @mobile-sub-menu-font-style @mobile-sub-menu-font-variant @mobile-sub-menu-font-weight @mobile-sub-menu-font-size~"/"@mobile-sub-menu-font-size+4 @mobile-sub-menu-font-family;
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
+		&:hover {
+			.custom-mixin-fade-color (@mobile-menu-color, @opacity:70%);
+		}
+	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
+		&:hover {
+			.custom-mixin-fade-color (@mobile-microwidgets-color, @opacity:70%);
+		}
 	}
 }
-	.dt-mobile-header .mini-search .field {
+	.dt-mobile-header .mini-search .popup-search-wrap {
 		top: auto;
-		bottom: @additional-menu-elements-font-size + 4;
+		bottom: auto;
 	}
-	.mini-search .submit:before {
+
+@mw-search-color-temp: escape(~"@{mw-search-color}");
+	.overlay-search-microwidget.default-icon .search-icon,
+	.mini-search.default-icon .search-icon {
+		min-width: @mw-search-icon-size;
 		.light-icons & {
-			.search-icon(@additional-menu-elements-color-temp);
-		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
-			.search-icon(@additional-logo-elements-color-temp);
-		}
-		.light-icons .dt-mobile-header & {
-			.search-icon(@mobile-menu-color-temp);
+			.search-icon(@mw-search-color-temp, @mw-search-icon-size);
 		}
 		.bold-icons & {
-			.search-icon-bold(@additional-menu-elements-color-temp);
+			.search-icon-bold(@mw-search-color-temp, @mw-search-icon-size);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
-			.search-icon-bold(@additional-logo-elements-color-temp);
+	}
+
+	.popup-search .submit.default-icon:before,
+	.overlay-search .submit.default-icon:before {
+		.light-icons & {
+			.search-icon(@additional-menu-elements-color-temp, @mw-search-custom-icon-size);
+		}
+		.light-icons .branding & {
+			.search-icon(@additional-logo-elements-color-temp, @mw-search-custom-icon-size);
+		}
+		.light-icons .mixed-header & {
+			.search-icon(@microwidgets-in-top-line-color-temp, @mw-search-custom-icon-size);
+		}
+		.light-icons .dt-mobile-header & {
+			.search-icon(@mobile-menu-color-temp, @mw-search-custom-icon-size);
+		}
+		.light-icons .mobile-header-bar & {
+			.search-icon(@mobile-microwidgets-color-temp, @mw-search-custom-icon-size);
+		}
+		.bold-icons & {
+			.search-icon-bold(@additional-menu-elements-color-temp, @mw-search-custom-icon-size);
+		}
+		.bold-icons .branding & {
+			.search-icon-bold(@additional-logo-elements-color-temp, @mw-search-custom-icon-size);
+		}
+		.bold-icons .mixed-header & {
+			.search-icon-bold(@microwidgets-in-top-line-color-temp, @mw-search-custom-icon-size);
 		}
 		.bold-icons .dt-mobile-header & {
-			.search-icon-bold(@mobile-menu-color-temp);
+			.search-icon-bold(@mobile-menu-color-temp, @mw-search-custom-icon-size);
+		}
+		.bold-icons .mobile-header-bar & {
+			.search-icon-bold(@mobile-microwidgets-color-temp, @mw-search-custom-icon-size);
 		}
 
 	}
-	.mini-search .submit.act:before {
-		.light-icons & {
-			.close-search-icon(@additional-menu-elements-color-temp);
-		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
-			.close-search-icon(@additional-logo-elements-color-temp);
-		}
-		.light-icons .dt-mobile-header & {
-			.close-search-icon(@mobile-menu-color-temp);
-		}
-		.bold-icons & {
-			.close-search-icon-bold(@additional-menu-elements-color-temp);
-		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
-			.close-search-icon-bold(@additional-logo-elements-color-temp);
-		}
-		.bold-icons .dt-mobile-header & {
-			.close-search-icon-bold(@mobile-menu-color-temp);
-		}
-	}
 .top-bar .mini-search .submit {
 	color: @top-color;
-}
-	.top-bar .mini-search .submit:before {
-		.light-icons & {
-			.search-icon(@top-icons-bg-color-temp);
-		}
-		.bold-icons & {
-			.search-icon-bold(@top-icons-bg-color-temp);
-		}
+	&:hover {
+		opacity: 1;
+		.custom-mixin-fade-color (@top-color, @opacity:70%);
 	}
-	.top-bar .mini-search .submit.act:before {
+}
+	.top-bar .popup-search .submit.default-icon:before,
+	.top-bar .overlay-search .submit.default-icon:before {
 		.light-icons & {
-			.close-search-icon(@top-icons-bg-color-temp);
+			.search-icon(@top-icons-bg-color-temp, @mw-search-custom-icon-size);
 		}
 		.bold-icons & {
-			.close-search-icon-bold(@top-icons-bg-color-temp);
+			.search-icon-bold(@top-icons-bg-color-temp, @mw-search-custom-icon-size);
 		}
 	}
 
@@ -160,40 +246,54 @@
 	font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 	color: @additional-menu-elements-color;
 	
-	.branding &,
-	.mixed-header &,
-	.classic-header .mobile-mini-widgets & {
+	.branding & {
 		font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 		color: @additional-logo-elements-color;
+	}
+	.mixed-header & {
+		font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+		color: @microwidgets-in-top-line-color;
 	}
 	.dt-mobile-header & {
 		font: @mobile-sub-menu-font-style @mobile-sub-menu-font-variant @mobile-sub-menu-font-weight @mobile-sub-menu-font-size~"/"@mobile-sub-menu-font-size+4 @mobile-sub-menu-font-family;
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
 	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
+	}
 }
 	.mini-login .submit:before {
 		.light-icons & {
 			.login-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.login-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.login-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.login-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.login-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.login-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.login-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.login-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.login-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.login-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 	.top-bar .mini-login .submit:before {
@@ -212,13 +312,15 @@
 		font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 		color: @additional-menu-elements-color;
 		
-		.branding &,
-		.mixed-header &,
-		.classic-header .mobile-mini-widgets & {
+		.branding & {
 			font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 			color: @additional-logo-elements-color;
 		}
-		.top-bar & {
+		.mixed-header & {
+			font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+			color: @microwidgets-in-top-line-color;
+		}
+		.masthead .top-bar & {
 			color: @top-color;
 		}
 		.dt-mobile-header & {
@@ -226,65 +328,85 @@
 			text-transform: @mobile-sub-menu-text-transform;
 			color: @mobile-menu-color;
 		}
+		.mobile-header-bar .mobile-mini-widgets & {
+			font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+			color: @mobile-microwidgets-color;
+		}
 	}
 	.mini-contacts.address {
 		.light-icons & {
 			.address-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .top-bar & {
+		.light-icons .masthead .top-bar & {
 			.address-icon(@top-icons-bg-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.address-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.address-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.address-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.address-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.address-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .top-bar & {
+		.bold-icons .masthead .top-bar & {
 			.address-icon-bold(@top-icons-bg-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.address-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.address-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.address-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.address-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 	.mini-contacts.phone {
 		.light-icons & {
 			.phone-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .top-bar & {
+		.light-icons .masthead .top-bar & {
 			.phone-icon(@top-icons-bg-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.phone-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.phone-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.phone-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.phone-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.phone-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .top-bar & {
+		.bold-icons .masthead .top-bar & {
 			.phone-icon-bold(@top-icons-bg-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.phone-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.phone-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.phone-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.phone-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 
@@ -292,30 +414,38 @@
 		.light-icons & {
 			.email-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .top-bar & {
+		.light-icons .masthead .top-bar & {
 			.email-icon(@top-icons-bg-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.email-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.email-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.email-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.email-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.email-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .top-bar & {
+		.bold-icons .masthead .top-bar & {
 			.email-icon-bold(@top-icons-bg-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.email-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.email-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.email-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.email-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 	
@@ -323,30 +453,38 @@
 		.light-icons & {
 			.skype-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .top-bar & {
+		.light-icons .masthead .top-bar & {
 			.skype-icon(@top-icons-bg-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.skype-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.skype-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.skype-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.skype-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.skype-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .top-bar & {
+		.bold-icons .masthead .top-bar & {
 			.skype-icon-bold(@top-icons-bg-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.bold-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.skype-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.skype-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.skype-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.skype-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 
@@ -354,30 +492,38 @@
 		.light-icons & {
 			.clock-icon(@additional-menu-elements-color-temp);
 		}
-		.light-icons .top-bar & {
+		.light-icons .masthead .top-bar & {
 			.clock-icon(@top-icons-bg-color-temp);
 		}
-		.light-icons .branding &,
-		.light-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.light-icons .branding & {
 			.clock-icon(@additional-logo-elements-color-temp);
+		}
+		.light-icons .mixed-header & {
+			.clock-icon(@microwidgets-in-top-line-color-temp);
 		}
 		.light-icons .dt-mobile-header & {
 			.clock-icon(@mobile-menu-color-temp);
 		}
+		.light-icons .mobile-header-bar & {
+			.clock-icon(@mobile-microwidgets-color-temp);
+		}
 		.bold-icons & {
 			.clock-icon-bold(@additional-menu-elements-color-temp);
 		}
-		.bold-icons .top-bar & {
+		.bold-icons .masthead .top-bar & {
 			.clock-icon-bold(@top-icons-bg-color-temp);
 		}
-		.bold-icons .branding &,
-		.bold-icons .mixed-header &,
-		.light-icons .classic-header .mobile-mini-widgets & {
+		.bold-icons .branding & {
 			.clock-icon-bold(@additional-logo-elements-color-temp);
+		}
+		.bold-icons .mixed-header & {
+			.clock-icon-bold(@microwidgets-in-top-line-color-temp);
 		}
 		.bold-icons .dt-mobile-header & {
 			.clock-icon-bold(@mobile-menu-color-temp);
+		}
+		.bold-icons .mobile-header-bar & {
+			.clock-icon-bold(@mobile-microwidgets-color-temp);
 		}
 	}
 
@@ -386,7 +532,7 @@
 .dt-mobile-header .soc-ico a {
 	width: @soc-icons-bg-size;
 	height: @soc-icons-bg-size;
-	margin: @soc-icon-margin-top @soc-icon-margin-right @soc-icon-margin-bottom @soc-icon-margin-left;
+	margin: 0 @soc-icons-gap/2;
 	line-height: @soc-icons-bg-size;
 	-webkit-border-radius: @soc-icons-border-radius;
 	border-radius: @soc-icons-border-radius;
@@ -395,10 +541,17 @@
 		width: @soc-icons-bg-size;
 		height: @soc-icons-bg-size;
 	}
+	&:first-child {
+		margin-left: 0;
+	}
+	&:last-child {
+		margin-right: 0;
+	}
 }
 .masthead .soc-ico .soc-font-icon,
 .dt-mobile-header .soc-ico .soc-font-icon {
 	font-size: @soc-icons-size;
+	line-height: @soc-icons-bg-size;
 }
 .masthead .soc-ico.border-on a:before,
 .dt-mobile-header .soc-ico.border-on a:before {
@@ -450,13 +603,26 @@
 	background-color: @top-icons-bg-color-hover;
 	background-image: none;
 }
-.masthead .soc-ico a .soc-font-icon,
-.dt-mobile-header .soc-ico a .soc-font-icon {
-	color: @top-icons-color;
+.custom-soc-icon-color (@customColor) when (iscolor(@customColor)) {
+	color: @customColor !important;
+	background: none !important;
+}
+.masthead .soc-ico a:not(:hover) .soc-font-icon,
+.dt-mobile-header .soc-ico a:not(:hover) .soc-font-icon {
+	color: @accent-bg-color;
+	.accent-gradient & {
+		.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	}
+	
+	.custom-soc-icon-color (@top-icons-color);
 }
 .masthead .soc-ico a:hover .soc-font-icon,
 .dt-mobile-header .soc-ico a:hover .soc-font-icon {
-	color: @soc-ico-hover-color !important;
+	color: @accent-bg-color;
+	.accent-gradient & {
+		.text-gradient (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	}
+	.custom-soc-icon-color (@soc-ico-hover-color);
 }
 
 /*Text*/
@@ -464,11 +630,13 @@
 	font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 	color: @additional-menu-elements-color;
 	
-	.branding &,
-	.mixed-header &,
-	.classic-header .mobile-mini-widgets & {
+	.branding & {
 		font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 		color: @additional-logo-elements-color;
+	}
+	.mixed-header & {
+		font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+		color: @microwidgets-in-top-line-color;
 	}
 	.top-bar & {
 		color: @top-color;
@@ -478,20 +646,26 @@
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
 	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
+	}
 }
 /*Custom menu*/
 .menu-select,
-.mini-nav > ul > li > a {
+.mini-nav > ul:not(.sub-nav) > li > a {
 	.masthead & {
 		font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 		color: @additional-menu-elements-color;
 	}
 	
-	.masthead .branding &,
-	.masthead.mixed-header &,
-	.classic-header .mobile-mini-widgets & {
+	.masthead .branding & {
 		font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 		color: @additional-logo-elements-color;
+	}
+	.masthead.mixed-header & {
+		font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+		color: @microwidgets-in-top-line-color;
 	}
 	.masthead .top-bar & {
 		color: @top-color;
@@ -504,17 +678,37 @@
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
 	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
+	}
+}
+.mini-nav .sub-nav > li > a * {
+	.mobile-header-bar .mobile-mini-widgets & {
+		.light-preset-color .masthead:not(#phantom):not(.sticky-on):not(.sticky-mobile-on) & {
+			color: @submenu-color !important;
+		}
+	}
+}
+.mini-nav .sub-nav > li:not(.act):hover > a * {
+	.mobile-header-bar .mobile-mini-widgets & {
+		.light-preset-color .masthead:not(#phantom):not(.sticky-on):not(.sticky-mobile-on) & {
+			color: @submenu-hover-color !important;
+		}
+	}
 }
 .mini-nav .customSelectInner {
 	.masthead & {
 		font: @additional-menu-elements-font-style @additional-menu-elements-font-variant @additional-menu-elements-font-weight @additional-menu-elements-font-size~"/"@additional-menu-elements-font-size + 4 @additional-menu-elements-font-family;
 		color: @additional-menu-elements-color;
 	}
-	.branding &,
-	.mixed-header &,
-	.classic-header .mobile-mini-widgets & {
+	.branding & {
 		font: @additional-logo-elements-font-style @additional-logo-elements-font-variant @additional-logo-elements-font-weight @additional-logo-elements-font-size~"/"@additional-logo-elements-font-size + 4 @additional-logo-elements-font-family;
 		color: @additional-logo-elements-color;
+	}
+	.mixed-header & {
+		font: @microwidgets-in-top-line-font-style @microwidgets-in-top-line-font-variant @microwidgets-in-top-line-font-weight @microwidgets-in-top-line-font-size~"/"@microwidgets-in-top-line-font-size + 4 @microwidgets-in-top-line-font_family;
+		color: @microwidgets-in-top-line-color;
 	}
 	.top-bar & {
 		color: @top-color;
@@ -525,6 +719,10 @@
 		font: @mobile-sub-menu-font-style @mobile-sub-menu-font-variant @mobile-sub-menu-font-weight @mobile-sub-menu-font-size~"/"@mobile-sub-menu-font-size+4 @mobile-sub-menu-font-family;
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
+	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
 	}
 	#bottom-bar & {
 		color: @bottom-color;
@@ -537,17 +735,22 @@
 		text-transform: @mobile-sub-menu-text-transform;
 		color: @mobile-menu-color;
 	}
+	.mobile-header-bar .mobile-mini-widgets & {
+		font: @mobile-microwidgets-font-style @mobile-sub-menu-font-variant @mobile-microwidgets-font-weight @mobile-microwidgets-font-size~"/"@mobile-microwidgets-font-size+4 @mobile-microwidgets-font-family;
+		color: @mobile-microwidgets-color;
+	}
 }
 .mini-nav .customSelectInner:before {
 	.light-icons & {
 		.select-ico(@additional-menu-elements-color-temp);
 	}
-	.light-icons .branding &,
-	.light-icons .mixed-header &,
-	.light-icons .classic-header .mobile-mini-widgets & {
+	.light-icons .branding & {
 		.select-ico(@additional-logo-elements-color-temp);
 	}
-	.light-icons .top-bar & {
+	.light-icons .mixed-header & {
+		.select-icon(@microwidgets-in-top-line-color-temp);
+	}
+	.light-icons .masthead .top-bar & {
 		.select-ico(@top-icons-bg-color-temp);
 	}
 	.light-icons #bottom-bar & {
@@ -556,15 +759,22 @@
 	.light-icons .dt-mobile-header & {
 		.select-ico(@mobile-menu-color-temp);
 	}
+	.light-icons .mobile-header-bar & {
+		.select-ico(@mobile-microwidgets-color-temp);
+	}
 	.bold-icons & {
 		.select-ico-bold(@additional-menu-elements-color-temp);
 	}
-	.bold-icons .branding &,
-	.bold-icons .mixed-header &,
-	.bold-icons .classic-header .mobile-mini-widgets & {
+	.bold-icons .mobile-header-bar & {
+		.select-ico-bold(@mobile-microwidgets-color-temp);
+	}
+	.bold-icons .branding & {
 		.select-ico(@additional-logo-elements-color-temp);
 	}
-	.bold-icons .top-bar & {
+	.bold-icons .mixed-header & {
+		.select-ico-bold(@microwidgets-in-top-line-color-temp);
+	}
+	.bold-icons .masthead .top-bar & {
 		.select-ico-bold(@top-icons-bg-color-temp);
 	}
 	.bold-icons #bottom-bar & {
@@ -572,6 +782,9 @@
 	}
 	.bold-icons .dt-mobile-header & {
 		.select-ico-bold(@mobile-menu-color-temp);
+	}
+	.bold-icons .mobile-header-bar & {
+		.select-ico-bold(@mobile-microwidgets-color-temp);
 	}
 }
 .mini-nav .menu-select:hover .customSelectInner:before {
@@ -594,5 +807,116 @@
 .mini-nav .sub-nav {
 	#page .masthead & {
 		width: @submenu-width ;
+	}
+}
+.btn-icon-last-color (@endColor: white) when not (@endColor = "") {
+	color: @endColor;
+}
+
+//Microwidget button
+.header-elements-button-1 {
+	font: @microwidget-button-font-style @microwidget-button-font-variant @microwidget-button-font-weight @microwidget-button-font-size~"/"@microwidget-button-font-size+4 @microwidget-button-font-family;
+	padding: @microwidget-button-top-padding @microwidget-button-right-padding @microwidget-button-bottom-padding @microwidget-button-left-padding;
+	border-radius: @microwidget-button-border-radius;
+	// border-width: @microwidget-button-border-width;
+	// border-color: @microwidget-button-border-color;
+	&:not(:hover) span {
+		color: @microwidget-button-color;
+		.text-gradient (@startColor: @microwidget-button-color, @endColor: @microwidget-button-color-2);
+	}
+
+	&.microwidget-btn-bg-on:before {
+		background: @microwidget-button-bg;
+		.background-gradient (@startColor: @microwidget-button-bg, @endColor: @microwidget-button-bg-2);
+	}
+	&.border-on:before {
+		.box-shadow (inset 0px 0px 0px @microwidget-button-border-width @microwidget-button-border-color);
+	}
+	& i {
+		font-size: @microwidget-button-icon-size;
+	}
+	
+	&.btn-icon-align-right:not(:hover) i {
+		color: @microwidget-button-color;
+		.btn-icon-last-color (@endColor: @microwidget-button-color-last);
+	}
+	&.btn-icon-align-left:not(:hover) i {
+		color: @microwidget-button-color;
+	}
+	&:hover span {
+		color: @microwidget-button-hover-color;
+		.text-gradient (@startColor: @microwidget-button-hover-color, @endColor: @microwidget-button-hover-color-2)
+	}
+	&.btn-icon-align-right:hover i {
+		color: @microwidget-button-hover-color;
+		.btn-icon-last-color (@endColor: @microwidget-button-hover-color-last);
+	}
+	&.btn-icon-align-left:hover i {
+		color: @microwidget-button-hover-color;
+	}
+	// &:hover {
+	// 	border-color: @microwidget-button-hover-border-color;
+	// }
+	&.microwidget-btn-hover-bg-on:after {
+		background: @microwidget-button-hover-bg;
+		.background-gradient (@startColor: @microwidget-button-hover-bg, @endColor: @microwidget-button-hover-bg-2);
+	}
+	&.hover-border-on:after {
+		.box-shadow (inset 0px 0px 0px @microwidget-button-border-width @microwidget-button-hover-border-color);
+	}
+}
+.header-elements-button-2 {
+	font: @microwidget-button-2-font-style @microwidget-button-2-font-variant @microwidget-button-2-font-weight @microwidget-button-2-font-size~"/"@microwidget-button-2-font-size+4 @microwidget-button-2-font-family;
+	padding: @microwidget-button-2-top-padding @microwidget-button-2-right-padding @microwidget-button-2-bottom-padding @microwidget-button-2-left-padding;
+	border-radius: @microwidget-button-2-border-radius;
+	// border-width: @microwidget-button-2-border-width;
+	// border-color: @microwidget-button-2-border-color;
+	&:not(:hover) span {
+		color: @microwidget-button-2-color;
+		.text-gradient (@startColor: @microwidget-button-2-color, @endColor: @microwidget-button-2-color-2);
+	}
+
+	&.microwidget-btn-bg-on:before {
+		background: @microwidget-button-2-bg;
+		.background-gradient (@startColor: @microwidget-button-2-bg, @endColor: @microwidget-button-2-bg-2);
+	}
+	&.border-on:before {
+		.box-shadow (inset 0px 0px 0px @microwidget-button-2-border-width @microwidget-button-2-border-color);
+	}
+	& i {
+		font-size: @microwidget-button-2-icon-size;
+	}
+	&:not(:hover) i {
+		color: @microwidget-button-2-color;
+		//.text-gradient (@startColor: @microwidget-button-2-color, @endColor: @microwidget-button-2-color-2);
+	}
+
+	&:hover span {
+		color: @microwidget-button-2-hover-color;
+		.text-gradient (@startColor: @microwidget-button-2-hover-color, @endColor: @microwidget-button-2-hover-color-2)
+	}
+	&.btn-icon-align-right:hover i {
+		color: @microwidget-button-2-hover-color;
+		.btn-icon-last-color (@endColor: @microwidget-button-2-hover-color-last);
+	}
+	&.btn-icon-align-left:hover i {
+		color: @microwidget-button-2-hover-color;
+	}
+	&.btn-icon-align-right:not(:hover) i {
+		color: @microwidget-button-2-color;
+		.btn-icon-last-color (@endColor: @microwidget-button-2-color-last);
+	}
+	&.btn-icon-align-left:not(:hover) i {
+		color: @microwidget-button-2-color;
+	}
+	// &:hover {
+	// 	border-color: @microwidget-button-2-hover-border-color;
+	// }
+	&.microwidget-btn-hover-bg-on:after {
+		background: @microwidget-button-2-hover-bg;
+		.background-gradient (@startColor: @microwidget-button-2-hover-bg, @endColor: @microwidget-button-2-hover-bg-2);
+	}
+	&.hover-border-on:after {
+		.box-shadow (inset 0px 0px 0px @microwidget-button-2-border-width @microwidget-button-2-hover-border-color);
 	}
 }

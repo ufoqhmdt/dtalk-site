@@ -1,9 +1,34 @@
 
+.masthead.masthead-mobile-header,
+.masthead.masthead-mobile-header:not(.mixed-header) {
+	background: @mobile-header-bg-color;
+}
+.mobile-sticky-header-overlay {
+	background-color: @mobile-overlay-bg-color;
+}
 .dt-mobile-header {
 	background-color: @mobile-menu-bg-color;
 	width: @mobile-menu-width;
 	.right-mobile-menu .show-mobile-header & {
 		right: @mobile-menu-width
+	}
+}
+.custom-mixin-bg (@customColor) when (iscolor(@customColor)) {
+	background: @customColor !important;
+}
+.dt-mobile-menu-icon {
+	
+	&:not(.floating-btn) {
+		.mobile-menu-icon-bg-on & {
+			background-color: @accent-bg-color;
+			.accent-gradient & {
+				.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+			}
+			.custom-mixin-bg (@mobile-toggle-menu-bg-color);
+			width: @mobile-hamburger-bg-size;
+			height: @mobile-hamburger-bg-size;
+			.border-radius (@radius: @mobile-toggle-menu-border-radius);
+		}
 	}
 }
 .floating-mobile-menu-icon .dt-mobile-menu-icon.floating-btn {
@@ -35,20 +60,32 @@
 .dt-mobile-menu-icon .lines,
 .dt-mobile-menu-icon .lines:before,
 .dt-mobile-menu-icon .lines:after {
-	background-color: @menu-color;
-	.mixed-header &,
-	.classic-header & {
-		background-color: @additional-logo-elements-color;
-	}
+	background-color: @mobile-toggle-menu-color;
+	// .mixed-header &,
+	// .classic-header & {
+	// 	background-color: @additional-logo-elements-color;
+	// }
 }
 /*Mobile-branding*/
 .mobile-branding > a,
 .mobile-branding > img {
 	padding: @mobile-logo-top-padding @mobile-logo-right-padding @mobile-logo-bottom-padding @mobile-logo-left-padding;
+	.transparent .masthead & {
+		padding: @transparent-mobile-logo-top-padding @transparent-mobile-logo-right-padding @transparent-mobile-logo-bottom-padding @transparent-mobile-logo-left-padding;
+	}
+}
+.sticky-mobile-logo-first-switch,
+.sticky-mobile-logo-second-switch {
+	.transparent .masthead.sticky-mobile-on & {
+		padding: @mobile-logo-top-padding @mobile-logo-right-padding @mobile-logo-bottom-padding @mobile-logo-left-padding;
+	}
 }
 /*Mobile menu*/
 .mobile-main-nav > li > a {
 	padding: @mobile-menu-font-size/2 + 8 30px @mobile-menu-font-size/2 + 8 0;
+}
+.dt-mobile-header .next-level-button {
+	top: @mobile-menu-font-size/2 + 2;
 }
 .mobile-main-nav > li > .sub-nav:last-child,
 .mobile-main-nav > li .dt-mega-menu-wrap,
@@ -61,7 +98,7 @@
 		color: @mobile-menu-color;
 		text-transform: @mobile-menu-text-transform;
 	}
-	.mobile-main-nav > .menu-item > a .fa {
+	.mobile-main-nav > .menu-item > a i[class^="fa"] {
 		font-size: @mobile-menu-font-size;
 	}
 
@@ -104,11 +141,11 @@
 				color: @mobile-menu-color;
 				text-transform: @mobile-sub-menu-text-transform;
 			}
-			.mobile-main-nav .sub-nav > .menu-item > a .fa {
+			.mobile-main-nav .sub-nav > .menu-item > a i[class^="fa"] {
 				font-size: @mobile-sub-menu-font-size;
 			}
 				.mobile-main-nav .sub-nav li > a .menu-text,
-				.mobile-main-nav .sub-nav li > a .fa {
+				.mobile-main-nav .sub-nav li > a i[class^="fa"] {
 					font-size: @mobile-sub-menu-font-size - 4;
 					line-height: @mobile-sub-menu-font-size;
 				}

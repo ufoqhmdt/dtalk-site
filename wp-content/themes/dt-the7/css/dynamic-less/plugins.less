@@ -1,31 +1,4 @@
-/* #LayerSlider DT Skin customisation
-================================================== */
-.ls-container.ls-carousel .ls-thumbnail-inner {
-	background-color: fade(@h1-color, 4%);
-}
-#page .ls-carousel .ls-nav-prev,
-#page .ls-carousel .ls-nav-next,
-#page .ls-carousel .ls-loading-container {
-	background-image: none;
-}
 
-#page .ls-carousel .ls-loading-container,
-#page .ls-carousel .ls-nav-prev,
-#page .ls-carousel .ls-nav-next {
-	background-color: fade(@accent-bg-color, 90%);
-	.accent-gradient & {
-		.background-fade-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2, @opacity: 90%);
-	}
-}
-#page .ls-carousel .ls-nav-prev:hover,
-#page .ls-carousel .ls-nav-next:hover {
-	color: #fff;
-	background-color: @accent-bg-color;
-
-	.accent-gradient & {
-		.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
-	}
-}
 
 /* #Form plugins customisation
 ================================================== */
@@ -93,7 +66,11 @@ h3.gform_title,
 	}
 	& > i {
 		.accent-icon-color & {
-			.paint-accent-color;
+			//.paint-accent-color;
+			color: @accent-bg-color !important;
+			.accent-gradient & {
+				.text-gradient-text-fill (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+		  	}
 		}
 	}
 	.accent-border-color & {
@@ -103,24 +80,35 @@ h3.gform_title,
 .uvc-main-heading > *,
 .aio-icon-title {
 	.accent-title-color & {
-		.paint-accent-color;
+		color: @accent-bg-color !important;
+		.accent-gradient & {
+			.text-gradient-text-fill (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	  	}
 	}
 }
 .uvc-sub-heading,
 .aio-icon-description {
 	.accent-subtitle-color & {
-		.paint-accent-color;
+		color: @accent-bg-color !important;
+		.accent-gradient & {
+			.text-gradient-text-fill (@startColor: @accent-bg-color, @endColor: @accent-text-color-2);
+	  	}
 	}
 }
-
+.uvc-main-heading > *,
+.uvc-sub-heading {
+	.accent-subtitle-color &,
+	.accent-title-color & {
+		display: inline-block;
+	}
+}
 .uvc-headings-line {
 	.accent-border-color & {
 		border-color: @accent-bg-color !important;
 		.accent-gradient & {
 			border-color: transparent;
-		    -moz-border-image: -moz-linear-gradient(top right, @accent-bg-color 0%, @accent-bg-color-2 100%);
-		    -webkit-border-image: -webkit-linear-gradient(top right, @accent-bg-color 0%,@accent-bg-color-2 100%);
-		    border-image: linear-gradient(to bottom right, @accent-bg-color 0%, @accent-bg-color-2 100%);
+		    -webkit-border-image: -webkit-linear-gradient(@accent-text-color-2);
+		    border-image: linear-gradient(@accent-text-color-2);
 		    border-image-slice: 1;
 		    
 		}
@@ -163,10 +151,13 @@ h3.gform_title,
 //CF 7
 .wpcf7-validation-errors,
 .wpcf7-mail-sent-ok {
-	background-color: @accent-bg-color;
-	.accent-gradient & {
+	.popup-message-style & {
+		background-color: @accent-bg-color;
+	}
+	
+	.accent-gradient.popup-message-style & {
 		.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
-	};
+	}
 	 & .wpcf7-not-valid-tip-text,
 	 & .wpcf7-valid-tip-text {
 	 	font: @base-font-style @base-font-variant @text-big~"/"@text-big-line-height @base-font-family;

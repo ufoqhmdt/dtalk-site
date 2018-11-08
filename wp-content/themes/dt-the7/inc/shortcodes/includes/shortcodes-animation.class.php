@@ -51,7 +51,7 @@ class Presscore_Shortcodes_Animation {
 	static public function get_html_class( $animation ) {
 		$class = '';
 
-		if ( array_key_exists( $animation, self::$animation_options ) ) {
+		if ( array_key_exists( $animation, self::$animation_options ) && self::is_animation_on( $animation ) ) {
 			$class = self::$animation_options[ $animation ] . ' animate-element';
 		}
 

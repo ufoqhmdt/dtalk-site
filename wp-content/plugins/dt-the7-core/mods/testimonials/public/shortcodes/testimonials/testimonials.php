@@ -43,17 +43,15 @@ if ( ! class_exists( 'DT_Shortcode_Testimonials', false ) ) {
 
 		protected function testimonials_masonry( $attributes = array() ) {
 
+			
 			if ( presscore_vc_is_inline() ) {
-				$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $attributes['category'], 'taxonomy' => $this->taxonomy ) );
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_testimonials',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_testim_masonry_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Testimonials', 'vc inline dummy', 'dt-the7-core' ),
 
-				$dummy = '
-					<div class="dt_vc-shortcode_dummy dt_vc-testimonials" style="height: 250px;">
-						<h5>Testimonials masonry</h5>
-						<p class="text-small"><strong>Display categories:</strong> ' . $terms_list . '</p>
-					</div>
-				';
-
-				return $dummy;
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			$output = '';
@@ -97,17 +95,15 @@ if ( ! class_exists( 'DT_Shortcode_Testimonials', false ) ) {
 
 		protected function testimonials_slider( $attributes = array() ) {
 
+			
 			if ( presscore_vc_is_inline() ) {
-				$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $attributes['category'], 'taxonomy' => $this->taxonomy ) );
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_testimonials',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_testim_carousel_editor_ico.gif', 131, 104 ),
+	                'title'  => _x( 'Testimonials slider', 'vc inline dummy', 'dt-the7-core' ),
 
-				$dummy = '
-					<div class="dt_vc-shortcode_dummy dt_vc-testimonials" style="height: 250px;">
-						<h5>Testimonials slider</h5>
-						<p class="text-small"><strong>Display categories:</strong> ' . $terms_list . '</p>
-					</div>
-				';
-
-				return $dummy;
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			$output = '';
@@ -121,17 +117,15 @@ if ( ! class_exists( 'DT_Shortcode_Testimonials', false ) ) {
 
 				echo '<section class="testimonial-item testimonial-item-slider">';
 					$autoslide = $attributes['autoslide'];
-					echo '<ul class="testimonials slider-content"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>' . "\n";
+					echo '<div class="testimonials slider-content owl-carousel dt-owl-carousel-init"' . ($autoslide ? ' data-autoslide="' . $autoslide . '"' : '') . '>' . "\n";
 
 						while ( $dt_query->have_posts() ) { $dt_query->the_post();
 
-							echo '<li>';
 								presscore_get_template_part( 'mod_testimonials', 'testimonials-post' );
-							echo '</li>';
 
 						}
 
-					echo '</ul>' . "\n";
+					echo '</div>' . "\n";
 				echo '</section>';
 
 				$output = ob_get_contents();

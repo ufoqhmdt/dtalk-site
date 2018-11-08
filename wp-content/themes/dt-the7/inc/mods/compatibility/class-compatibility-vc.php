@@ -34,6 +34,23 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_VC', false ) ) :
 			add_action( 'admin_print_scripts-post-new.php', array( __CLASS__, 'vc_row_scripts' ), 9999 );
 			add_action( 'admin_init', array( __CLASS__, 'remove_teaser_meta_box' ), 7 );
 			add_filter( 'presscore_localized_script', array( __CLASS__, 'localize_script' ) );
+
+			if ( presscore_vc_is_inline() ) {
+				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_vc_inline_assets' ), 20 );
+			}
+
+			add_action( 'vc_after_init_base' , array(  __CLASS__, 'remove_vc_the_excerpt_filter' ) );
+		}
+
+		/**
+		 * Remove vc excerptFilter. This filter cause great performance overhead so theme replaces it with own, more performant one.
+		 *
+		 * @see the7_shortcodeaware_excerpt_filter
+		 *
+		 * @since 6.4.0
+		 */
+		public static function remove_vc_the_excerpt_filter() {
+			remove_filter( 'the_excerpt', array( vc_manager()->vc(), 'excerptFilter' ) );
 		}
 
 		public static function load_bridge() {
@@ -59,17 +76,25 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_VC', false ) ) :
 		}
 
 		public static function load_admin_static() {
-			wp_enqueue_style( 'dt-vc-bridge', PRESSCORE_THEME_URI . '/inc/shortcodes/css/js_composer_bridge.css' );
+			wp_enqueue_style( 'dt-vc-bridge', PRESSCORE_THEME_URI . '/inc/shortcodes/css/js_composer_bridge.css', array(), THE7_VERSION );
 
 			if ( function_exists( 'vc_is_inline' ) && vc_is_inline() ) {
-				wp_enqueue_script( 'vc-custom-view-by-dt', PRESSCORE_THEME_URI . '/inc/shortcodes/js/vc-custom-view.js', array(), false, true );
+				wp_enqueue_script( 'vc-custom-view-by-dt', PRESSCORE_THEME_URI . '/inc/shortcodes/js/vc-custom-view.js', array(), THE7_VERSION, true );
 			}
 		}
 
 		public static function vc_row_scripts() {
 			if ( is_callable( 'vc_editor_post_types' ) && in_array( get_post_type(), vc_editor_post_types() ) ) {
-				wp_enqueue_script( 'dt-vc_row-custom-admin', trailingslashit( PRESSCORE_SHORTCODES_URI ) . 'vc_extend/vc_row-custom-admin.js', array(), wp_get_theme()->get( 'Version' ), true );
+				wp_enqueue_script( 'dt-vc_row-custom-admin', trailingslashit( PRESSCORE_SHORTCODES_URI ) . 'vc_extend/vc_row-custom-admin.js', array(), THE7_VERSION, true );
 			}
+		}
+
+		/**
+		 * Enqueue assets for vc inline editor.
+		 */
+		public static function enqueue_vc_inline_assets() {
+			wp_enqueue_style( 'the7-vc-inline-editor', get_template_directory_uri() . '/inc/shortcodes/css/vc-inline-editor.css', array(), THE7_VERSION );
+			wp_enqueue_script( 'the7-vc-inline-editor', get_template_directory_uri() . '/inc/shortcodes/js/vc-inline-editor.js', array(), THE7_VERSION, true );
 		}
 
 		public static function remove_teaser_meta_box() {

@@ -12,6 +12,12 @@ class Presscore_Mod_Team_Public {
 		foreach ( array( 'team' ) as $shortcode_name ) {
 			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
 		}
+		foreach ( array( 'team-carousel' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
+		foreach ( array( 'team-masonry' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
 	}
 
 	public function load_shortcodes_vc_bridge() {
@@ -26,6 +32,13 @@ class Presscore_Mod_Team_Public {
 		if ( 'page' == $post_type && 'team' == $template ) {
 			presscore_congif_populate_team_vars();
 		}
+	}
+
+	public function filter_masonry_wrap_taxonomy( $taxonomy, $post_type ) {
+		if ( 'dt_team' === $post_type ) {
+			$taxonomy = 'dt_team_category';
+		}
+		return $taxonomy;
 	}
 
 	public function archive_post_content( $html ) {

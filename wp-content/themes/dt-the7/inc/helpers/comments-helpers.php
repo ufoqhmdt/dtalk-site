@@ -46,9 +46,10 @@ if ( ! function_exists( 'presscore_comment' ) ) :
 					<footer class="comment-meta">
 						<div class="comment-author vcard">
 							<?php
-							$avatar = '<span class="avatar no-avatar"></span>';
-							if ( dt_validate_gravatar( $comment->comment_author_email ) ) {
-								$avatar = get_avatar( $comment, 60 );
+							$avatar = presscore_get_avatar( $comment, 60 );
+
+							if ( ! $avatar ) {
+								$avatar = '<span class="avatar no-avatar"></span>';
 							}
 
 							$author_url = get_comment_author_url();

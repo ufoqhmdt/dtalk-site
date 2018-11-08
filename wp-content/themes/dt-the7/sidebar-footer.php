@@ -2,12 +2,14 @@
 /**
  * The Sidebar containing the main widget areas.
  *
- * @package vogue
+ * @package The7
  * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 $footer_sidebar = presscore_validate_footer_sidebar( presscore_config()->get( 'footer_widgetarea_id' ) );
 
@@ -17,10 +19,9 @@ $show_bottom_bar = apply_filters( 'presscore_show_bottom_bar', presscore_config(
 if ( $show_sidebar || $show_bottom_bar ) : ?>
 
 	<!-- !Footer -->
-	<footer id="footer" <?php echo presscore_footer_html_class( 'footer' ); ?>>
+	<footer id="footer" <?php echo presscore_footer_html_class( 'footer' ) ?>>
 
 		<?php
-
 		if ( $show_sidebar ) :
 
 			// footer layout
@@ -31,20 +32,16 @@ if ( $show_sidebar || $show_bottom_bar ) : ?>
 			<div class="wf-wrap">
 				<div class="wf-container-footer">
 					<div class="wf-container">
-
 						<?php
 						do_action( 'presscore_before_footer_widgets' );
-
 						dynamic_sidebar( $footer_sidebar );
 						?>
-
 					</div><!-- .wf-container -->
 				</div><!-- .wf-container-footer -->
 			</div><!-- .wf-wrap -->
 
 		<?php
 			$sidebar_layout->remove_sidebar_columns();
-
 		endif;
 
 		if ( $show_bottom_bar ) {
@@ -54,4 +51,4 @@ if ( $show_sidebar || $show_bottom_bar ) : ?>
 
 	</footer><!-- #footer -->
 
-<?php endif; ?>
+<?php endif ?>

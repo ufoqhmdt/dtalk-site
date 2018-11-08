@@ -112,8 +112,8 @@ function dt_get_resized_img( $img, $opts, $resize = true, $is_retina = false ) {
 	$img_w = $w;
 
 	if ( $opts['hd_convert'] && $is_retina ) {
-		$img_h *= $opts['hd_ratio'];
-		$img_w *= $opts['hd_ratio'];
+		$img_h = round( $img_h * $opts['hd_ratio'] );
+		$img_w = round( $img_w * $opts['hd_ratio'] );
 	}
 
 	if ( 1 == $opts['zc'] ) {
@@ -223,11 +223,11 @@ function dt_get_thumb_img( $opts = array() ) {
 		$_img_meta = $original_image;
 
 		if ( $_prop > 1 ) {
-			$h = intval(floor($_img_meta[1] / $_prop));
-			$w = intval(floor($_prop * $h));
+			$h = (int) floor((int) $_img_meta[1] / $_prop);
+			$w = (int) floor($_prop * $h );
 		} else if ( $_prop < 1 ) {
-			$w = intval(floor($_prop * $_img_meta[2]));
-			$h = intval(floor($w / $_prop));
+			$w = (int) floor($_prop * $_img_meta[2]);
+			$h = (int) floor($w / $_prop );
 		} else {
 			$w = $h = min($_img_meta[1], $_img_meta[2]);
 		}
@@ -318,7 +318,8 @@ function dt_get_thumb_img( $opts = array() ) {
 		if ( $resized_image_hd ) {
 			$src_att .= ', ' . sprintf( $srcset_tpl, $hd_src, $resized_image_hd[1] );
 		}
-		$src_att = 'src="' . esc_attr( $src ) . '" srcset="' . esc_attr( $src_att ) . '"';
+		$src_sizes = $resized_image[1] . 'px';
+		$src_att = 'src="' . esc_attr( $src ) . '" srcset="' . esc_attr( $src_att ) . '" sizes="' . esc_attr( $src_sizes ) . '"';
 	}
 
 	$output = str_replace(
@@ -503,47 +504,6 @@ function dt_get_uploaded_logo( $logo, $type = 'normal' ) {
 	return $res_arr;
 }
 
-/**
- * Get image based on devicePixelRatio coocie and theme options.
- *
- * @param $logo array Regular logo.
- * @param $r_logo array Retina logo.
- * @param $default array Default logo.
- * @param $custom string Custom img attributes.
- *
- * @return string.
- */
-function dt_get_retina_sensible_image ( $logo, $r_logo, $default, $custom = '', $class = '' ) {
-	if ( empty( $default ) ) { return ''; }
-
-	if ( $logo && !$r_logo ) { $r_logo = $logo; }
-	elseif ( $r_logo && !$logo ) { $logo = $r_logo; }
-	elseif ( !$r_logo && !$logo ) { $logo = $r_logo = $default; } 
-
-	$img_meta = dt_is_hd_device() ? $r_logo : $logo;
-
-	if ( ! isset( $img_meta['size'] ) && isset( $img_meta[1], $img_meta[2] ) ) { $img_meta['size'] = image_hwstring( $img_meta[1], $img_meta[2] ); }
-	$output = dt_get_thumb_img( array(
-		'wrap' 		=> '<img %IMG_CLASS% %SRC% %SIZE% %CUSTOM% />',
-		'img_class'	=> $class,
-		'img_meta' 	=> $img_meta,
-		'custom'	=> $custom,
-		'echo'		=> false,
-		// TODO: add alt if it's possible
-		'alt'		=> '',
-	) );
-
-	return $output;
-}
-
-/**
- * Get device pixel ratio cookie value and check if it greater than 1.
- *
- * @return boolean
- */
-function dt_is_hd_device() {
-	return (isset($_COOKIE['devicePixelRatio']) && $_COOKIE['devicePixelRatio'] > 1.3);
-}
 
 // TODO: refactor
 /**
@@ -557,7 +517,7 @@ function dt_get_google_fonts( $font = '', $effect = '' ) {
 	}
 
 	?>
-	<link rel="stylesheet" type="text/css" href="//fonts.lug.ustc.edu.cn/css?family=<?php echo str_replace( ' ', '+', $font ); ?>">
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=<?php echo str_replace( ' ', '+', $font ); ?>">
 	<?php
 }
 
@@ -571,7 +531,7 @@ function dt_make_web_font_uri( $font ) {
 		return false;
 	}
 
-    return '//fonts.lug.ustc.edu.cn/css?family=' . str_replace( ' ', '+', $font );
+    return '//fonts.googleapis.com/css?family=' . str_replace( ' ', '+', $font );
 }
 
 /**
@@ -593,53 +553,28 @@ function dt_create_tag( $type, $options ) {
 	}
 }
 
-/**
- * Return favicon html.
- *
- * @param $icon string
- *
- * @return string.
- *
- * @since presscore 0.1
- */
-function dt_get_favicon( $icon = '' ) {
-	$output = '';
-	if ( ! empty( $icon ) ) {
+function the7_get_image_mime( $image ) {
+	$ext = explode( '.', $image );
 
-		if ( strpos( $icon, '/wp-content' ) === 0 || strpos( $icon, '/files' ) === 0 ) {
-			$icon = get_site_url() . $icon;
-		}
-
-		$ext = explode( '.', $icon );
-		if ( count( $ext ) > 1 ) {
-			$ext = end( $ext );
-		} else {
-			return '';
-		}
-
-		switch ( $ext ) {
-			case 'png':
-				$icon_type = esc_attr( image_type_to_mime_type( IMAGETYPE_PNG ) );
-				break;
-			case 'gif':
-				$icon_type = esc_attr( image_type_to_mime_type( IMAGETYPE_GIF ) );
-				break;
-			case 'jpg':
-			case 'jpeg':
-				$icon_type = esc_attr( image_type_to_mime_type( IMAGETYPE_JPEG ) );
-				break;
-			case 'ico':
-				$icon_type = esc_attr( 'image/x-icon' );
-				break;
-			default:
-				return '';
-		}
-
-		$output .= '<!-- icon -->' . "\n";
-		$output .= '<link rel="icon" href="' . $icon . '" type="' . $icon_type . '" />' . "\n";
-		$output .= '<link rel="shortcut icon" href="' . $icon . '" type="' . $icon_type . '" />' . "\n";
+	if ( count( $ext ) <= 1 ) {
+		return '';
 	}
-	return  $output;
+
+	$ext = end( $ext );
+
+	switch ( $ext ) {
+		case 'png':
+			return image_type_to_mime_type( IMAGETYPE_PNG );
+		case 'gif':
+			return image_type_to_mime_type( IMAGETYPE_GIF );
+		case 'jpg':
+		case 'jpeg':
+			return image_type_to_mime_type( IMAGETYPE_JPEG );
+		case 'ico':
+			return 'image/x-icon';
+		default:
+			return '';
+	}
 }
 
 /**
@@ -807,7 +742,14 @@ function dt_prepare_categorizer_data( array $opts ) {
 		}
 	}
 
-	$terms = get_categories( $args );
+	/**
+	 * Filter get_categories() args.
+     *
+     * @since 6.8.0
+     *
+     * @param array $args get_categories() args.
+	 */
+	$terms = get_categories( apply_filters( 'dt_prepare_categorizer_data_categories_args', $args ) );
 
 	return array(
 		'terms'         => $terms,
@@ -853,81 +795,11 @@ function dt_get_embed( $src, $width = '', $height = '' ) {
 }
 
 /**
- * Add little javascript that detects devicePixelRatio and if it's more than 1 - reload the page.
- */
-function dt_core_detect_retina_script() {
-/*
-
-function createCookie(name, value, days) {
-	var expires;
-	if (days) {
-		var date = new Date();
-		date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-		expires = "; expires=" + date.toGMTString();
-	}
-	else expires = "";
-	document.cookie = name + "=" + value + expires + "; path=/";
-}
-
-function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-	}
-	return null;
-}
-
-function eraseCookie(name) {
-	createCookie(name, "", -1);
-}
-
-function areCookiesEnabled() {
-	var r = false;
-	createCookie("testing", "Hello", 1);
-	if (readCookie("testing") != null) {
-		r = true;
-		eraseCookie("testing");
-	}
-	return r;
-}
-
-(function(w){
-	var targetCookie = readCookie('devicePixelRatio'),
-		dpr=((w.devicePixelRatio===undefined)?1:w.devicePixelRatio);
-	
-	if( !areCookiesEnabled() || (targetCookie != null) ) return;
-
-	createCookie('devicePixelRatio', dpr, 7);
-
-	if ( dpr != 1 ) {
-		w.location.reload(true);
-	}
-
-})(window)
-
-
-function createCookie(a,d,b){if(b){var c=new Date;c.setTime(c.getTime()+864E5*b);b="; expires="+c.toGMTString()}else b="";document.cookie=a+"="+d+b+"; path=/"}function readCookie(a){a+="=";for(var d=document.cookie.split(";"),b=0;b<d.length;b++){for(var c=d[b];" "==c.charAt(0);)c=c.substring(1,c.length);if(0==c.indexOf(a))return c.substring(a.length,c.length)}return null}function eraseCookie(a){createCookie(a,"",-1)}
-function areCookiesEnabled(){var a=!1;createCookie("testing","Hello",1);null!=readCookie("testing")&&(a=!0,eraseCookie("testing"));return a}(function(a){var d=readCookie("devicePixelRatio"),b=void 0===a.devicePixelRatio?1:a.devicePixelRatio;areCookiesEnabled()&&null==d&&(a.navigator.standalone?(d=new XMLHttpRequest,d.open("GET","<?php echo get_template_directory_uri();?>/set-cookie.php?devicePixelRatio="+b,!1),d.send()):createCookie("devicePixelRatio",b,7),a.location.reload(!0))})(window);
-
-
-*/
-	if ( !isset($_COOKIE['devicePixelRatio']) ) :
-?><script type="text/javascript">
-function createCookie(a,d,b){if(b){var c=new Date;c.setTime(c.getTime()+864E5*b);b="; expires="+c.toGMTString()}else b="";document.cookie=a+"="+d+b+"; path=/"}function readCookie(a){a+="=";for(var d=document.cookie.split(";"),b=0;b<d.length;b++){for(var c=d[b];" "==c.charAt(0);)c=c.substring(1,c.length);if(0==c.indexOf(a))return c.substring(a.length,c.length)}return null}function eraseCookie(a){createCookie(a,"",-1)}
-function areCookiesEnabled(){var a=!1;createCookie("testing","Hello",1);null!=readCookie("testing")&&(a=!0,eraseCookie("testing"));return a}(function(a){var d=readCookie("devicePixelRatio"),b=void 0===a.devicePixelRatio?1:a.devicePixelRatio;areCookiesEnabled()&&null==d&&(createCookie("devicePixelRatio",b,7),1!=b&&a.location.reload(!0))})(window);
-</script><?php
-	endif;
-}
-
-/**
  * Ajax send mail function.
  *
  * Description here.
  *
- * @since presscore 1.0
+ * @since 1.0.0
  */
 function dt_core_send_mail() {
 	$honey_msg = isset( $_POST['send_message'] ) ? trim( $_POST['send_message'] ) : '';
@@ -946,13 +818,8 @@ function dt_core_send_mail() {
 
 	$fields = apply_filters( 'dt_core_send_mail-sanitize_fields', $fields, $fields_titles );
 
-	$nonce = wp_create_nonce( 'dt_contact_form' );
 	$send = false;
 	$errors = '';
-
-	if ( is_user_logged_in() && ! check_ajax_referer( 'dt_contact_form', 'nonce', false ) ) {
-		$errors = _x( 'Nonce do not match', 'feedback msg', 'the7mk2' );
-	}
 
 	if( $honey_msg ) {
 		$errors = _x( 'Sorry, we suspect that you are bot', 'feedback', 'the7mk2' );
@@ -978,7 +845,7 @@ function dt_core_send_mail() {
 
 		// set headers
 		$headers = array(
-			'From: ' . esc_attr( strip_tags( $name ) ) . ' <' . $email . '>',
+			'From: ' . esc_attr( strip_tags( $name ) ) . ' <' . $em . '>',
 			'Reply-To: ' . $email,
 		);
 		$headers = apply_filters( 'dt_core_send_mail-headers', $headers );
@@ -990,7 +857,7 @@ function dt_core_send_mail() {
 				continue;
 			}
 
-			$msg_mail .= $fields_titles[ $field ] . " $value\n";
+			$msg_mail .= $fields_titles[ $field ] . ' ' . stripslashes( $value ) . "\n";
 		}
 		$msg_mail = wp_kses_post( $msg_mail );
 		$msg_mail = apply_filters( 'dt_core_send_mail-msg', $msg_mail, $fields );
@@ -1005,18 +872,20 @@ function dt_core_send_mail() {
 			$headers
 		);
 
+		$custom_success_msg = of_get_option( 'custom_success_messages', '' );
+		$custom_error_msg = of_get_option( 'custom_error_messages', '' );
+
 		// message
 		if ( $send ) {
-			$errors = _x( 'Feedback has been sent to the administrator', 'feedback msg', 'the7mk2' );
+			$errors = empty( $custom_success_msg ) ? _x( 'Your message has been sent.', 'feedback msg', 'the7mk2' ) : $custom_success_msg;
 		} else {
-			$errors = _x( 'The message has not been sent', 'feedback msg', 'the7mk2' );
+			$errors = empty( $custom_error_msg ) ? _x( 'The message has not been sent. Please try again.', 'feedback msg', 'the7mk2' ) : $custom_error_msg;
 		}
 	}
 
 	wp_send_json( array(
 		'success' => $send,
 		'errors'  => $errors,
-		'nonce'   => $nonce,
 	) );
 }
 add_action( 'wp_ajax_nopriv_dt_send_mail', 'dt_core_send_mail' );
@@ -1046,7 +915,7 @@ function dt_sanitize_email_fields( $fields = array(), $fields_titles = array() )
 				$fields[ $field ] = sanitize_email( $value );
 				break;
 
-			case 'msg' :
+			case 'message' :
 				$fields[ $field ] = esc_html( $value );
 				break;
 
@@ -1075,74 +944,6 @@ function dt_core_join_left_filter( $parts ) {
 		$parts['join'] = str_replace( 'INNER', 'LEFT', $parts['join']);
 	}
 	return $parts;
-}
-
-/**
- * Original can be found here: https://gist.github.com/justinph/5197810
- * Utility function to check if a gravatar exists for a given email or id
- *
- * @param int|string|object $id_or_email A user ID,  email address, or comment object
- *
- * @return bool if the gravatar exists or not
- */
-function dt_validate_gravatar($id_or_email) {
-	if(get_option('show_avatars') != 1)
-		return false;
-	//id or email code borrowed from wp-includes/pluggable.php
-	$email = '';
-	if ( is_numeric($id_or_email) ) {
-		$id = (int) $id_or_email;
-		$user = get_userdata($id);
-		if ( $user )
-			$email = $user->user_email;
-	} elseif ( is_object($id_or_email) ) {
-		// No avatar for pingbacks or trackbacks
-		$allowed_comment_types = apply_filters( 'get_avatar_comment_types', array( 'comment' ) );
-		if ( ! empty( $id_or_email->comment_type ) && ! in_array( $id_or_email->comment_type, (array) $allowed_comment_types ) )
-			return false;
- 
-		if ( !empty($id_or_email->user_id) ) {
-			$id = (int) $id_or_email->user_id;
-			$user = get_userdata($id);
-			if ( $user)
-				$email = $user->user_email;
-		} elseif ( !empty($id_or_email->comment_author_email) ) {
-			$email = $id_or_email->comment_author_email;
-		}
-	} else {
-		$email = $id_or_email;
-	}
- 
-	$hashkey = md5(strtolower(trim($email)));
-	$uri = 'http://www.gravatar.com/avatar/' . $hashkey . '?d=404';
- 
-	$data = wp_cache_get($hashkey);
-	if (false === $data) {
-		$response = wp_remote_head($uri);
-		if( is_wp_error($response) ) {
-			$data = 'not200';
-		} else {
-			$data = $response['response']['code'];
-		}
-		wp_cache_set($hashkey, $data, $group = '', $expire = 60*5);
- 
-	}		
-	if ($data == '200'){
-		return true;
-	} else {
-		return false;
-	}
-}
-
-/**
- * Retina on flag.
- *
- * @todo Remove
- *
- * @return boolean
- */
-function dt_retina_on() {
-	return true;
 }
 
 /**
@@ -1345,8 +1146,14 @@ function dt_is_legacy_mode() {
 	return Presscore_Modules_Legacy::is_legacy_mode_active();
 }
 
+/**
+ * @todo: Remove in 5.7.0
+ *
+ * @deprecated
+ * @return bool
+ */
 function dt_is_plugins_silenced() {
-	return The7_Admin_Dashboard_Settings::get( 'silence-plugins' );
+	return false;
 }
 
 function dt_make_image_src_ssl_friendly( $src ) {
@@ -1394,6 +1201,9 @@ function presscore_get_post_type_edit_link( $post_type, $text = null ) {
 
 if ( ! function_exists( 'presscore_config' ) ) :
 
+	/**
+	 * @return Presscore_Config
+	 */
 	function presscore_config() {
 		return Presscore_Config::get_instance();
 	}
@@ -1461,19 +1271,33 @@ function presscore_sanitize_classes( $classes ) {
 }
 
 function presscore_theme_is_activated() {
+	if ( defined( 'ENVATO_HOSTED_SITE' ) ) {
+		return true;
+	}
+
 	return ( 'yes' === get_site_option( 'the7_registered' ) );
 }
 
 function presscore_activate_theme() {
 	update_site_option( 'the7_registered', 'yes' );
+	do_action( 'the7_after_theme_activation' );
 }
 
 function presscore_deactivate_theme() {
 	delete_site_option( 'the7_registered' );
+	do_action( 'the7_after_theme_deactivation' );
+}
+
+function presscore_delete_purchase_code() {
+	delete_site_option( 'the7_purchase_code' );
 }
 
 function presscore_get_purchase_code() {
-    return get_site_option( 'the7_purchase_code' );
+	if ( defined( 'SUBSCRIPTION_CODE' ) ) {
+	    return 'envato_hosted:' . SUBSCRIPTION_CODE;
+	}
+
+	return get_site_option( 'the7_purchase_code' );
 }
 
 function presscore_get_censored_purchase_code() {
@@ -1486,15 +1310,86 @@ function presscore_get_censored_purchase_code() {
 	return $code;
 }
 
+/**
+ * Wrapper for set_time_limit to see if it is enabled.
+ *
+ * @since 6.4.0
+ * @param int $limit Time limit.
+ */
+function the7_set_time_limit( $limit = 0 ) {
+	if ( function_exists( 'set_time_limit' ) && false === strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+		@set_time_limit( $limit ); // @codingStandardsIgnoreLine
+	}
+}
+
 if ( ! function_exists( 'the7_get_theme_version' ) ):
 
 	/**
      * Returns parent theme version.
      *
+     * @TODO: Remove in 6.1.0
+     *
+     * @deprecated
+     *
 	 * @return false|string
 	 */
     function the7_get_theme_version() {
-        return wp_get_theme( get_template() )->get( 'Version' );
+        return THE7_VERSION;
     }
 
 endif;
+
+/**
+ * Add a submenu page after specified submenu page.
+ *
+ * This function takes a capability which will be used to determine whether
+ * or not a page is included in the menu.
+ *
+ * The function which is hooked in to handle the output of the page must check
+ * that the user has the required capability as well.
+ *
+ * @since 7.0.0
+ *
+ * @global array $submenu
+ * @global array $menu
+ * @global array $_wp_real_parent_file
+ * @global bool  $_wp_submenu_nopriv
+ * @global array $_registered_pages
+ * @global array $_parent_pages
+ *
+ * @param string   $parent_slug The slug name for the parent menu (or the file name of a standard
+ *                              WordPress admin page).
+ * @param string   $page_title  The text to be displayed in the title tags of the page when the menu
+ *                              is selected.
+ * @param string   $menu_title  The text to be used for the menu.
+ * @param string   $capability  The capability required for this menu to be displayed to the user.
+ * @param string   $menu_slug   The slug name to refer to this menu by. Should be unique for this menu
+ *                              and only include lowercase alphanumeric, dashes, and underscores characters
+ *                              to be compatible with sanitize_key().
+ * @param callable $function    The function to be called to output the content for this page.
+ * @param string $insert_after  Insert after menu item with that slug.
+ * @return false|string The resulting page's hook_suffix, or false if the user does not have the capability required.
+ */
+function the7_add_submenu_page_after( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function = '', $insert_after = '' ) {
+	$hook = add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
+
+	if ( $hook && $insert_after ) {
+		global $submenu;
+
+		$menu_slug   = plugin_basename( $menu_slug );
+		$new_submenu = array();
+		foreach ( $submenu[ $parent_slug ] as $i => $item ) {
+			if ( $item[2] === $menu_slug ) {
+				continue;
+			}
+
+			isset( $new_submenu[ $i ] ) ? $new_submenu[] = $item : $new_submenu[ $i ] = $item;
+			if ( $item[2] === $insert_after ) {
+				$new_submenu[] = array( $menu_title, $capability, $menu_slug, $page_title );
+			}
+		}
+		$submenu[ $parent_slug ] = $new_submenu;
+	}
+
+	return $hook;
+}

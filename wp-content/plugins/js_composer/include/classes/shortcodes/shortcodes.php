@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer Shortcodes main
+ * WPBakery WPBakery Page Builder Shortcodes main
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  *
  */
 
@@ -224,7 +224,7 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 	abstract class WPBakeryShortCode extends WPBakeryVisualComposerAbstract {
 
 		/**
-		 * @var
+		 * @var string - shortcode tag
 		 */
 		protected $shortcode;
 		/**
@@ -439,6 +439,11 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 			if ( is_file( $default_dir . $this->getFileName() . '.php' ) ) {
 				return $this->setTemplate( $default_dir . $this->getFileName() . '.php' );
 			}
+			$template = apply_filters( 'vc_shortcode_set_template_' . $this->shortcode, '' );
+
+			if ( ! empty( $template ) ? $template : '' ) {
+				return $this->setTemplate( $template );
+			}
 
 			return '';
 		}
@@ -540,7 +545,7 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 		 * @return string
 		 */
 		public function output( $atts, $content = null, $base = '' ) {
-			$this->atts = $this->prepareAtts( $atts );
+			$this->atts = $prepared_atts = $this->prepareAtts( $atts );
 			$this->shortcode_content = $content;
 			$output = '';
 			$content = empty( $content ) && ! empty( $atts['content'] ) ? $atts['content'] : $content;
@@ -572,7 +577,7 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 				}
 			}
 			// Filter for overriding outputs
-			$output = apply_filters( 'vc_shortcode_output', $output, $this, $this->atts );
+			$output = apply_filters( 'vc_shortcode_output', $output, $this, $prepared_atts );
 
 			return $output;
 		}
@@ -659,21 +664,20 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 		 */
 		public function endBlockComment( $string ) {
 			// _deprecated_function( 'WPBakeryShortCode::endBlockComment', '4.7 (will be removed in 4.10)', 'vc_asset_url' );
-
-			return wpb_debug() ? '<!-- END ' . $string . ' -->' : '';
+			return '';
 		}
 
 		/**
 		 * if wpb_debug=true return HTML comment
 		 *
 		 * @since 4.7
-		 *
+		 * @deprecated 5.5 no need for extra info in output, use xdebug
 		 * @param string $comment
 		 *
 		 * @return string
 		 */
 		public function debugComment( $comment ) {
-			return wpb_debug() ? '<!-- ' . $comment . ' -->' : '';
+			return '';
 		}
 
 		/**
@@ -691,6 +695,14 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 		 */
 		public function setSettings( $name, $value ) {
 			$this->settings[ $name ] = $value;
+		}
+
+		/**
+		 * @since 5.5
+		 * @return mixed
+		 */
+		public function getSettings() {
+			return $this->settings;
 		}
 
 		/**
@@ -931,15 +943,18 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 		}
 
 		/**
+		 * This functions prepares attributes to use in template
+		 * Converts back escaped characters
+		 *
 		 * @param $atts
 		 *
 		 * @return array
 		 */
 		protected function prepareAtts( $atts ) {
-			$return = array();
+			$returnAttributes = array();
 			if ( is_array( $atts ) ) {
 				foreach ( $atts as $key => $val ) {
-					$return[ $key ] = str_replace( array(
+					$returnAttributes[ $key ] = str_replace( array(
 						'`{`',
 						'`}`',
 						'``',
@@ -951,11 +966,11 @@ if ( ! class_exists( 'WPBakeryShortCode' ) ) {
 				}
 			}
 
-			return $return;
+			return apply_filters( 'vc_shortcode_prepare_atts', $returnAttributes, $this->shortcode, $this->settings );
 		}
 
 		/**
-		 * @return mixed
+		 * @return string
 		 */
 		public function getShortcode() {
 			return $this->shortcode;
@@ -1182,38 +1197,36 @@ if ( ! class_exists( 'WPBakeryShortCodesContainer' ) ) {
 		 * @return string
 		 */
 		public function contentAdmin( $atts, $content = null ) {
-			$width = $el_class = '';
+			$width = '';
 
 			$atts = shortcode_atts( $this->predefined_atts, $atts );
 			extract( $atts );
 			$this->atts = $atts;
 			$output = '';
 
-			for ( $i = 0; $i < count( $width ); $i ++ ) {
-				$output .= '<div ' . $this->mainHtmlBlockParams( $width, $i ) . '>';
-				if ( $this->backened_editor_prepend_controls ) {
-					$output .= $this->getColumnControls( $this->settings( 'controls' ) );
-				}
-				$output .= '<div class="wpb_element_wrapper">';
-
-				if ( isset( $this->settings['custom_markup'] ) && '' !== $this->settings['custom_markup'] ) {
-					$markup = $this->settings['custom_markup'];
-					$output .= $this->customMarkup( $markup );
-				} else {
-					$output .= $this->outputTitle( $this->settings['name'] );
-					$output .= '<div ' . $this->containerHtmlBlockParams( $width, $i ) . '>';
-					$output .= do_shortcode( shortcode_unautop( $content ) );
-					$output .= '</div>';
-					$output .= $this->paramsHtmlHolders( $atts );
-				}
-
-				$output .= '</div>';
-				if ( $this->backened_editor_prepend_controls ) {
-					$output .= $this->getColumnControls( 'add', 'bottom-controls' );
-
-				}
-				$output .= '</div>';
+			$output .= '<div ' . $this->mainHtmlBlockParams( $width, 1 ) . '>';
+			if ( $this->backened_editor_prepend_controls ) {
+				$output .= $this->getColumnControls( $this->settings( 'controls' ) );
 			}
+			$output .= '<div class="wpb_element_wrapper">';
+
+			if ( isset( $this->settings['custom_markup'] ) && '' !== $this->settings['custom_markup'] ) {
+				$markup = $this->settings['custom_markup'];
+				$output .= $this->customMarkup( $markup );
+			} else {
+				$output .= $this->outputTitle( $this->settings['name'] );
+				$output .= '<div ' . $this->containerHtmlBlockParams( $width, 1 ) . '>';
+				$output .= do_shortcode( shortcode_unautop( $content ) );
+				$output .= '</div>';
+				$output .= $this->paramsHtmlHolders( $atts );
+			}
+
+			$output .= '</div>';
+			if ( $this->backened_editor_prepend_controls ) {
+				$output .= $this->getColumnControls( 'add', 'bottom-controls' );
+
+			}
+			$output .= '</div>';
 
 			return $output;
 		}
@@ -1392,7 +1405,10 @@ if ( ! class_exists( 'WPBakeryShortCodeFishBones' ) ) {
  * Class Vc_Shortcodes_Manager
  */
 final class Vc_Shortcodes_Manager {
-	private $shortcode_classes = array();
+	private $shortcode_classes = array(
+		'default' => array(),
+	);
+
 	private $tag;
 	/**
 	 * Core singleton class
@@ -1424,8 +1440,12 @@ final class Vc_Shortcodes_Manager {
 	}
 
 	public function getElementClass( $tag ) {
-		if ( isset( $this->shortcode_classes[ $tag ] ) ) {
-			return $this->shortcode_classes[ $tag ];
+		$currentScope = WPBMap::getScope();
+		if ( isset( $this->shortcode_classes[ $currentScope ], $this->shortcode_classes[ $currentScope ][ $tag ] ) ) {
+			return $this->shortcode_classes[ $currentScope ][ $tag ];
+		}
+		if ( ! isset( $this->shortcode_classes[ $currentScope ] ) ) {
+			$this->shortcode_classes[ $currentScope ] = array();
 		}
 		$settings = WPBMap::getShortCode( $tag );
 		if ( empty( $settings ) ) {
@@ -1449,7 +1469,7 @@ final class Vc_Shortcodes_Manager {
 		} else {
 			$shortcode_class = new WPBakeryShortCodeFishBones( $settings );
 		}
-		$this->shortcode_classes[ $tag ] = $shortcode_class;
+		$this->shortcode_classes[ $currentScope ][ $tag ] = $shortcode_class;
 
 		return $shortcode_class;
 	}
@@ -1505,5 +1525,18 @@ final class Vc_Shortcodes_Manager {
 			$element_class = $this->getElementClass( $tag );
 			$element_class->printIconStyles();
 		}
+	}
+
+	public function isShortcodeClassInitialized( $tag ) {
+		$currentScope = WPBMap::getScope();
+
+		return isset( $this->shortcode_classes[ $currentScope ], $this->shortcode_classes[ $currentScope ][ $tag ] );
+	}
+
+	public function unsetElementClass( $tag ) {
+		$currentScope = WPBMap::getScope();
+		unset( $this->shortcode_classes[ $currentScope ][ $tag ] );
+
+		return true;
 	}
 }

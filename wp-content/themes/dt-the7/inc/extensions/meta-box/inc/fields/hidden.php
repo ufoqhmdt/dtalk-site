@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Hidden_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Hidden_Field' ) )
 {
-	class RWMB_Hidden_Field
+	class THE7_RWMB_Hidden_Field
 	{
 		/**
 		 * Get field HTML
@@ -18,7 +18,7 @@ if ( ! class_exists( 'RWMB_Hidden_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			return sprintf(
-				'<input type="hidden" class="rwmb-hidden" name="%s" id="%s" value="%s" />',
+				'<input type="hidden" class="the7-mb-hidden" name="%s" id="%s" value="%s" />',
 				$field['field_name'],
 				$field['id'],
 				$meta

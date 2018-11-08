@@ -73,6 +73,15 @@ $need_to_install_plugins = ! $this->plugins_checker()->is_plugins_active( $dummy
 			<button class="button button-primary dt-dummy-button-import"><?php _e( 'Import content', 'the7mk2' ); ?></button><span class="spinner"></span>
 		</div>
 	</div>
+    <div class="dt-dummy-controls-block">
+        <hr style="margin-bottom: 1.1em;">
+        <p><strong>Want to import a particular page(s)?</strong></p>
+    </div>
+    <div class="dt-dummy-controls-block dt-dummy-control-buttons dt-dummy-controls-block-import-one-page" >
+        <div class="dt-dummy-button-wrap">
+            <button class="button button-primary dt-dummy-button-import-one-page">Select page(s) to import</button><span class="spinner"></span>
+        </div>
+    </div>
 
 <?php if ( ! empty( $dummy_info['bottom_content'] ) ) : ?>
 

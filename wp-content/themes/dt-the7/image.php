@@ -2,19 +2,22 @@
 /**
  * Attachment template.
  *
- * @package presscore
- * @since presscore 0.1
+ * @package The7
+ * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 global $post;
 
-$config = Presscore_Config::get_instance();
-$config->set('template', 'image');
+$config = presscore_config();
+$config->set( 'template', 'image' );
 
-get_header(); ?>
+get_header();
+?>
 
 			<!-- Content -->
 			<div id="content" class="content" role="main">
@@ -23,9 +26,9 @@ get_header(); ?>
 
 					<?php while ( have_posts() ) : the_post(); ?>
 
-						<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+						<article id="post-<?php the_ID() ?>" <?php post_class() ?>>
 
-							<?php do_action('presscore_before_post_content'); ?>
+							<?php do_action( 'presscore_before_post_content' ) ?>
 
 							<?php
 							$img_meta = wp_get_attachment_image_src( $post->ID, 'full' );
@@ -38,7 +41,7 @@ get_header(); ?>
 								'wrap'			=>'<a %HREF% %CLASS% %CUSTOM% %TITLE%><img %IMG_CLASS% %SRC% %ALT% %SIZE% /></a>'
 							);
 
-							if ( isset($img_meta[1]) && $img_meta[1] < 890 ) {
+							if ( isset( $img_meta[1] ) && $img_meta[1] < 890 ) {
 								$img_args['wrap'] = "\n" . '<img %IMG_CLASS% %SRC% %SIZE% %ALT%/>' . "\n";
 								$img_args['class'] = '';
 								$img_args['img_class'] = 'alignleft';
@@ -54,14 +57,14 @@ get_header(); ?>
 
 						</article>
 
-						<?php do_action('presscore_after_post_content'); ?>
+						<?php do_action( 'presscore_after_post_content' ) ?>
 
-					<?php endwhile; ?>
+					<?php endwhile ?>
 
-				<?php endif; ?>
+				<?php endif ?>
 
 			</div><!-- #content -->
 
-			<?php do_action('presscore_after_content'); ?>
+			<?php do_action( 'presscore_after_content' ) ?>
 
-<?php get_footer(); ?>
+<?php get_footer() ?>

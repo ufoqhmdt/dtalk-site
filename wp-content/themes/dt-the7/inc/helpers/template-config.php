@@ -137,7 +137,6 @@ if ( ! function_exists( 'presscore_config_populate_archive_vars' ) ) :
 		} else {
 			$config->set( 'sidebar_position', 'disabled' );
 		}
-
 	}
 
 endif;
@@ -334,11 +333,15 @@ if ( ! function_exists( 'presscore_config_populate_header_options' ) ) :
 			$config->set( 'header_background', get_post_meta( $post_id, "{$prefix}background", true ), 'normal' );
 			$config->set( 'header.transparent.background.opacity', get_post_meta( $post_id, "{$prefix}transparent_bg_opacity", true ), 50 );
 			$config->set( 'header.transparent.background.color', get_post_meta( $post_id, "{$prefix}transparent_bg_color", true ), '#000000' );
+			$config->set( 'top_bar.transparent.background.opacity', get_post_meta( $post_id, "{$prefix}transparent_top_bar_bg_opacity", true ), 25 );
+			$config->set( 'top_bar.transparent.background.color', get_post_meta( $post_id, "{$prefix}transparent_top_bar_bg_color", true ), '#ffffff' );
 			$config->set( 'header.transparent.color_scheme', get_post_meta( $post_id, "{$prefix}transparent_bg_color_scheme", true ), 'from_options' );
 		} elseif ( 'disabled' === $header_title ) {
 			$config->set( 'header_background', get_post_meta( $post_id, "{$prefix}disabled_background", true ), 'normal' );
 			$config->set( 'header.transparent.background.opacity', get_post_meta( $post_id, "{$prefix}disabled_transparent_bg_opacity", true ), 50 );
 			$config->set( 'header.transparent.background.color', get_post_meta( $post_id, "{$prefix}disabled_transparent_bg_color", true ), '#000000' );
+			$config->set( 'top_bar.transparent.background.opacity', get_post_meta( $post_id, "{$prefix}disabled_transparent_top_bar_bg_opacity", true ), 25 );
+			$config->set( 'top_bar.transparent.background.color', get_post_meta( $post_id, "{$prefix}disabled_transparent_top_bar_bg_color", true ), '#ffffff' );
 			$config->set( 'header.transparent.color_scheme', get_post_meta( $post_id, "{$prefix}disabled_transparent_bg_color_scheme", true ), 'from_options' );
 		}
 
@@ -348,11 +351,8 @@ if ( ! function_exists( 'presscore_config_populate_header_options' ) ) :
 			case 'side':
 				$config->set( 'header_background', 'normal' );
 				break;
-			case 'overlay':
-			case 'slide_out':
-				if ( 'top_line' !== $config->get( 'header.mixed.view' ) ) {
-					$config->set( 'header_background', 'normal' );
-				}
+			case 'top_line':
+				$config->set( 'header_background', 'normal' );
 				break;
 		}
 
@@ -367,14 +367,18 @@ if ( ! function_exists( 'presscore_config_populate_header_options' ) ) :
 		$config->set( 'fancy_header.title', get_post_meta( $post_id, "{$prefix}title", true ), '' );
 		$config->set( 'fancy_header.title.mode', get_post_meta( $post_id, "{$prefix}title_mode", true ), 'custom' );
 		$config->set( 'fancy_header.title.aligment', get_post_meta( $post_id, "{$prefix}title_aligment", true ), 'center' );
-		$config->set( 'fancy_header.title.font.size', get_post_meta( $post_id, "{$prefix}title_size", true ), 'h1' );
+		$config->set( 'fancy_header.title.font.size', get_post_meta( $post_id, "{$prefix}title_font_size", true ));
+		$config->set( 'fancy_header.title.line.height', get_post_meta( $post_id, "{$prefix}title_line_height", true ));
+		$config->set( 'fancy_header.title.capitalize', get_post_meta( $post_id, "{$prefix}uppercase", true ));
 		$config->set( 'fancy_header.title.color.mode', get_post_meta( $post_id, "{$prefix}title_color_mode", true ), 'color' );
 		$config->set( 'fancy_header.title.color', get_post_meta( $post_id, "{$prefix}title_color", true ), '#ffffff' );
 
 		// subtitle
 
 		$config->set( 'fancy_header.subtitle', get_post_meta( $post_id, "{$prefix}subtitle", true ), '' );
-		$config->set( 'fancy_header.subtitle.font.size', get_post_meta( $post_id, "{$prefix}subtitle_size", true ), 'h3' );
+		$config->set( 'fancy_header.subtitle.font.size', get_post_meta( $post_id, "{$prefix}subtitle_font_size", true ));
+		$config->set( 'fancy_header.subtitle.line.height', get_post_meta( $post_id, "{$prefix}subtitle_line_height", true ));
+		$config->set( 'fancy_header.subtitle.capitalize', get_post_meta( $post_id, "{$prefix}subtitle_uppercase", true ));
 		$config->set( 'fancy_header.subtitle.color.mode', get_post_meta( $post_id, "{$prefix}subtitle_color_mode", true ), 'color' );
 		$config->set( 'fancy_header.subtitle.color', get_post_meta( $post_id, "{$prefix}subtitle_color", true ), '#ffffff' );
 
@@ -387,12 +391,18 @@ if ( ! function_exists( 'presscore_config_populate_header_options' ) ) :
 		$config->set( 'fancy_header.bg.position.y', get_post_meta( $post_id, "{$prefix}bg_position_y", true ) );
 		$config->set( 'fancy_header.bg.fullscreen', get_post_meta( $post_id, "{$prefix}bg_fullscreen", true ) );
 
-		$config->set( 'fancy_header.bg.fixed', get_post_meta( $post_id, "{$prefix}bg_fixed", true ) );
-		$config->set( 'fancy_header.parallax.speed', floatval( get_post_meta( $post_id, "{$prefix}parallax_speed", true ) ) );
+		$config->set( 'fancy_header.bg.fixed', get_post_meta( $post_id, "{$prefix}scroll_effect", true ));
+		$config->set( 'fancy_header.bg.overlay', get_post_meta( $post_id, "{$prefix}bg_overlay", true ) );
+		$config->set( 'fancy_header.bg.overlay.color', get_post_meta( $post_id, "{$prefix}overlay_color", true ), '#000000' );
+
+		$config->set( 'fancy_header.bg.overlay.opacity', get_post_meta( $post_id, "{$prefix}bg_overlay_opacity", true ), 30 );
+		$config->set( 'fancy_header.parallax.speed', floatval( get_post_meta( $post_id, "{$prefix}bg_parallax", true ) ) );
 
 		// height
 
 		$config->set( 'fancy_header.height', absint( get_post_meta( $post_id, "{$prefix}height", true ) ) );
+		$config->set( 'fancy_header.padding.top',  get_post_meta( $post_id, "{$prefix}padding-top", true ), 0  );
+		$config->set( 'fancy_header.padding.bottom',  get_post_meta( $post_id, "{$prefix}padding-bottom", true ), 0  );
 
 		// breadcrumbs
 		$config->set( 'fancy_header.breadcrumbs', get_post_meta( $post_id, "{$prefix}breadcrumbs", true ), 'enabled' );
@@ -418,15 +428,6 @@ if ( ! function_exists( 'presscore_config_populate_header_options' ) ) :
 		$config->set( 'slideshow_slider_height', $slider_prop['height'] );
 
 		$config->set( 'slideshow_slider_scaling', get_post_meta( $post_id, "{$prefix}scaling", true ) );
-
-		$config->set( 'slideshow_3d_layout', get_post_meta( $post_id, "{$prefix}3d_layout", true ) );
-
-		$slider_3d_prop = get_post_meta( $post_id, "{$prefix}3d_slider_proportions", true );
-		if ( empty($slider_3d_prop) ) {
-			$slider_3d_prop = array( 'width' => 500, 'height' => 500 );
-		}
-		$config->set( 'slideshow_3d_slider_width', $slider_3d_prop['width'] );
-		$config->set( 'slideshow_3d_slider_height', $slider_3d_prop['height'] );
 
 		$config->set( 'slideshow_autoslide_interval', get_post_meta( $post_id, "{$prefix}autoslide_interval", true ) );
 		$config->set( 'slideshow_autoplay', get_post_meta( $post_id, "{$prefix}autoplay", true ) );
@@ -486,6 +487,11 @@ if ( ! function_exists( 'presscore_config_logo_options' ) ) :
 
 		$config->set( 'logo.header.floating.regular', of_get_option( 'header-style-floating-logo_regular', array( '', 0 ) ) );
 		$config->set( 'logo.header.floating.hd', of_get_option( 'header-style-floating-logo_hd', array( '', 0 ) ) );
+
+		if ( presscore_header_is_transparent() && ! presscore_header_layout_is_side() ) {
+			$config->set( 'header.mobile.logo.first_switch', of_get_option( 'header-transparent-mobile-first_switch-logo' ) );
+			$config->set( 'header.mobile.logo.second_switch', of_get_option( 'header-transparent-mobile-second_switch-logo' ) );
+		}
 	}
 
 endif;
@@ -626,20 +632,13 @@ if ( ! function_exists( 'presscore_config_get_theme_option' ) ) :
 			'template.lightbox.overlay.opacity'                          => array( 'option', 'general-lightbox_overlay_opacity', 85 ),
 			'template.accent.color.mode'                          => array( 'option', 'general-accent_color_mode', 'color' ),
 			'template.layout'                                     => array( 'option', 'general-layout', 'wide' ),
-
 			'template.posts_filter.style'                         => array( 'option', 'general-filter_style', 'ios' ),
 			'template.posts_filter.text_upper_case'               => array( 'option', 'general-filter_ucase', false ),
-			
-
-			'slideshow.bullets.style'                             => array( 'option', 'general-slideshow_bullets_style', 'outline' ),
-
 			'template.images.hover.style'                         => array( 'option', 'image_hover-style', 'none' ),
-			'template.images.hover.animation'                     => array( 'option', 'image_hover-onclick_animation', true ),
+			
 			'template.images.hover.icon'                          => array( 'option', 'image_hover-default_icon', 'none' ),
-
 			'post.preview.mini_images.style'                      => array( 'option', 'image_hover-album_miniatures_style', 'style_1' ),
 			'post.preview.hover.icon.style'                       => array( 'option', 'image_hover-project_icons_style', 'accent' ),
-
 			'buttons.style'                                       => array( 'option', 'buttons-style', 'flat' ),
 			'buttons.background'                                  => array( 'option', 'buttons-color_mode', 'accent' ),
 			'buttons.text.color'                                  => array( 'option', 'buttons-text_color_mode', 'accent' ),
@@ -650,8 +649,9 @@ if ( ! function_exists( 'presscore_config_get_theme_option' ) ) :
 			'header.floating_navigation.enabled'                  => array( 'option', 'header-show_floating_navigation', '1' ),
 			'header.floating_navigation.show_after'               => array( 'option', 'header-floating_navigation-show_after', '150' ),
 			'header.floating_navigation.decoraion'                => array( 'option', 'header-floating_navigation-decoration' ),
+			
 			'header.top_bar.background.mode'                      => array( 'option', 'top_bar-bg-style', 'content_line' ),
-
+			'header.top_bar.transparent.line'                      => array( 'option', 'top_bar-line-in-transparent-header' ),
 			'page_title.enabled'                                  => array( 'option', 'general-show_titles' ),
 			'page_title.align'                                    => array( 'option', 'general-title_align' ),
 			'page_title.font.size'                                => array( 'option', 'general-title_size' ),
@@ -669,37 +669,38 @@ if ( ! function_exists( 'presscore_config_get_theme_option' ) ) :
 			'page_title.background.fullscreen'                    => array( 'option', 'general-title_bg_fullscreen' ),
 			'page_title.background.responsiveness'                         => array( 'option', 'general-titles_responsiveness' ),
 			'page_title.background.overlay'                         => array( 'option', 'general-title_bg_overlay' ),
-
 			'page_title.background.parallax'                => array( 'option', 'general-title_scroll_effect' ),
-			
 			'page_title.background.parallax_speed'                => array( 'option', 'general-title_bg_parallax' ),
-
 			'header_background'                                   => array( 'option', 'header-background', 'normal' ),
-
 			'header.transparent.background.opacity'               => array( 'option', 'header-transparent_bg_opacity', 50 ),
 			'header.transparent.background.color'                 => array( 'option', 'header-transparent_bg_color', '#000000' ),
-			// 'header.is_transparent'                               => array( 'option', 'header-is_transparent' ),
 			'header.transparent.color_scheme'                     => array( 'option', 'page_title-background-style-transparent-color_scheme' ),
-
 			'header.layout'                                       => array( 'option', 'header-layout', 'inline' ),
-
+			'header.navigation'                                       => array( 'option', 'header_navigation' ),
 			'header.mobile.logo.first_switch.layout'              => array( 'option', 'header-mobile-first_switch-layout' ),
-			'header.mobile.logo.first_switch'                     => array( 'option', 'header-mobile-first_switch-logo', 'mobile' ),
 			'header.mobile.logo.second_switch.layout'             => array( 'option', 'header-mobile-second_switch-layout' ),
+			'header.mobile.logo.first_switch'                     => array( 'option', 'header-mobile-first_switch-logo', 'mobile' ),
 			'header.mobile.logo.second_switch'                    => array( 'option', 'header-mobile-second_switch-logo', 'mobile' ),
 			'header.mobile.floatin_navigation'                    => array( 'option', 'header-mobile-floating_navigation' ),
 			'header.mobile.menu.align'                            => array( 'option', 'header-mobile-menu-align', 'left' ),
+			'header.mobile.menu_icon.size'                              => array( 'option', 'header-mobile-menu_icon-size' ),
+			'header.mobile.menu_icon.bg.enable'                              => array( 'option', 'header-mobile-menu_icon-bg-enable' ),
 			'header.menu.submenu.parent_clickable'                => array( 'option', 'header-menu-submenu-parent_is_clickable', true ),
 			'header.menu.hover.decoration.style'                  => array( 'option', 'menu-decoration_style', '' ),
-
 			'header.decoration'                                   => array( 'option', 'header-decoration', 'shadow' ),
-
 			'header.elements.search.caption'                      => array( 'option', 'header-elements-search-caption' ),
-			'header.elements.search.icon.enabled'                 => array( 'option', 'header-elements-search-icon', true ),
+			'header.elements.search.input.caption'                      => array( 'option', 'header-elements-search-input-caption' ),
+			'header.elements.search.icon.enabled'                 => array( 'option', 'header-elements-search-icon', 'default'),
+			'header.elements.search.icon.custom'                 => array( 'option', 'header-elements-search_custom-icon', true ),
+			'header.elements.search.style'                 => array( 'option', 'microwidgets-search_style', true ),
+			'header.elements.search.icon'                 => array( 'option', 'microwidgets-search_icon', true ),
+			'header.elements.search.custom.icon'                 => array( 'option', 'microwidgets-search_custom-icon', true ),
 			'header.elements.login.caption'                       => array( 'option', 'header-elements-login-caption' ),
 			'header.elements.logout.caption'                      => array( 'option', 'header-elements-logout-caption' ),
 			'header.elements.login.icon.enabled'                  => array( 'option', 'header-elements-login-icon', true ),
 			'header.elements.login.url'                           => array( 'option', 'header-elements-login-url' ),
+
+			'product.related.show_cart_btn'                  => array( 'option', 'woocommerce-related_btn'),
 		) );
 
 		$sidebar_style = of_get_option( 'sidebar-visual_style', 'with_dividers' );
@@ -725,21 +726,43 @@ if ( ! function_exists( 'presscore_config_get_theme_option' ) ) :
 		// bottom bar
 		$config->set( 'template.bottom_bar.enabled', of_get_option( 'bottom_bar-enabled' ) );
 		$config->set( 'template.bottom_bar.style', of_get_option( 'bottom_bar-style', 'full_width_line' ) );
+		$config->set( 'template.bottom_bar.layout', of_get_option( 'bottom_bar-layout', 'logo_left' ) );
 		$config->set( 'template.bottom_bar.copyrights', of_get_option( 'bottom_bar-copyrights', '' ) );
 		$config->set( 'template.bottom_bar.text', of_get_option( 'bottom_bar-text', '' ) );
 		$config->set( 'template.bottom_bar.credits', of_get_option( 'bottom_bar-credits', true ) );
 
 		// header layouts
 		$header = 'header-' . $config->get( 'header.layout' ) . '-';
+		$header_mixed = 'header-' . $config->get( 'header.navigation' ) . '-';
+
+		$header_raw = $config->get( 'header.layout' );
+        if ( in_array( $header_raw, array( 'top_line', 'side_line', 'menu_icon' ) ) ) {
+            // Config for mixed headers
+            $config->map( array(
+               'header.logo.position'                                     => array( 'option', "{$header_mixed}logo-position" ),
+               'header.menu.position'                                     => array( 'option', "{$header_mixed}menu-position" ),
+               'header.content.position'                                  => array( 'option', "{$header_mixed}content-position" ),
+				'header.position'                                          => array( 'option', "{$header_mixed}position" ),
+				'header.menu.items.alignment'                              => array( 'option', "{$header_mixed}menu-items_alignment" ),
+				'header.menu.items.link'                                   => array( 'option', "{$header_mixed}menu-items_link" ),
+            ));
+        } else {
+            $header = 'header-' . $header_raw . '-';
+            // Config for inline headers
+            $config->map( array(
+               'header.logo.position'                                     => array( 'option', "{$header}logo-position" ),
+               'header.menu.position'                                     => array( 'option', "{$header}menu-position" ),
+               'header.content.position'                                  => array( 'option', "{$header}content-position" ),
+				'header.position'                                          => array( 'option', "{$header}position" ),
+				'header.menu.items.alignment'                              => array( 'option', "{$header}menu-items_alignment" ),
+				'header.menu.items.link'                                   => array( 'option', "{$header}menu-items_link" ),
+            ));
+        }
 
 		$config->map( array(
 			'header.elements.enabled'                                  => array( 'option', "{$header}show_elements" ),
 			'header.elements'                                          => array( 'option', "{$header}elements" ),
 			'header.is_fullwidth'                                      => array( 'option', "{$header}is_fullwidth" ),
-			'header.logo.position'                                     => array( 'option', "{$header}logo-position" ),
-			'header.menu.position'                                     => array( 'option', "{$header}menu-position" ),
-			'header.menu.items.alignment'                              => array( 'option', "{$header}menu-items_alignment" ),
-			'header.menu.items.link'                                   => array( 'option', "{$header}menu-items_link" ),
 			'header.menu.items.margins.style'                          => array( 'option', 'header-menu-item-surround_margins-style' ),
 			'header.menu.background.style'                             => array( 'option', "{$header}menu-bg-style" ),
 			'header.menu.show_next_lvl_icons'                          => array( 'option', 'header-menu-show_next_lvl_icons', true ),
@@ -751,26 +774,27 @@ if ( ! function_exists( 'presscore_config_get_theme_option' ) ) :
 			'header.menu.decoration.style.other.hover.line.enabled'    => array( 'option', 'header-menu-decoration-other-hover-line' ),
 			'header.menu.decoration.style.other.active.style'          => array( 'option', 'header-menu-decoration-other-active-style' ),
 			'header.menu.decoration.style.other.active.line.enabled'   => array( 'option', 'header-menu-decoration-other-active-line' ),
-			'header.menu.decoration.style.other.click_decor.enabled'   => array( 'option', 'header-menu-decoration-other-click_decor' ),
 			'header.menu.decoration.style.other.links.is_justified'    => array( 'option', 'header-menu-decoration-other-links-is_justified' ),
 			'header.menu.hover.color.style'                            => array( 'option', 'header-menu-hover-font-color-style' ),
 			'header.menu.submenu.hover.color.style'                    => array( 'option', 'header-menu-submenu-hover-font-color-style' ),
 			'header.menu.submenu.show_next_lvl_icons'                  => array( 'option', 'header-menu-submenu-show_next_lvl_icons', true ),
 			'header.menu.submenu.background.hover.style'               => array( 'option', 'header-menu-submenu-bg-hover' ),
-			'header.content.position'                                  => array( 'option', "{$header}content-position" ),
-			'header.position'                                          => array( 'option', "{$header}position" ),
-			'header.layout.slide_out.animation'                        => array( 'option', "{$header}overlay-animation" ),
-			'header.layout.slide_out.x_cursor.enabled'                 => array( 'option', 'header-slide_out-overlay-x_cursor' ),
-			'header.layout.slide_out.blur.enabled'                     => array( 'option', 'header-slide_out-overlay-blur' ),
+			
+			'header.layout.slide_out.animation'                        => array( 'option', "header-slide_out-overlay-animation" ),
+			
 			'header.layout.side.menu.submenu.position'                 => array( 'option', 'header-side-menu-submenu-position' ),
 			'header.decoration'                                        => array( 'option', 'header-decoration' ),
 			'header.mixed.decoration'                                  => array( 'option', 'header-mixed-decoration' ),
 			'header.mixed.menu_icon.size'                              => array( 'option', 'header-menu_icon-size' ),
 			'header.mixed.view'                                        => array( 'option', "{$header}layout" ),
-			'header.mixed.view.menu_icon.floating_logo.enabled'        => array( 'option', "{$header}layout-menu_icon-show_floating_logo" ),
-			'header.mixed.view.top_line.is_fullwidth'                  => array( 'option', "{$header}layout-top_line-is_fullwidth" ),
-			'header.mixed.view.top_line.logo.position'                 => array( 'option', "{$header}layout-top_line-logo-position" ),
-			'header.mixed.view.side_line.position'                     => array( 'option', "{$header}layout-side_line-position" ),
+			'header.mixed.navigation'                                  => array( 'option', 'header_navigation' ),
+			'header.mixed.view.menu_icon.floating_logo.enabled'        => array( 'option', "layout-menu_icon-show_floating_logo" ),
+			'header.mixed.view.menu_icon.position'        => array( 'option', "layout-menu_icon-position" ),
+			'header.mixed.view.top_line.is_fullwidth'                  => array( 'option', "layout-top_line-is_fullwidth" ),
+			'header.mixed.view.top_line.is_sticky'                     => array( 'option', "layout-top_line-is_sticky" ),
+			'header.mixed.view.top_line.logo.position'                 => array( 'option', "layout-top_line-logo-position" ),
+			'header.mixed.view.side_line.position'                     => array( 'option', "layout-side_line-position" ),
+			'header.mixed.view.side_line_v.position'                     => array( 'option', "layout-side_line-v_position" ),
 			'template.icons.style'                                     => array( 'option', "{$header}icons_style", 'light' ),
 		) );
 	}

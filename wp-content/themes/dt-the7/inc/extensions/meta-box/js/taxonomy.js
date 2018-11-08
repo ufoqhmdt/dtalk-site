@@ -24,6 +24,6 @@ jQuery( document ).ready( function( $ )
 		{
 			$( this ).val( $( 'options:first', this ).val() ).attr( 'disabled', 'disabled' );
 		} );
-		$childList.filter( '.rwmb-taxonomy-' + $value ).removeClass( 'disabled' ).addClass( 'active' ).children( 'select' ).removeAttr( 'disabled' );
+		$childList.filter( '.the7-mb-taxonomy-' + $value ).removeClass( 'disabled' ).addClass( 'active' ).children( 'select' ).removeAttr( 'disabled' );
 	} );
 } );

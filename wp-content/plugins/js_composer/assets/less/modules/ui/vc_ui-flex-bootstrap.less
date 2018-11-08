@@ -51,8 +51,31 @@
   .vc_col(1); // kickstart it
 }
 
+.vc_float-media-grid-columns-rtl(@class) {
+  // initial
+  .vc_col-rtl(@index) when (@index = 1) {
+    @item: ~".rtl .vc_rtl-columns-reverse .vc_media-@{class} .vc_col-@{class}-@{index}";
+    .vc_col-rtl((@index + 1), @item);
+  }
+
+  // general
+  .vc_col-rtl(@index, @list) when (@index =< @grid-columns) {
+    @item: ~".rtl .vc_rtl-columns-reverse .vc_media-@{class} .vc_col-@{class}-@{index}";
+    .vc_col-rtl((@index + 1), ~"@{list}, @{item}");
+  }
+
+  // terminal
+  .vc_col-rtl(@index, @list) when (@index > @grid-columns) {
+    @{list} {
+      float: right;
+    }
+  }
+  .vc_col-rtl(1); // kickstart it
+}
+
 .vc_make-media-grid(@class) {
   .vc_float-media-grid-columns(@class);
+  .vc_float-media-grid-columns-rtl(@class);
   .vc_media-@{class} {
     .vc_loop-grid-columns(@grid-columns, @class, width);
     .vc_loop-grid-columns(@grid-columns, @class, pull);

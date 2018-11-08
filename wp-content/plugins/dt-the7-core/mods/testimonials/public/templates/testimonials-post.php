@@ -10,8 +10,14 @@ global $post;
 $post_id = get_the_ID();
 
 // get avatar ( featured image )
-$avatar = '<span class="alignleft no-avatar"></span>';
-if ( has_post_thumbnail( $post_id ) ) {
+$config = Presscore_Config::get_instance();
+$show_avatar = $config->get( 'show_avatar', true );
+if ( $show_avatar ) {
+	$avatar = '<span class="alignleft no-avatar"></span>';
+}else {
+	$avatar = '';
+}
+if ( has_post_thumbnail( $post_id ) && $show_avatar ) {
 
 	$thumb_id = get_post_thumbnail_id( $post_id );
 	$avatar = dt_get_thumb_img( array(
@@ -31,7 +37,9 @@ if ( has_post_thumbnail( $post_id ) ) {
 }
 
 // get link
-$link = get_post_meta( $post_id, '_dt_testimonial_options_link', true );
+$link = false;
+// TODO: Remove it in the future. To enable just uncomment.
+//$link = get_post_meta( $post_id, '_dt_testimonial_options_link', true );
 if ( $link ) {
 	$link = esc_url( $link );
 	$avatar = '<a href="' . $link . '" class="rollover" target="_blank">' . $avatar . '</a>';
@@ -57,7 +65,7 @@ if ( $title ) {
 		$title = '<span class="text-primary">' . $title . '</span>';
 	}
 
-	$title .= '<br />';
+	//$title .= '<br />';
 } else {
 	$title = '';
 }
@@ -76,10 +84,10 @@ echo '<article>', "\n\t",
 			$content,
 		'</div>', "\n\t",
 		'<div class="testimonial-vcard">',
-			'<div class="wf-td">',
+			'<div class="testimonial-thumbnail">',
 				$avatar,
 			'</div>',
-			'<div class="wf-td">',
+			'<div class="testimonial-desc">',
 				$title . $position,
 			'</div>',
 		'</div>', "\n",

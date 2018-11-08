@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( !class_exists( 'RWMB_Range_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Range_Field' ) )
 {
-	class RWMB_Range_Field
+	class THE7_RWMB_Range_Field
 	{
 		/**
 		 * Enqueue styles
@@ -13,7 +13,7 @@ if ( !class_exists( 'RWMB_Range_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'rwmb-range', RWMB_CSS_URL . 'range.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-range', THE7_RWMB_CSS_URL . 'range.css', array(), THE7_RWMB_VER );
 		}
 
 		/**
@@ -28,7 +28,7 @@ if ( !class_exists( 'RWMB_Range_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			return sprintf(
-				'<input type="range" class="rwmb-range" name="%s" id="%s" value="%s" min="%s" max="%s" step="%s" />',
+				'<input type="range" class="the7-mb-range" name="%s" id="%s" value="%s" min="%s" max="%s" step="%s" />',
 				$field['field_name'],
 				$field['id'],
 				$meta,

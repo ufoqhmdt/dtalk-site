@@ -14,10 +14,6 @@ body #load {
 	-webkit-transition: all .35s ease-out;
 	transition: all .35s ease-out;
 }
-body #load.loader-removed {
-	opacity: 0;
-	visibility: hidden;
-}
 
 /* #Double circles
 ================================================== */
@@ -45,12 +41,11 @@ body #load.loader-removed {
 /* #Beautiful loading dynamic
 ================================================== */
 
-.background-gradient (@startColor: #eee, @endColor: white) when (iscolor(@endColor)) {
+.background-gradient (@startColor: #eee, @endColor: white) when not (@endColor = "") {
 	background: @startColor; /* Old browsers */
-	background: -webkit-linear-gradient(30deg,  @startColor 0%,@endColor 100%); /* Chrome10+,Safari5.1+ */
-	background: linear-gradient(30deg, @startColor 0%,@endColor 100%); /* W3C */
-} 
-
+	background: -webkit-linear-gradient(@endColor); /* Chrome10+,Safari5.1+ */
+	background: linear-gradient(@endColor); /* W3C */
+}
 
 #load {
 	background-color: @beautiful-loading-bg;

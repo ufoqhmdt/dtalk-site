@@ -2,10 +2,10 @@
 
 if ( ! class_exists( 'Presscore_Portfolio_Posts_Scroller', false ) ) {
 
-	class Presscore_Portfolio_Posts_Scroller extends Presscore_Posts_Slider_Scroller {
+	class Presscore_Portfolio_Posts_Scroller extends The7pt_Posts_Scroller {
 
 		protected function setup_config() {
-			$config = presscore_get_config();
+			$config = presscore_config();
 
 			$config->set( 'is_scroller', true );
 			$config->set( 'template', 'portfolio' );
@@ -13,14 +13,16 @@ if ( ! class_exists( 'Presscore_Portfolio_Posts_Scroller', false ) ) {
 			$config->set( 'layout', 'grid' );
 			$config->set( 'justified_grid', false );
 			$config->set( 'all_the_same_width', true );
-			$config->set( 'post.preview.width.min', $this->args['width'], 300 );
 			$config->set( 'post.preview.load.effect', false );
 
 			$config->set( 'show_titles', $this->args['show_title'] );
 			$config->set( 'show_excerpts', $this->args['show_excerpt'] );
 
-			if ( 'under_image' == $this->args['appearance'] ) {
-				$config->set( 'post.preview.background.enabled', ! in_array( $this->args['bg_under_projects'], array( 'disabled', '' ) ) );
+			if ( 'under_image' === $this->args['appearance'] ) {
+				$config->set( 'post.preview.background.enabled', ! in_array( $this->args['bg_under_projects'], array(
+					'disabled',
+					'',
+				), true ) );
 				$config->set( 'post.preview.background.style', $this->args['bg_under_projects'] );
 			} else {
 				$config->set( 'post.preview.background.enabled', false );
@@ -41,20 +43,32 @@ if ( ! class_exists( 'Presscore_Portfolio_Posts_Scroller', false ) ) {
 			$config->set( 'post.meta.fields.categories', $this->args['show_categories'] );
 			$config->set( 'post.meta.fields.comments', $this->args['show_comments'] );
 			$config->set( 'post.meta.fields.author', $this->args['show_author'] );
+			$config->set( 'thumb_proportions', $this->args['proportions'] );
+			$config->set( 'image_layout', 'resize' );
+		}
+
+		protected function get_container_data_atts() {
+			$data = array(
+				'padding-side' => $this->args['padding'],
+				'autoslide'    => $this->args['autoslide'] ? 'true' : 'false',
+				'delay'        => $this->args['autoslide'],
+				'loop'         => $this->args['loop'] ? 'true' : 'false',
+				'arrows'       => 'true',
+				'next-icon'    => 'icon-ar-017-r',
+				'prev-icon'    => 'icon-ar-017-l',
+			);
+
+			if ( isset( $this->args['columns'] ) && is_array( $this->args['columns'] ) ) {
+				$data = array_merge( $data, $this->args['columns'] );
+			}
+
+			return presscore_get_inlide_data_attr( $data );
 		}
 
 		protected function render_slide() {
 			presscore_populate_portfolio_config();
 			presscore_get_config()->set( 'post.preview.media.style', 'featured_image' );
 			presscore_get_template_part( 'mod_portfolio', 'masonry/project' );
-		}
-
-		protected function add_hooks() {
-			add_filter( 'dt_portfolio_thumbnail_args', array( &$this, 'set_image_dimensions' ) );
-		}
-
-		protected function remove_hooks() {
-			remove_filter( 'dt_portfolio_thumbnail_args', array( &$this, 'set_image_dimensions' ) );
 		}
 
 	}

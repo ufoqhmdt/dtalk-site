@@ -1,12 +1,12 @@
 jQuery( document ).ready( function( $ )
 {
 	// Reorder images
-	$( '.rwmb-images' ).each( function()
+	$( '.the7-mb-images' ).each( function()
 	{
 		var $this    = $( this ),
-			$container = $this.closest('.rwmb-uploaded'),
+			$container = $this.closest('.the7-mb-uploaded'),
 			data     = {
-				action  	: 'rwmb_reorder_images',
+				action  	: 'the7_mb_reorder_images',
 				_ajax_nonce	: $container.data('reorder_nonce'),
 				post_id 	: $( '#post_ID' ).val(),
 				field_id	: $container.data('field_id')

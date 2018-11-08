@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 function presscore_add_bulk_edit_fields( $col, $type ) {
 	// display for one column
-	if ( ! in_array( $col, array( 'presscore-sidebar' ) ) ) {
+	if ( $col !== 'presscore-sidebar' ) {
 		return;
 	}
 	$no_change_option = '<option value="-1">' . _x( '&mdash; No Change &mdash;', 'backend bulk edit', 'the7mk2' ) .'</option>';

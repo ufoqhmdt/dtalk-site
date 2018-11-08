@@ -42,7 +42,7 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_BBPress', false ) ) :
 						'src' => PRESSCORE_THEME_URI . '/css/compatibility/bb-press.less',
 						'fallback_src' => '',
 						'deps' => array(),
-						'ver' => wp_get_theme()->get( 'Version' ),
+						'ver' => THE7_VERSION,
 						'media' => 'all'
 					)
 				)

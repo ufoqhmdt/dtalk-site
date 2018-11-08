@@ -4,23 +4,23 @@
  */
 jQuery( document ).ready( function( $ )
 {	
-	$( ':input.rwmb-color' ).each( rwmb_update_color_picker );
-	$( '.rwmb-input' ).on( 'clone', ':input.rwmb-color', rwmb_update_color_picker )
-	.on( 'focus', '.rwmb-color', function()
+	$( ':input.the7-mb-color' ).each( the7_mb_update_color_picker );
+	$( '.the7-mb-input' ).on( 'clone', ':input.the7-mb-color', the7_mb_update_color_picker )
+	.on( 'focus', '.the7-mb-color', function()
 	{
-		$( this ).siblings( '.rwmb-color-picker' ).show();
+		$( this ).siblings( '.the7-mb-color-picker' ).show();
 		return false;
-	} ).on( 'blur',  '.rwmb-color', function()
+	} ).on( 'blur',  '.the7-mb-color', function()
 	{
-		$( this ).siblings( '.rwmb-color-picker' ).hide();
+		$( this ).siblings( '.the7-mb-color-picker' ).hide();
 		return false;
 	} );
 	
-	function rwmb_update_color_picker()
+	function the7_mb_update_color_picker()
 	{
 		var $this = $( this ),
-			$clone_container = $this.closest('.rwmb-clone'),
-			$color_picker = $this.siblings( '.rwmb-color-picker' );
+			$clone_container = $this.closest('.the7-mb-clone'),
+			$color_picker = $this.siblings( '.the7-mb-color-picker' );
 		
 		// Make sure the value is displayed
 		if ( !$this.val() )

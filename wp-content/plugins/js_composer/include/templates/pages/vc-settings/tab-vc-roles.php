@@ -12,7 +12,7 @@ $vc_role = new Vc_Roles();
 	class="vc_settings-tab-content vc_settings-tab-content-active"<?php echo apply_filters( 'vc_setting-tab-form-' . $tab, '' ) ?>
 	data-vc-roles="form">
 	<div class="tab_intro">
-		<p><?php _e( 'Control user group role access to the features and options of Visual Composer - manage WordPress default and custom roles.', 'js_composer' ) ?></p>
+		<p><?php _e( 'Control user group role access to the features and options of WPBakery Page Builder - manage WordPress default and custom roles.', 'js_composer' ) ?></p>
 	</div>
 	<!-- Settings template start -->
 	<div class="vc_wp-settings">
@@ -38,12 +38,10 @@ $vc_role = new Vc_Roles();
 							data-vc-target="[data-vc-unique-id=<?php echo esc_attr( $unique_id ) ?>]">
 							<div class="widget-top">
 								<div class="widget-title-action">
-									<a class="widget-action hide-if-no-js" href="#"></a>
-									<a class="widget-control-edit hide-if-js">
-										<span class="edit vc_automapper-edit-btn">Edit</span>
-										<span class="add vc_automapper-delete-btn">Add</span>
-										<span class="screen-reader-text">Search</span>
-									</a>
+									<button type="button" class="widget-action hide-if-no-js" aria-expanded="true">
+										<span class="screen-reader-text">Edit widget: Search</span>
+										<span class="toggle-indicator" aria-hidden="true"></span>
+									</button>
 								</div>
 								<div class="widget-title">
 									<h4>

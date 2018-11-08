@@ -1,115 +1,108 @@
 <?php
 /**
  * Less related functions.
+ *
  * @package the7
- * @since 1.0.0
+ * @since   1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
-
-/**
- * Set presscore_less_css_is_writable option to 0.
- */
-function presscore_stylesheet_is_not_writable() {
-	update_option( 'presscore_less_css_is_writable', 0 );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
-add_action( 'wp-less_save_stylesheet_error', 'presscore_stylesheet_is_not_writable' );
-
-/**
- * Set presscore_less_css_is_writable option to 1.
- */
-function presscore_stylesheet_is_writable() {
-	update_option( 'presscore_less_css_is_writable', 1 );
-}
-add_action( 'wp-less_stylesheet_save_post', 'presscore_stylesheet_is_writable' );
 
 /**
  * This function returns less vars array to use with phpless.
+ *
  * @return array
  */
 function presscore_compile_less_vars() {
 	// Include custom lessphp functions.
 	require_once 'class-lessphp-functions.php';
 
-	DT_LessPHP_Functions::register_functions();
-
-	$less_vars = new Presscore_Lib_LessVars_Manager( new Presscore_Lib_SimpleBag(), new Presscore_Lib_LessVars_Factory() );
+	$less_vars = the7_get_new_less_vars_manager();
 
 	do_action( 'presscore_setup_less_vars', $less_vars );
 
 	return apply_filters( 'presscore_compiled_less_vars', $less_vars->get_vars() );
 }
 
-if ( ! function_exists( 'presscore_less_get_accent_colors' ) ) :
+if ( ! function_exists( 'the7_get_new_less_vars_manager' ) ) {
 
 	/**
-	 * Helper that returns array of accent less vars.
+	 * Factory function for Presscore_Lib_LessVars_Manager.
 	 *
-	 * @since 3.0.0
-	 * 
-	 * @param  Presscore_Lib_LessVars_Manager $less_vars
-	 * @return array Returns array like array( 'first-color', 'seconf-color' )
+	 * @since 5.7.0
+	 * @return Presscore_Lib_LessVars_Manager
 	 */
-	function presscore_less_get_accent_colors( Presscore_Lib_LessVars_Manager $less_vars ) {
-		// less vars
-		$_color_vars = array( 'accent-bg-color', 'accent-bg-color-2' );
-		// options ids
-		$_test_id = 'general-accent_color_mode';
-		$_color_id = 'general-accent_bg_color';
-		$_gradient_id = 'general-accent_bg_color_gradient';
-		// options defaults
-		$_color_def = '#D73B37';
-		$_gradient_def = array( '#ffffff', '#000000' );
+	function the7_get_new_less_vars_manager() {
+		return new Presscore_Lib_LessVars_Manager( new Presscore_Lib_SimpleBag(), new Presscore_Lib_LessVars_Factory() );
+	}
+}
 
-		$accent_colors = $less_vars->get_var( $_color_vars );
-		if ( ! array_product( $accent_colors ) ) {
-			switch ( of_get_option( $_test_id ) ) {
-				case 'gradient':
-					$colors = of_get_option( $_gradient_id, $_gradient_def );
-					break;
-				case 'color':
-				default:
-					$colors = array( of_get_option( $_color_id, $_color_def ), null );
-			}
-			$less_vars->add_hex_color( $_color_vars, $colors );
-			$accent_colors = $less_vars->get_var( $_color_vars );
-		}
-
-		return $accent_colors;
+/**
+ * Helper that returns array of accent less vars.
+ *
+ * @since 6.6.0
+ *
+ * @param  Presscore_Lib_LessVars_Manager $less_vars
+ *
+ * @return array Returns array like array( 'first-color', 'seconf-color' )
+ */
+function the7_less_get_accent_colors( Presscore_Lib_LessVars_Manager $less_vars ) {
+	$accent_less_vars_names = array( 'accent-bg-color', 'accent-bg-color-2' );
+	switch ( of_get_option( 'general-accent_color_mode' ) ) {
+		case 'gradient':
+			$gradient_obj = the7_less_create_gradient_obj( of_get_option( 'general-accent_bg_color_gradient' ) );
+			list( $first_color, $gradient ) = the7_less_prepare_gradient_var( $gradient_obj );
+			$accent_colors = array( $first_color, $gradient_obj );
+			$less_vars->add_rgba_color( $accent_less_vars_names[0], $first_color );
+			$less_vars->add_keyword( $accent_less_vars_names[1], $gradient );
+			break;
+		case 'color':
+		default:
+			$accent_colors = array( of_get_option( 'general-accent_bg_color' ), the7_less_create_gradient_obj() );
+			$less_vars->add_hex_color( $accent_less_vars_names, $accent_colors );
 	}
 
-endif;
+	return $accent_colors;
+}
 
-if ( ! function_exists( 'presscore_less_get_conditional_colors' ) ) :
-
-	/**
-	 * Function returns $color|$gradient|$accent based on $test value.
-	 * @since 3.0.0
-	 * @param  string $test
-	 * @param  string $color
-	 * @param  array $gradient
-	 * @param  array|string $accent
-	 * @return array|string
-	 */
-	function presscore_less_get_conditional_colors( $test, $color, $gradient, $accent ) {
-		switch ( call_user_func_array( 'of_get_option', $test ) ) {
-			case 'outline':
-			case 'color':
-				$_color = array(
-					call_user_func_array( 'of_get_option', $color ),
-					null
-				);
-				break;
-			case 'gradient':
-				$_color = call_user_func_array( 'of_get_option', $gradient );
-				break;
-			case 'accent':
-			default:
-				$_color = $accent;
-		}
-
-		return $_color;
+/**
+ * Prepare gradient string to be exported as a less var.
+ *
+ * @since 6.6.0
+ *
+ * @param string|array|The7_Less_Gradient $gradient
+ *
+ * @return array
+ */
+function the7_less_prepare_gradient_var( $gradient ) {
+	if ( is_a( $gradient, 'The7_Less_Gradient' ) ) {
+		$gradient_obj = $gradient;
+	} else {
+		$gradient_obj = the7_less_create_gradient_obj( $gradient );
 	}
 
-endif;
+	return array(
+		$gradient_obj->get_color_stop( 1 )->get_color(),
+		$gradient_obj->get_string(),
+	);
+}
+
+/**
+ * Return new The7_Less_Gradient object.
+ *
+ * @since 6.6.0
+ *
+ * @param string|array $gradient
+ *
+ * @return The7_Less_Gradient
+ */
+function the7_less_create_gradient_obj( $gradient = null ) {
+	if ( is_array( $gradient ) && isset( $gradient[0], $gradient[1] ) ) {
+		$gradient = "135deg|{$gradient[0]} 30%|{$gradient[1]} 100%";
+	}
+
+	return new The7_Less_Gradient( $gradient );
+}

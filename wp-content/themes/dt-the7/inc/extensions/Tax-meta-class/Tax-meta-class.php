@@ -225,8 +225,11 @@ class Tax_Meta_Class {
       
       // Enqueu JQuery UI, use proper version.
       $this->enqueue_jqueryui();
-      wp_enqueue_script( 'at-timepicker', '//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.4.5/jquery-ui-timepicker-addon.min.js', array( 'tmc-jquery-ui' ),false,true );
-    }    
+
+    /**
+     * Assets inclusion from CDN are prohibited and removed to cover Theme Checker requirements.
+     */
+    }
   }
   
   /**
@@ -1201,8 +1204,10 @@ class Tax_Meta_Class {
    * @access public
    */
   public function enqueue_jqueryui(){
-    wp_enqueue_style( 'tmc-jquery-ui-css', 'http://ajax.lug.ustc.edu.cn/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/themes/'.apply_filters('tmc_jquery_ui_theme','smoothness').'/jquery-ui.css' );
-    wp_enqueue_script( 'tmc-jquery-ui', 'https://ajax.lug.ustc.edu.cn/ajax/libs/jqueryui/' . $this->get_jqueryui_ver() . '/jquery-ui.min.js', array( 'jquery' ) );
+      /**
+       * Do nothing here since The7 don't use any date/time jquery elements.
+       * Assets inclusion from CDN are prohibited and removed to cover Theme Checker requirements.
+       */
   }
   
   /**

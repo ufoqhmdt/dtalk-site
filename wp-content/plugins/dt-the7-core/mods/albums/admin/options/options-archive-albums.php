@@ -14,7 +14,7 @@ $new_options[] = array( 'name' => _x( 'Albums archives', 'theme-options', 'dt-th
 	$new_options['template_page_id_gallery_category'] = array(
 		'id'		=> 'template_page_id_gallery_category',
 		'name'		=> _x( 'Choose a page to take settings from', 'theme-options', 'dt-the7-core' ),
-		'desc'		=> _x( 'Page header, sidebar and footer settings would be applied to taxonomy and post type archive pages.', 'theme-options', 'dt-the7-core' ),
+		'desc'		=> _x( 'This template will be applied to taxonomy and post type archive pages.', 'theme-options', 'dt-the7-core' ),
 		'type'		=> 'pages_list',
 	);
 

@@ -4,10 +4,10 @@
  */
 jQuery( document ).ready( function ( $ )
 {	
-	$( ':input.rwmb-select-advanced' ).each( rwmb_update_select_advanced );
-	$( '.rwmb-input' ).on( 'clone', ':input.rwmb-select-advanced', rwmb_update_select_advanced );
+	$( ':input.the7-mb-select-advanced' ).each( the7_mb_update_select_advanced );
+	$( '.the7-mb-input' ).on( 'clone', ':input.the7-mb-select-advanced', the7_mb_update_select_advanced );
 	
-	function rwmb_update_select_advanced()
+	function the7_mb_update_select_advanced()
 	{
 		var $this = $( this ),
 			options = $this.data( 'options' );

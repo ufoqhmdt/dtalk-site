@@ -20,6 +20,7 @@ $nav_bar->render();
 	value="<?php _e( 'Crunching...', 'js_composer' ) ?>"/>
 <input type="hidden" name="vc_grid_item_editor" value="true"/>
 <script type="text/javascript">
+	var vc_post_id = <?php echo get_the_ID(); ?>;
 	<?php
 	$vc_gitem_template = vc_request_param( 'vc_gitem_template' );
 	if ( strlen( $vc_gitem_template ) && false !== ( $template = Vc_Grid_Item::predefinedTemplate( $vc_gitem_template ) ) ) {

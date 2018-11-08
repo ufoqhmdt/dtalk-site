@@ -4,38 +4,44 @@
         <input type="hidden" name="action" value="the7_save_dashboard_settings">
 		<?php wp_nonce_field( The7_Admin_Dashboard_Settings::SETTINGS_ID . '-save' ); ?>
 
+        <div class="the7-column-container">
+            <div class="the7-column">
+                <table class="the7-system-status" cellspacing="0" cellpadding="0">
+                   <tr>
+                        <td><label for="the7-db-auto-update"><?php esc_html_e( 'DB auto update', 'the7mk2' ); ?></label></td>
+                        <td><input type="checkbox" id="the7-db-auto-update" name="the7_dashboard_settings[db-auto-update]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'db-auto-update' ) ); ?>></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
 		<div class="the7-column-container">
 			<div class="the7-column">
 				<h3><?php esc_html_e( 'Legacy Features', 'the7mk2' ); ?></h3>
 
 				<table class="the7-system-status" cellspacing="0" cellpadding="0">
+                   <tr>
+                        <td><label for="the7-legacy-options-in-sidebar"><?php esc_html_e( 'Show theme options in sidebar', 'the7mk2' ); ?></label></td>
+                        <td><input type="checkbox" id="the7-legacy-options-in-sidebar" name="the7_dashboard_settings[options-in-sidebar]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'options-in-sidebar' ) ); ?>></td>
+                    </tr>
                     <tr>
                         <td><label for="the7-legacy-rows"><?php esc_html_e( 'The7 rows', 'the7mk2' ); ?></label></td>
                         <td><input type="checkbox" id="the7-legacy-rows" name="the7_dashboard_settings[rows]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'rows' ) ); ?>></td>
                     </tr>
-
                     <tr>
                         <td><label for="the7-legacy-icons-bar"><?php esc_html_e( 'Icons Bar', 'the7mk2' ); ?></label></td>
                         <td><input type="checkbox" id="the7-legacy-icons-bar" name="the7_dashboard_settings[icons-bar]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'icons-bar' ) ); ?>></td>
                     </tr>
-
                     <tr>
                         <td><label for="the7-legacy-overlapping-headers"><?php esc_html_e( 'Overlapping Headers', 'the7mk2' ); ?></label></td>
                         <td><input type="checkbox" id="the7-legacy-overlapping-headers" name="the7_dashboard_settings[overlapping-headers]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'overlapping-headers' ) ); ?>></td>
                     </tr>
+                    <tr>
+                        <td><label for="the7-legacy-fontawesome-4-compatibility"><?php esc_html_e( 'FontAwesome 4 compatibility', 'the7mk2' ); ?></label></td>
+                        <td><input type="checkbox" id="the7-legacy-fontawesome-4-compatibility" name="the7_dashboard_settings[fontawesome-4-compatibility]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'fontawesome-4-compatibility' ) ); ?>></td>
+                    </tr>
 				</table>
 			</div>
-
-            <div class="the7-column">
-                <h3><?php esc_html_e( 'Bundled Plugins', 'the7mk2' ); ?></h3>
-
-                <table class="the7-system-status" cellspacing="0" cellpadding="0">
-                    <tr>
-                        <td><label for="the7-silence-bundled-plugins"><?php esc_html_e( 'Silence plugins activation messages', 'the7mk2' ); ?></label></td>
-                        <td><input type="checkbox" id="the7-silence-bundled-plugins" name="the7_dashboard_settings[silence-plugins]" <?php checked( true, The7_Admin_Dashboard_Settings::get( 'silence-plugins' ) ); ?>></td>
-                    </tr>
-                </table>
-            </div>
 
             <div class="the7-column<?php echo ( dt_the7_core_is_enabled() ? '' : ' hide-if-js' ); ?>" style="clear: both; width: 100%;">
 

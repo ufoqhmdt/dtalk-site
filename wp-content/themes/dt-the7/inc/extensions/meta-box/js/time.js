@@ -4,10 +4,10 @@
  */
 jQuery( document ).ready( function( $ )
 {
-	$( ':input.rwmb-time' ).each( rwmb_update_time_picker );
-	$( '.rwmb-input' ).on( 'clone', ':input.rwmb-time', rwmb_update_time_picker );
+	$( ':input.the7-mb-time' ).each( the7_mb_update_time_picker );
+	$( '.the7-mb-input' ).on( 'clone', ':input.the7-mb-time', the7_mb_update_time_picker );
 	
-	function rwmb_update_time_picker()
+	function the7_mb_update_time_picker()
 	{
 		var $this = $( this ),
 			options = $this.data( 'options' );

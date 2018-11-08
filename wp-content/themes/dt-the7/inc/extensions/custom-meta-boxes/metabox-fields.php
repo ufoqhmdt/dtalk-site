@@ -10,21 +10,21 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 // Proportion slider field
 /**************************************************************************************/
 
-if ( !class_exists( 'RWMB_Proportion_Slider_Field' ) ) {
-	class RWMB_Proportion_Slider_Field {
+if ( !class_exists( 'THE7_RWMB_Proportion_Slider_Field' ) ) {
+	class THE7_RWMB_Proportion_Slider_Field {
 		/**
 		 * Enqueue scripts and styles
 		 *
 		 * @return void
 		 */
 		static function admin_enqueue_scripts() {
-			$url = RWMB_CSS_URL . 'jqueryui';
+			$url = THE7_RWMB_CSS_URL . 'jqueryui';
 			wp_enqueue_style( 'jquery-ui-core', "{$url}/jquery.ui.core.css", array(), '1.8.17' );
 			wp_enqueue_style( 'jquery-ui-theme', "{$url}/jquery.ui.theme.css", array(), '1.8.17' );
 			wp_enqueue_style( 'jquery-ui-slider', "{$url}/jquery.ui.slider.css", array(), '1.8.17' );
-			wp_enqueue_style( 'rwmb-slider', RWMB_CSS_URL . 'slider.css' );
+			wp_enqueue_style( 'the7-mb-slider', THE7_RWMB_CSS_URL . 'slider.css' );
 
-			wp_enqueue_script( 'rwmb-slider', RWMB_JS_URL . 'slider.js', array( 'jquery-ui-slider', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-core' ), RWMB_VER, true );
+			wp_enqueue_script( 'the7-mb-slider', THE7_RWMB_JS_URL . 'slider.js', array( 'jquery-ui-slider', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-core' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -39,8 +39,8 @@ if ( !class_exists( 'RWMB_Proportion_Slider_Field' ) ) {
 		static function html( $html, $meta, $field ) {
 			return sprintf(
 				'<div class="clearfix">
-					<div class="rwmb-slider" id="%s" data-options="%s"></div>
-					<span class="rwmb-slider-value-label">%s<span>%s</span>%s</span>
+					<div class="the7-mb-slider" id="%s" data-options="%s"></div>
+					<span class="the7-mb-slider-value-label">%s<span>%s</span>%s</span>
 					<input type="hidden" name="%s" value="%s" />
 				</div>',
 				$field['id'], esc_attr( json_encode( $field['js_options'] ) ),
@@ -80,8 +80,8 @@ if ( !class_exists( 'RWMB_Proportion_Slider_Field' ) ) {
 		 */
 		static function dt_filter_begin_html( $begin, $field, $meta ) {
 			$preview = '
-			<div class="rwmb-proportion_slider-preview-container">
-				<img src="' . PRESSCORE_ADMIN_URI .'/assets/images/blank.gif" class="rwmb-proportion_slider-prop-box" />
+			<div class="the7-mb-proportion_slider-preview-container">
+				<img src="' . PRESSCORE_ADMIN_URI .'/assets/images/blank.gif" class="the7-mb-proportion_slider-prop-box" />
 			</div>
 			';
 
@@ -100,16 +100,16 @@ if ( !class_exists( 'RWMB_Proportion_Slider_Field' ) ) {
 			return implode('', $begin_parts);
 		}
 	}
-	add_filter('rwmb_proportion_slider_begin_html', array('RWMB_Proportion_Slider_Field', 'dt_filter_begin_html'), 10, 3);
+	add_filter('the7_mb_proportion_slider_begin_html', array('THE7_RWMB_Proportion_Slider_Field', 'dt_filter_begin_html'), 10, 3);
 }
 
 /**************************************************************************************/
 // New advanced image field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Image_Advanced_MK2_Field' ) && class_exists( 'THE7_RWMB_Image_Field' ) )
 {
-	class RWMB_Image_Advanced_MK2_Field extends RWMB_Image_Field
+	class THE7_RWMB_Image_Advanced_MK2_Field extends THE7_RWMB_Image_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -122,8 +122,8 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 
 			// Make sure scripts for new media uploader in WordPress 3.5 is enqueued
 			wp_enqueue_media();
-			wp_enqueue_script( 'rwmb-image-advanced-mk2', PRESSCORE_EXTENSIONS_URI . '/custom-meta-boxes/js/media.js', array( 'jquery' ), RWMB_VER, true );
-			wp_enqueue_style( 'rwmb-image-advanced-mk2-style', PRESSCORE_EXTENSIONS_URI . '/custom-meta-boxes/css/advanced-mk2.css', RWMB_VER );
+			wp_enqueue_script( 'the7-mb-image-advanced-mk2', PRESSCORE_EXTENSIONS_URI . '/custom-meta-boxes/js/media.js', array( 'jquery' ), THE7_RWMB_VER, true );
+			wp_enqueue_style( 'the7-mb-image-advanced-mk2-style', PRESSCORE_EXTENSIONS_URI . '/custom-meta-boxes/css/advanced-mk2.css', THE7_RWMB_VER );
 		}
 
 		/**
@@ -135,13 +135,13 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		{
 
 			// Attach images via Ajax
-			add_action( 'wp_ajax_rwmb_attach_media', array( __CLASS__, 'wp_ajax_attach_media' ), 9 );
+			add_action( 'wp_ajax_the7_mb_attach_media', array( __CLASS__, 'wp_ajax_attach_media' ), 9 );
 
 			// Reorder images via Ajax
-			add_action( 'wp_ajax_rwmb_reorder_images', array( __CLASS__, 'wp_ajax_reorder_images' ), 9 );
+			add_action( 'wp_ajax_the7_mb_reorder_images', array( __CLASS__, 'wp_ajax_reorder_images' ), 9 );
 
 			// Delete file via Ajax
-			add_action( 'wp_ajax_rwmb_delete_file', array( __CLASS__, 'wp_ajax_delete_file' ), 9 );
+			add_action( 'wp_ajax_the7_mb_delete_file', array( __CLASS__, 'wp_ajax_delete_file' ), 9 );
 
 			// Image template
 			add_action( 'admin_footer', array( __CLASS__, 'image_temaplate') );
@@ -159,10 +159,10 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			// $attachment_id    = isset( $_POST['attachment_id'] ) ? $_POST['attachment_id'] : 0;
 			$attachments_ids    = isset( $_POST['attachments_ids'] ) ? $_POST['attachments_ids'] : array();
 
-			check_ajax_referer( "rwmb-attach-media_{$field_id}" );
+			check_ajax_referer( "the7-mb-attach-media_{$field_id}" );
 
 			if ( empty($attachments_ids) ) {
-				RW_Meta_Box::ajax_response( _x( 'Empty atachments', 'image upload', 'the7mk2' ), 'error' );
+				The7_RW_Meta_Box::ajax_response( _x( 'Empty atachments', 'image upload', 'the7mk2' ), 'error' );
 				exit;
 			}
 
@@ -172,7 +172,7 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			// update
 			update_post_meta( $post_id, $field_id, $attachments_ids );
 
-			RW_Meta_Box::ajax_response( false, 'success' );
+			The7_RW_Meta_Box::ajax_response( false, 'success' );
 
 			exit;
 		}
@@ -188,14 +188,14 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			$order    	= isset( $_POST['order'] ) ? $_POST['order'] : 0;
 			$post_id 	= is_numeric( $_REQUEST['post_id'] ) ? $_REQUEST['post_id'] : 0;
 
-			check_ajax_referer( "rwmb-reorder-images_{$field_id}" );
+			check_ajax_referer( "the7-mb-reorder-images_{$field_id}" );
 
 			parse_str( $order, $items );
 			$items = array_map( 'absint', $items['item'] );
 
 			update_post_meta( $post_id, $field_id, $items );
 
-			RW_Meta_Box::ajax_response( _x( 'Order saved', 'image upload', 'the7mk2' ), 'success' );
+			The7_RW_Meta_Box::ajax_response( _x( 'Order saved', 'image upload', 'the7mk2' ), 'success' );
 			exit;
 		}
 
@@ -213,7 +213,7 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
 			$force_delete  = isset( $_POST['force_delete'] ) ? intval( $_POST['force_delete'] ) : 0;
 
-			check_ajax_referer( "rwmb-delete-file_{$field_id}" );
+			check_ajax_referer( "the7-mb-delete-file_{$field_id}" );
 
 			// get saved ids
 			$saved_ids = get_post_meta( $post_id, $field_id, true );
@@ -230,9 +230,9 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			$ok = $force_delete ? wp_delete_attachment( $attachment_id ) : true;
 
 			if ( $ok )
-				RW_Meta_Box::ajax_response( '', 'success' );
+				The7_RW_Meta_Box::ajax_response( '', 'success' );
 			else
-				RW_Meta_Box::ajax_response( _x( 'Error: Cannot delete file', 'image upload', 'the7mk2' ), 'error' );
+				The7_RW_Meta_Box::ajax_response( _x( 'Error: Cannot delete file', 'image upload', 'the7mk2' ), 'error' );
 			exit;
 		}
 
@@ -247,14 +247,14 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		 */
 		static function html( $html, $meta, $field )
 		{
-			$i18n_title = apply_filters( 'rwmb_image_advanced_select_string', _x( 'Select or Upload Images', 'image upload', 'the7mk2' ), $field );
-			$attach_nonce = wp_create_nonce( "rwmb-attach-media_{$field['id']}" );
+			$i18n_title = apply_filters( 'the7_mb_image_advanced_select_string', _x( 'Select or Upload Images', 'image upload', 'the7mk2' ), $field );
+			$attach_nonce = wp_create_nonce( "the7-mb-attach-media_{$field['id']}" );
 
 			// Uploaded images
 			$html .= self::get_uploaded_images( $meta, $field );
 
 			// Show form upload
-			$classes = array( 'button', 'rwmb-image-advanced-upload-mk2', 'hide-if-no-js', 'new-files' );
+			$classes = array( 'button', 'the7-mb-image-advanced-upload-mk2', 'hide-if-no-js', 'new-files' );
 			if ( ! empty( $field['max_file_uploads'] ) && count( $meta ) >= (int) $field['max_file_uploads'] )
 				$classes[] = 'hidden';
 
@@ -265,8 +265,8 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		}
 
 		/**
-		 * Get field value
-		 * It's the combination of new (uploaded) images and saved images
+		 * Get field value.
+		 * Use $old var as a base value here because advanced_mk2 values don't send via POST so $new will be always empty.
 		 *
 		 * @param array $new
 		 * @param array $old
@@ -276,13 +276,13 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		 * @return array|mixed
 		 */
 		static function value( $new, $old, $post_id, $field )
-		{				
-			if ( !$new ) $new = array();
-			if ( !$old ) $old = array();
-			
-			$new = (array) $new;
-			
-			return array_unique( array_merge( $old, $new ) );
+		{
+			$no_old_value = ( '' === $old || false === $old );
+			if ( $no_old_value && array_key_exists( 'std', $field ) ) {
+				return $field['std'];
+			}
+
+			return $old;
 		}
 
 		/**
@@ -302,13 +302,11 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			}
 
 			$name = $field['id'];
+			if ( ! is_array( $new ) ) {
+			    $new = array();
+            }
 
-			if ( '' === $new || array() === $new ) {
-				delete_post_meta( $post_id, $name );
-				return;
-			}
-
-			update_post_meta( $post_id, $name, (array) $new );
+			update_post_meta( $post_id, $name, $new );
 		}
 
 		/**
@@ -323,12 +321,18 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+            if ( ! $saved ) {
+                return ( $field['std'] ? $field['std'] : array() );
+            }
 
-			if ( empty( $meta ) )
-				return array();
+			$meta = get_post_meta( $post_id, $field['id'], true );
+            if ( ! is_array( $meta ) ) {
+                $meta = array();
+            }
 
-			return (array) $meta;
+            $meta = array_map( 'esc_attr', $meta );
+
+			return $meta;
 		}
 
 		/**
@@ -355,9 +359,13 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		 */
 		static function get_uploaded_images( $images, $field )
 		{
-			$reorder_nonce = wp_create_nonce( "rwmb-reorder-images_{$field['id']}" );
-			$delete_nonce = wp_create_nonce( "rwmb-delete-file_{$field['id']}" );
-			$classes = array('rwmb-images', 'rwmb-uploaded');
+			if ( ! is_array( $images ) ) {
+			    $images = array();
+            }
+
+		    $reorder_nonce = wp_create_nonce( "the7-mb-reorder-images_{$field['id']}" );
+			$delete_nonce = wp_create_nonce( "the7-mb-delete-file_{$field['id']}" );
+			$classes = array('the7-mb-images', 'the7-mb-uploaded');
 			if ( count( $images ) <= 0  )
 				$classes[] = 'hidden';
 			$ul = '<ul class="%s" data-field_id="%s" data-delete_nonce="%s" data-reorder_nonce="%s" data-force_delete="%s" data-max_file_uploads="%s">';
@@ -392,14 +400,14 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 		 */
 		static function img_html( $image )
 		{
-			$i18n_delete = apply_filters( 'rwmb_image_delete_string', _x( 'Delete', 'image upload', 'the7mk2' ) );
-			$i18n_edit   = apply_filters( 'rwmb_image_edit_string', _x( 'Edit', 'image upload', 'the7mk2' ) );
+			$i18n_delete = apply_filters( 'the7_mb_image_delete_string', _x( 'Delete', 'image upload', 'the7mk2' ) );
+			$i18n_edit   = apply_filters( 'the7_mb_image_edit_string', _x( 'Edit', 'image upload', 'the7mk2' ) );
 			$li = '
 				<li id="item_%s">
 					<img src="%s" />
-					<div class="rwmb-image-bar">
-						<a title="%s" class="rwmb-edit-file" href="%s" target="_blank">%s</a> |
-						<a title="%s" class="rwmb-delete-file" href="#" data-attachment_id="%s">×</a>
+					<div class="the7-mb-image-bar">
+						<a title="%s" class="the7-mb-edit-file" href="%s" target="_blank">%s</a> |
+						<a title="%s" class="the7-mb-delete-file" href="#" data-attachment_id="%s">×</a>
 					</div>
 				</li>
 			';
@@ -431,9 +439,9 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 			<script type="text/html" id="tmpl-dt-post-gallery-item">
 				<li id="item_{{ data.imgID }}">
 					<img src="{{ data.imgSrc }}" />
-					<div class="rwmb-image-bar">
-						<a title="{{ data.editTitle }}" class="rwmb-edit-file" href="{{ data.editHref }}" target="_blank">{{ data.editTitle }}</a> |
-						<a title="{{ data.deleteTitle }}" class="rwmb-delete-file" href="#" data-attachment_id="{{ data.imgID }}">×</a>
+					<div class="the7-mb-image-bar">
+						<a title="{{ data.editTitle }}" class="the7-mb-edit-file" href="{{ data.editHref }}" target="_blank">{{ data.editTitle }}</a> |
+						<a title="{{ data.deleteTitle }}" class="the7-mb-delete-file" href="#" data-attachment_id="{{ data.imgID }}">×</a>
 					</div>
 				</li>
 			</script>
@@ -446,8 +454,8 @@ if ( ! class_exists( 'RWMB_Image_Advanced_MK2_Field' ) )
 // Fancy category field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Fancy_Category_Field' ) ) {
-	class RWMB_Fancy_Category_Field {
+if ( ! class_exists( 'THE7_RWMB_Fancy_Category_Field' ) ) {
+	class THE7_RWMB_Fancy_Category_Field {
 
 		static $field = array();
 		static $meta = '';
@@ -914,17 +922,17 @@ if ( ! class_exists( 'RWMB_Fancy_Category_Field' ) ) {
 			return self::$tax_query[ $_taxonomy ];
 		}
 	}
-	add_filter( 'rwmb_fancy_category_begin_html', array('RWMB_Fancy_Category_Field', 'begin_html'), 10 );
-	add_filter( 'rwmb_fancy_category_end_html', array('RWMB_Fancy_Category_Field', 'end_html'), 10 );
+	add_filter( 'the7_mb_fancy_category_begin_html', array('THE7_RWMB_Fancy_Category_Field', 'begin_html'), 10 );
+	add_filter( 'the7_mb_fancy_category_end_html', array('THE7_RWMB_Fancy_Category_Field', 'end_html'), 10 );
 }
 
 /**************************************************************************************/
 // Proper taxonomy field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Taxonomy_List_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Taxonomy_List_Field' ) && class_exists( 'THE7_RWMB_Taxonomy_Field' ) )
 {
-	class RWMB_Taxonomy_List_Field extends RWMB_Taxonomy_Field
+	class THE7_RWMB_Taxonomy_List_Field extends THE7_RWMB_Taxonomy_Field
 	{
 		/**
 		 * Normalize parameters for field
@@ -978,7 +986,7 @@ if ( ! class_exists( 'RWMB_Taxonomy_List_Field' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+			$meta = The7_RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
 
 			if ( empty( $meta ) )
 				return array();
@@ -992,9 +1000,9 @@ if ( ! class_exists( 'RWMB_Taxonomy_List_Field' ) )
 // Simple proportions field
 /**************************************************************************************/
 
-if ( ! class_exists( 'RWMB_Simple_Proportions_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Simple_Proportions_Field' ) )
 {
-	class RWMB_Simple_Proportions_Field
+	class THE7_RWMB_Simple_Proportions_Field
 	{
 		/**
 		 * Get field HTML
@@ -1011,7 +1019,7 @@ if ( ! class_exists( 'RWMB_Simple_Proportions_Field' ) )
 			$height_name = $field['field_name'] . '[height]';
 
 			return sprintf(
-				'<label>%s <input type="text" class="rwmb-text" name="%s" id="%s-width" value="%s" size="%s" %s/></label> <span>&times;</span> <label>%s <input type="text" class="rwmb-text" name="%s" id="%s-height" value="%s" size="%s" %s/></label>%s',
+				'<label>%s <input type="text" class="the7-mb-text" name="%s" id="%s-width" value="%s" size="%s" %s/></label> <span>&times;</span> <label>%s <input type="text" class="the7-mb-text" name="%s" id="%s-height" value="%s" size="%s" %s/></label>%s',
 				_x( 'width', 'metabox', 'the7mk2' ),
 				$width_name,
 				$field['id'],
@@ -1112,7 +1120,7 @@ if ( ! class_exists( 'RWMB_Simple_Proportions_Field' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
+			$meta = The7_RW_Meta_Box::meta( $meta, $post_id, $saved, $field );
 
 			if ( empty( $meta ) )
 				return array('width' => '', 'height' => '');
@@ -1125,9 +1133,9 @@ if ( ! class_exists( 'RWMB_Simple_Proportions_Field' ) )
 /**
  * Dropdown Pages.
  */
-if ( !class_exists( 'RWMB_Dropdown_Pages_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Dropdown_Pages_Field' ) )
 {
-	class RWMB_Dropdown_Pages_Field
+	class THE7_RWMB_Dropdown_Pages_Field
 	{
 
 		/**
@@ -1149,7 +1157,7 @@ if ( !class_exists( 'RWMB_Dropdown_Pages_Field' ) )
 				'option_none_value' => '0',
 				'selected'          => $meta,
 				'post_status'       => $field['post_status'],
-				'class'             => 'rwmb-select',
+				'class'             => 'the7-mb-select',
 			) );
 
 			return $html;
@@ -1170,7 +1178,7 @@ if ( !class_exists( 'RWMB_Dropdown_Pages_Field' ) )
 
 			$field['std'] = empty( $field['std'] ) ? _x( 'Select a Page', 'pages', 'the7mk2' ) : $field['std'];
 
-			return RWMB_Select_Field::normalize_field( $field );
+			return THE7_RWMB_Select_Field::normalize_field( $field );
 		}
 
 		/**
@@ -1189,7 +1197,7 @@ if ( !class_exists( 'RWMB_Dropdown_Pages_Field' ) )
 		 */
 		static function meta( $meta, $post_id, $saved, $field )
 		{
-			$meta = RWMB_Select_Field::meta( $meta, $post_id, $saved, $field );
+			$meta = THE7_RWMB_Select_Field::meta( $meta, $post_id, $saved, $field );
 			return is_array( $meta ) ? current( $meta ) : $meta;
 		}
 
@@ -1207,7 +1215,7 @@ if ( !class_exists( 'RWMB_Dropdown_Pages_Field' ) )
 		 */
 		static function save( $new, $old, $post_id, $field )
 		{
-			return RWMB_Select_Field::save( $new, $old, $post_id, $field );
+			return THE7_RWMB_Select_Field::save( $new, $old, $post_id, $field );
 		}
 	}
 }
@@ -1221,14 +1229,14 @@ function presscore_meta_box_text_assistive_text( $field_html, $field, $meta ) {
 	}
 	return $field_html;
 }
-add_filter( 'rwmb_text_html', 'presscore_meta_box_text_assistive_text', 10, 3 );
+add_filter( 'the7_mb_text_html', 'presscore_meta_box_text_assistive_text', 10, 3 );
 
 /**
  * Add some classes to meta box wrap.
  */
 function presscore_meta_box_classes( $begin, $field, $meta ) {
 	$classes = array(
-		'rwmb-input-'.esc_attr($field['id'])
+		'the7-mb-input-'.esc_attr($field['id'])
 	);
 
 	// compatibility with old scripts and styles
@@ -1242,7 +1250,7 @@ function presscore_meta_box_classes( $begin, $field, $meta ) {
 	}
 
 	if ( !empty($field['show_on']) ) {
-		$begin = str_replace('class="rwmb-field', 'data-show-on="' . esc_attr(implode(',', (array) $field['show_on'])) . '" class="rwmb-field hide-if-js', $begin);
+		$begin = str_replace('class="the7-mb-field', 'data-show-on="' . esc_attr(implode(',', (array) $field['show_on'])) . '" class="the7-mb-field hide-if-js', $begin);
 	}
 
 	if ( !empty($field['top_divider']) ) {
@@ -1254,9 +1262,9 @@ function presscore_meta_box_classes( $begin, $field, $meta ) {
 		$begin = '<div class="dt_hr dt_hr-top"></div>' . $begin;
 	}
 
-	return str_replace('class="rwmb-input', 'class="rwmb-input ' . implode(' ', $classes), $begin);
+	return str_replace('class="the7-mb-input', 'class="the7-mb-input ' . implode(' ', $classes), $begin);
 }
-add_filter('rwmb_begin_html', 'presscore_meta_box_classes', 10, 3);
+add_filter('the7_mb_begin_html', 'presscore_meta_box_classes', 10, 3);
 
 /**
  * Add some classes to meta box wrap.
@@ -1274,13 +1282,13 @@ function presscore_meta_box_classes_end_html( $end, $field, $meta ) {
 
 	return $end;
 }
-add_filter('rwmb_end_html', 'presscore_meta_box_classes_end_html', 10, 3);
+add_filter('the7_mb_end_html', 'presscore_meta_box_classes_end_html', 10, 3);
 
 
 function presscore_meta_box_before_html( $before_html, $field ) {
 	static $saved_show_on_template = array();
 
-	$open_template = '<div class="rwmb-hidden-field hide-if-js" data-show-on="%s">';
+	$open_template = '<div class="the7-mb-hidden-field hide-if-js" data-show-on="%s">';
 	$close_template = '</div>';
 
 	$field_show_on_template = isset( $field['show_on_template'] ) ? $field['show_on_template'] : array();
@@ -1313,4 +1321,4 @@ function presscore_meta_box_before_html( $before_html, $field ) {
 
 	return $result_html;
 }
-add_filter( 'rwmb_field_before_html', 'presscore_meta_box_before_html', 10, 2 );
+add_filter( 'the7_mb_field_before_html', 'presscore_meta_box_before_html', 10, 2 );

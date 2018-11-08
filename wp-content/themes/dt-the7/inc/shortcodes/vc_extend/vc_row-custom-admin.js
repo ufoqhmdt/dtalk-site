@@ -1,6 +1,6 @@
 (function ($) {
 
-	if ( typeof window.vc.EditElementUIPanel == 'undefined' ) {
+	if (!window.vc || typeof window.vc.EditElementUIPanel === 'undefined') {
 		return;
 	}
 
@@ -189,7 +189,6 @@
 		if ( 'dt_blog_list' === this.model.attributes.shortcode ) {
 			blogListMetaFilter.call(this, data);
             blogListCategorizationFilter.call(this, data);
-            console.log('bingo!!!');
 		}
 	};
 

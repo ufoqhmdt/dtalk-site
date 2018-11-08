@@ -40,6 +40,11 @@ if ( ! function_exists( 'presscore_ajax_pagination_controller' ) ) :
 
 		do_action( 'presscore_before_ajax_response', $template );
 
+		// Map all vc shortcodes if needed. Shortcodes must be mapped prior auto excerpt usage.
+		if ( ! shortcode_exists( 'vc_row' ) && is_callable( array( 'WPBMap', 'addAllMappedShortcodes' ) ) ) {
+			WPBMap::addAllMappedShortcodes();
+		}
+
 		$response = array( 'success' => false, 'reason' => 'undefined template' );
 		if ( in_array( $template, array( 'template-blog-list.php', 'template-blog-masonry.php' ) ) ) {
 			$response = presscore_blog_ajax_loading_responce( $ajax_data );

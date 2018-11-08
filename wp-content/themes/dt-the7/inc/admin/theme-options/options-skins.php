@@ -3,7 +3,7 @@
  * Skins.
  *
  * @package the7
- * @since 1.0.0
+ * @since   1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,11 +17,11 @@ $options[] = array(
 
 $options[] = array( 'name' => _x( 'Skins', 'theme-options', 'the7mk2' ), 'type' => 'heading', 'id' => 'skins' );
 
-	$options[] = array( 'name' => _x( 'Skins', 'theme-options', 'the7mk2' ), 'type' => 'block' );
+$options[] = array( 'name' => _x( 'Skins', 'theme-options', 'the7mk2' ), 'type' => 'block' );
 
-		$options['preset'] = array(
-			'id' => 'preset',
-			'std' => 'none',
-			'type' => 'images',
-			'options' => optionsframework_get_presets_list(),
-		);
+$options['preset'] = array(
+	'id'      => 'preset',
+	'std'     => 'none',
+	'type'    => 'skins',
+	'options' => optionsframework_get_presets_list(),
+);

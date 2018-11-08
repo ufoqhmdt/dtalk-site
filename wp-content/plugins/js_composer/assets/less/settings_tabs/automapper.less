@@ -216,7 +216,8 @@
       .widget-top {
         cursor: default;
         background: #f1f1f1;
-        a.widget-action:after {
+        .toggle-indicator:after { display: none; }
+        .toggle-indicator:before {
           content: '\f142';
           cursor: pointer;
         }

@@ -21,22 +21,22 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Jgrid', false ) ) {
 			parent::setup( $atts, $content );
 
 			// vc inline dummy
-			if ( $this->vc_is_inline ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
+			if ( presscore_vc_is_inline() ) {
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-albums_justified_grid',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_album_justif_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Albums Justified Grid', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-albums_justified_grid',
-					'title' => _x( 'Albums Justified Grid', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array(
-						$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) )
-					)
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			return $this->shortcode_html(); 
 		}
 
 		protected function shortcode_html() {
+			add_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			add_filter( 'found_posts', array( $this, 'fix_pagination' ), 1, 2 );
 
 			$dt_query = $this->get_posts_by_terms( array(
 				'orderby' => $this->atts['orderby'],
@@ -46,6 +46,18 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Jgrid', false ) ) {
 				'category' => $this->atts['category']
 			) );
 
+			remove_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			remove_filter( 'found_posts', array( $this, 'fix_pagination' ), 1 );
+
+			switch ( presscore_config()->get( 'post.preview.mini_images.style' ) ) {
+				case 'style_1':
+					$classes = 'album-minuatures-style-1';
+					break;
+				case 'style_2':
+					$classes = 'album-minuatures-style-2';
+					break;
+			}
+
 			$output = '';
 			if ( $dt_query->have_posts() ) {
 
@@ -54,7 +66,7 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Jgrid', false ) ) {
 				$this->setup_config();
 
 				$output = $this->the_loop( array(
-					'masonry_container_class' => array( 'wf-container', 'dt-albums-shortcode', 'jgrid-shortcode' ),
+					'masonry_container_class' => array( 'wf-container', 'dt-albums-shortcode', 'jgrid-shortcode', $classes ),
 					'post_template_callback' => array( $this, 'post_template' ),
 					'query' => $dt_query,
 					'full_width' => $this->atts['full_width'],
@@ -71,6 +83,39 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Jgrid', false ) ) {
 			return $output;
 		}
 
+		/**
+		 * Add offset to the posts query.
+		 *
+		 * @since 1.15.0
+		 *
+		 * @param WP_Query $query
+		 */
+		public function add_offset( &$query ) {
+			$offset  = (int) $this->atts['posts_offset'];
+			$ppp     = (int) $query->query_vars['posts_per_page'];
+			$current = (int) $query->query_vars['paged'];
+
+			if ( $query->is_paged ) {
+				$page_offset = $offset + ( $ppp * ( $current - 1 ) );
+				$query->set( 'offset', $page_offset );
+			} else {
+				$query->set( 'offset', $offset );
+			}
+		}
+
+		/**
+		 * Fix pagination accordingly with posts offset.
+		 *
+		 * @since 1.15.0
+		 *
+		 * @param int $found_posts
+		 *
+		 * @return int
+		 */
+		public function fix_pagination( $found_posts ) {
+			return $found_posts - (int) $this->atts['posts_offset'];
+		}
+
 		protected function post_template() {
 			presscore_populate_album_post_config();
 
@@ -83,6 +128,7 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Jgrid', false ) ) {
 				'order'                       => 'desc',
 				'orderby'                     => 'date',
 				'number'                      => '12',
+				'posts_offset'                => 0,
 				'show_title'                  => '',
 				'show_excerpt'                => '',
 				'show_categories'             => '',

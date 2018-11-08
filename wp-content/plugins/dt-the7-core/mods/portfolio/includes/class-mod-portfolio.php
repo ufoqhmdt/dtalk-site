@@ -38,7 +38,8 @@ if ( ! class_exists( 'Presscore_Mod_Portfolio', false ) ) {
 		}
 
 		private function setup_services() {
-			presscore_template_manager()->add_path( 'mod_portfolio', array( 'mods/portfolio/public/templates', 'inc/mods/portfolio/public/templates' ) );
+			 presscore_template_manager()->add_path( 'mod_portfolio', array( 'mods/portfolio/public/templates', 'inc/mods/portfolio/public/templates' ) );
+            presscore_template_manager()->add_path( 'mod_portfolio_shortcodes', array( 'mods/portfolio/public/shortcodes', 'inc/mods/portfolio/public/shortcodes' ) );
 		}
 
 		private function define_admin_hooks() {
@@ -66,6 +67,9 @@ if ( ! class_exists( 'Presscore_Mod_Portfolio', false ) ) {
 			add_action( 'init', array( $mod_admin, 'register_post_types' ), 5 );
 			add_action( 'init', array( $mod_admin, 'register_taxonomies' ), 5 );
 
+			// add import by url page.
+			add_filter( 'the7_import_by_url_menu_items', array( $mod_admin, 'add_import_by_url_menu_item' ) );
+
 			// add custom meta boxes
 			add_action( 'presscore_load_meta_boxes', array( $mod_admin, 'add_meta_boxes' ) );
 
@@ -80,7 +84,11 @@ if ( ! class_exists( 'Presscore_Mod_Portfolio', false ) ) {
 			$mod_public = new Presscore_Mod_Portfolio_Public();
 
 			add_filter( 'presscore_ajax_pagination_response', array( $mod_public, 'resolve_template_ajax' ), 20, 3 );
+			/**
+			 * @deprecated 1.6.1
+			 */
 			add_filter( 'presscore_config_post_id_filter', array( $mod_public, 'archive_page_id' ), 15 );
+			add_filter( 'the7_archive_page_template_id', array( $mod_public, 'archive_page_id' ) );
 			add_filter( 'presscore_archive_post_content-dt_portfolio', array( $mod_public, 'archive_post_content' ) );
 			add_filter( 'presscore_posted_on_wrap_class', array( $mod_public, 'post_meta_wrap_class_filter' ) );
 			add_filter( 'presscore_get_page_title', array( $mod_public, 'filter_page_title' ) );

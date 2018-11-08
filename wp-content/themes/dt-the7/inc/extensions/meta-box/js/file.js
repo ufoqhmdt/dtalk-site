@@ -1,13 +1,13 @@
 jQuery( document ).ready( function( $ )
 {
 	// Add more file
-	$( '.rwmb-add-file' ).each( function()
+	$( '.the7-mb-add-file' ).each( function()
 	{
 		var $this = $( this ),
 			$uploads = $this.siblings( '.file-input' ),
 			$first = $uploads.first(),
 			uploadCount = $uploads.length,
-			$fileList = $this.closest( '.rwmb-input' ).find( '.rwmb-uploaded' ),
+			$fileList = $this.closest( '.the7-mb-input' ).find( '.the7-mb-uploaded' ),
 			fileCount = $fileList.children( 'li' ).length,
 			maxFileUploads = $fileList.data( 'max_file_uploads' );
 
@@ -38,13 +38,13 @@ jQuery( document ).ready( function( $ )
 	} );
 
 	// Delete file via Ajax
-	$( '.rwmb-uploaded' ).on( 'click', '.rwmb-delete-file', function()
+	$( '.the7-mb-uploaded' ).on( 'click', '.the7-mb-delete-file', function()
 	{
 		var $this = $( this ),
 			$parent = $this.parents( 'li' ),
-			$container = $this.closest( '.rwmb-uploaded' ),
+			$container = $this.closest( '.the7-mb-uploaded' ),
 			data = {
-				action: 'rwmb_delete_file',
+				action: 'the7_mb_delete_file',
 				_ajax_nonce: $container.data( 'delete_nonce' ),
 				post_id: $( '#post_ID' ).val(),
 				field_id: $container.data( 'field_id' ),
@@ -66,7 +66,7 @@ jQuery( document ).ready( function( $ )
 				//If transition events not supported
 				// if( !('ontransitionend' in window) && ('onwebkittransitionend' in window) && !('onotransitionend' in myDiv || navigator.appName == 'Opera') ) 
 					$parent.remove();
-				$container.trigger( 'update.rwmbFile' );
+				$container.trigger( 'update.the7mbFile' );
 			}
 		}, 'xml' );
 
@@ -74,11 +74,11 @@ jQuery( document ).ready( function( $ )
 	} );
 	
 	//Remove deleted file
-	$( '.rwmb-uploaded' ).on( 'transitionend webkitTransitionEnd otransitionend', 'li.removed', function() {
+	$( '.the7-mb-uploaded' ).on( 'transitionend webkitTransitionEnd otransitionend', 'li.removed', function() {
 		$( this ).remove();
 	});
 	
-	$( 'body' ).on( 'update.rwmbFile', '.rwmb-uploaded', function()
+	$( 'body' ).on( 'update.the7mbFile', '.the7-mb-uploaded', function()
 	{
 		var $fileList = $( this ),
 			maxFileUploads = $fileList.data( 'max_file_uploads' ),

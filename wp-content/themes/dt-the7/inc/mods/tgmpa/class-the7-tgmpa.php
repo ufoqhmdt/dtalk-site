@@ -2,13 +2,39 @@
 
 if ( ! class_exists( 'The7_TGMPA' ) ) {
 
-	class The7_TGMPA extends TGM_Plugin_Activation {
+	class The7_TGMPA extends The7_TGM_Plugin_Activation {
 
 		/**
 		 * Public plugin install action.
 		 */
 		public function public_do_plugin_install() {
-			return parent::do_plugin_install();
+			return $this->do_plugin_install();
+		}
+
+		/**
+		 * Override parent method.
+		 *
+		 * @return bool
+		 */
+		protected function do_plugin_install() {
+			add_filter( 'upgrader_package_options', array( __CLASS__, 'clear_plugin_destination_filter' ) );
+			$installation_result = parent::do_plugin_install();
+			remove_filter( 'upgrader_package_options', array( __CLASS__, 'clear_plugin_destination_filter' ) );
+
+			return $installation_result;
+		}
+
+		/**
+		 * Filter $options to clear plugin destination before installation.
+		 *
+		 * @param array $options
+		 *
+		 * @return array
+		 */
+		public static function clear_plugin_destination_filter( $options ) {
+			$options['clear_destination'] = true;
+
+			return $options;
 		}
 
 		/**
@@ -196,7 +222,7 @@ if ( ! class_exists( 'The7_TGMPA' ) ) {
 
 	if ( ! function_exists( 'load_the7_tgmpa' ) ) {
 		function load_the7_tgmpa() {
-			$GLOBALS['tgmpa'] = The7_TGMPA::get_instance();
+			$GLOBALS['the7_tgmpa'] = The7_TGMPA::get_instance();
 		}
 	}
 

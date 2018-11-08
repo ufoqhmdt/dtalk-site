@@ -10,6 +10,7 @@
     white-space: nowrap;
     font-size: 0 !important; //remove bottom extra space from display: inline-block
     > .vc_parent {
+      vertical-align: top;
       display: inline-block;
     }
     > .vc_element {
@@ -196,12 +197,12 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    font-size: 18px;
+    font-size: 15px;
     color: #F2F2F2;
     position: relative;
 
     &::before {
-      font-family: 'VC-Icons' !important;
+      font-family: 'vcpb-plugin-icons' !important;
       position: absolute;
       left: 50%;
       top: 50%;
@@ -210,11 +211,19 @@
   }
 
   .vc-c-icon-delete_empty {
-    font-size: 20px;
+    font-size: 13px;
+  }
+
+  .vc-c-icon-dragndrop {
+    font-size: 13px;
   }
 
   .vc-c-icon-add{
-    font-size: 24px;
+    font-size: 14px;
+  }
+
+  .vc-c-icon-row_default_fe {
+    font-size: 10px;
   }
 }
 
@@ -241,11 +250,12 @@
   .vc_btn-content {
     text-decoration: none !important;
     width: auto !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
     color: #FFFFFF !important;
     line-height: 16px !important;
     padding: 7px 12px !important;
     cursor: auto !important;
+    // height: 30px;
     &:hover {
       text-decoration: none !important;
     }
@@ -307,8 +317,9 @@
 
 
 .vc_control-btn-switcher {
-  overflow-x: hidden;
+  overflow: hidden;
   width: 24px;
+  height: 30px;
   .transition(width 0.5s);
   display: inline-block;
   &-disable-switcher {

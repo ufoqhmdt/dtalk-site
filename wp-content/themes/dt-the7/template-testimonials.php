@@ -2,7 +2,7 @@
 /**
  * Testimonials template.
  *
- * @package the7
+ * @package The7
  * @since 1.0.0
  */
 
@@ -35,7 +35,6 @@ get_header();
 					if ( post_password_required() ) {
 						the_content();
 					} else {
-
 						// Backup config.
 						$config_backup = $config->get();
 
@@ -64,7 +63,6 @@ get_header();
 
 						// Restore config.
 						$config->reset( $config_backup );
-
 					}
 
 					do_action( 'presscore_after_loop' );

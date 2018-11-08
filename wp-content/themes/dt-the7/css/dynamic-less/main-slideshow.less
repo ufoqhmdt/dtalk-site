@@ -19,7 +19,6 @@
 			}
 
 		#main-slideshow.fixed > .royalSlider,
-		#main-slideshow.fixed .three-d-slider,
 		#main-slideshow.fixed .ts-wrap {
 			max-width: @content-width - 88;
 		}
@@ -30,65 +29,3 @@
 					background-color: fade(@base-color, 15%);
 				}
 			}
-
-	
-	.tp-bullets.custom .tp-bullet.selected:after {
-		background-color: fade(@base-color, 25%);
-		.sidebar &,
-		.sidebar-content & {
-			background-color: fade(@widget-sidebar-color, 25%);
-		}
-		.footer & {
-			background-color: fade(@widget-footer-color, 25%);
-		}
-	}
-	
-	.tp-bullets.custom .tp-bullet:before,
-	.tp-bullets.custom .tp-bullet.selected:hover:before,
-	#main-slideshow .tp-bullets.custom .tp-bullet:hover:before {
-		border-color: fade(@base-color, 25%);
-		.sidebar &,
-		.sidebar-content & {
-			border-color: fade(@widget-sidebar-color, 25%);
-		}
-		.footer & {
-			border-color: fade(@widget-footer-color, 25%);
-		}
-	}
-	
-	.tp-bullets.custom .tp-bullet:before,
-	.tp-bullets.custom .tp-bullet.selected:hover:before,
-	#main-slideshow .tp-bullets.custom .tp-bullet:hover:before {
-		.outlines-bullets & {
-			background-color: fade(@base-color, 4%);
-			.box-shadow (inset 0px 0px 0px 1px fade(@base-color, 25%));
-		}
-		.outlines-bullets .sidebar &,
-		.outlines-bullets .sidebar-content.solid-bg & {
-			background-color: fade(@widget-sidebar-color, 4%);
-			.box-shadow (inset 0px 0px 0px 1px fade(@widget-sidebar-color, 25%));
-		}
-		.outlines-bullets .footer & {
-			background-color: fade(@widget-footer-color, 4%);
-			.box-shadow (inset 0px 0px 0px 1px fade(@widget-footer-color, 25%));
-		}
-	}
-	
-	.tp-bullets.custom .tp-bullet:after {
-		.accent-bullets & {
-			background-color: @accent-bg-color;
-		}
-		.accent-bullets.accent-gradient & {
-			.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
-		}
-	}
-
-	.tp-bullets.custom .tp-bullet.selected:before
-	{
-		.accent-bullets & {
-			background-color: fade(@accent-bg-color, 20%);
-		}
-		.accent-bullets.accent-gradient & {
-			.background-fade-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2, @opacity: 20%);
-		}
-	}

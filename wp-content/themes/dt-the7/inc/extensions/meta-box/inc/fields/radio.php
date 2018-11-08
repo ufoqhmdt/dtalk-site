@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Radio_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Radio_Field' ) )
 {
-	class RWMB_Radio_Field
+	class THE7_RWMB_Radio_Field
 	{
 		/**
 		 * Get field HTML
@@ -18,7 +18,7 @@ if ( ! class_exists( 'RWMB_Radio_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			$html = array();
-			$tpl = '<label><input type="radio" class="rwmb-radio" name="%s" value="%s"%s> %s</label>';
+			$tpl = '<label><input type="radio" class="the7-mb-radio" name="%s" value="%s"%s> %s</label>';
 
 			foreach ( $field['options'] as $value => $label )
 			{

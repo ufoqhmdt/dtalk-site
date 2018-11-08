@@ -33,16 +33,13 @@ if ( ! class_exists( 'DT_Shortcode_Team', false ) ) {
 			$attributes = $this->sanitize_attributes( $atts );
 
 			if ( presscore_vc_is_inline() ) {
-				$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $attributes['category'], 'taxonomy' => 'dt_team_category' ) );
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_team',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_team_masonry_editor_ico.gif', 98, 104 ),
+	                'title'  => _x( 'Team (old)', 'vc inline dummy', 'dt-the7-core' ),
 
-				$dummy = '
-					<div class="dt_vc-shortcode_dummy dt_vc-team" style="height: 250px;">
-						<h5>Team</h5>
-						<p class="text-small"><strong>Display categories:</strong> ' . $terms_list . '</p>
-					</div>
-				';
-
-				return $dummy;
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
 
 			$output = '';
@@ -204,6 +201,7 @@ if ( ! class_exists( 'DT_Shortcode_Team', false ) ) {
 			$config->set( 'template.columns.number', $attributes['columns'] );
 			$config->set( 'post.preview.background.enabled', $attributes['members_bg'] );
 		}
+
 
 		public function compatibility_check( $atts ) {
 			// For old round images settings.

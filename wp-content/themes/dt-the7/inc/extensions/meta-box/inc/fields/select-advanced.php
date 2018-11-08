@@ -3,11 +3,11 @@
 defined( 'ABSPATH' ) || exit;
 
 // Make sure "select" field is loaded
-require_once RWMB_FIELDS_DIR . 'select.php';
+require_once THE7_RWMB_FIELDS_DIR . 'select.php';
 
-if ( !class_exists( 'RWMB_Select_Advanced_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Select_Advanced_Field' ) )
 {
-	class RWMB_Select_Advanced_Field extends RWMB_Select_Field
+	class THE7_RWMB_Select_Advanced_Field extends THE7_RWMB_Select_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -16,11 +16,11 @@ if ( !class_exists( 'RWMB_Select_Advanced_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'select2', RWMB_CSS_URL . 'select2/select2.css', array(), '3.2' );
-			wp_enqueue_style( 'rwmb-select-advanced', RWMB_CSS_URL . 'select-advanced.css', array(), RWMB_VER );
+			wp_enqueue_style( 'select2', THE7_RWMB_CSS_URL . 'select2/select2.css', array(), '3.2' );
+			wp_enqueue_style( 'the7-mb-select-advanced', THE7_RWMB_CSS_URL . 'select-advanced.css', array(), THE7_RWMB_VER );
 
-			wp_register_script( 'select2', RWMB_JS_URL . 'select2/select2.min.js', array(), '3.2', true );
-			wp_enqueue_script( 'rwmb-select-advanced', RWMB_JS_URL . 'select-advanced.js', array( 'select2' ), RWMB_VER, true );
+			wp_register_script( 'select2', THE7_RWMB_JS_URL . 'select2/select2.min.js', array(), '3.2', true );
+			wp_enqueue_script( 'the7-mb-select-advanced', THE7_RWMB_JS_URL . 'select-advanced.js', array( 'select2' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -35,7 +35,7 @@ if ( !class_exists( 'RWMB_Select_Advanced_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			$html = sprintf(
-				'<select class="rwmb-select-advanced" name="%s" id="%s" size="%s"%s data-options="%s">',
+				'<select class="the7-mb-select-advanced" name="%s" id="%s" size="%s"%s data-options="%s">',
 				$field['field_name'],
 				$field['id'],
 				$field['size'],

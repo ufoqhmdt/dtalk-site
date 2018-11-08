@@ -164,12 +164,17 @@ class The7_Demo_Content {
 		$this->admin = new The7_Demo_Content_Admin( $this->plugin_name, $this->version );
 		$this->remote = new The7_Demo_Content_Remote_Content();
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $this->admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $this->admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $this->admin, 'register_scripts' );
+
+		// Notices.
+		$this->loader->add_action( 'admin_notices', $this->admin, 'display_successful_demo_installation_admin_notice' );
 
 		// Ajax handler.
 		$this->loader->add_action( 'wp_ajax_the7_import_demo_content', $this->admin, 'import_dummy_content' );
 		$this->loader->add_action( 'wp_ajax_the7_demo_content_php_status', $this->admin, 'get_php_ini_status' );
+
+		// Admin menu.
+		$this->loader->add_action( 'admin_menu', $this->admin, 'add_import_by_url_admin_menu' );
 	}
 
 	/**

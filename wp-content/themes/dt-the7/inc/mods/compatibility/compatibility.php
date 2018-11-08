@@ -26,10 +26,10 @@ if ( ! class_exists( 'Presscore_Modules_ComparibilityModule', false ) ) :
 			include $path . 'class-compatibility-bbpress.php';
 			include $path . 'class-compatibility-ldlms.php';
 			include $path . 'class-compatibility-gopricing.php';
-			
 			include $path . 'wpml/class-compatibility-wpml.php';
 			include $path . 'backward-compat/mod-the7-compatibility.php';
 			include $path . 'woocommerce/class-compatibility-woocommerce.php';
+			include $path . 'edd/class-compatibility-edd.php';
 		}
 	}
 

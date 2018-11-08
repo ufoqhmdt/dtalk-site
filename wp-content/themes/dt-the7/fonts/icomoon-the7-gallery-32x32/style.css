@@ -1,0 +1,86 @@
+@font-face {
+  font-family: 'icomoon-the7-photo-32x32';
+  src:  url('fonts/icomoon-the7-photo-32x32.eot?yjzbpy');
+  src:  url('fonts/icomoon-the7-photo-32x32.eot?yjzbpy#iefix') format('embedded-opentype'),
+    url('fonts/icomoon-the7-photo-32x32.ttf?yjzbpy') format('truetype'),
+    url('fonts/icomoon-the7-photo-32x32.woff?yjzbpy') format('woff'),
+    url('fonts/icomoon-the7-photo-32x32.svg?yjzbpy#icomoon-the7-photo-32x32') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-im-"], [class*="icon-im-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon-the7-photo-32x32' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+[class^="icon-im-"]:before,
+[class*="icon-im-"]:before {
+  font-family: inherit !important;
+  margin: 0 !important;
+}
+
+.icon-im-hover-000:before {
+  content: "\e900";
+}
+.icon-im-hover-001:before {
+  content: "\e901";
+}
+
+.icon-im-hover-003:before {
+  content: "\e902";
+}
+.icon-im-hover-004:before {
+  content: "\e903";
+}
+.icon-im-hover-005:before {
+  content: "\e904";
+}
+.icon-im-hover-009:before {
+  content: "\e906";
+}
+.icon-im-hover-010:before {
+  content: "\e905";
+}
+.icon-im-hover-011:before {
+  content: "\e906";
+}
+.icon-im-hover-012:before {
+  content: "\e907";
+}
+.icon-im-hover-013:before {
+  content: "\e908";
+}
+.icon-im-hover-021:before {
+  content: "\e909";
+}
+.icon-im-hover-022:before {
+  content: "\e90a";
+}
+.icon-im-hover-023:before {
+  content: "\e90b";
+}
+.icon-im-hover-024:before {
+  content: "\e90c";
+}
+.icon-im-hover-031:before {
+  content: "\e90d";
+}
+.icon-im-hover-032:before {
+  content: "\e90e";
+}
+.icon-im-hover-041:before {
+  content: "\e90f";
+}
+.icon-im-hover-042:before {
+  content: "\e910";
+}

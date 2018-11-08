@@ -26,6 +26,24 @@ if ( ! function_exists( 'presscore_microsite_disable_headers' ) ) :
 
 endif;
 
+if ( ! function_exists( 'presscore_microsite_top_bar_class_filter' ) ):
+
+	/**
+	 * Add custom classes to the top bar.
+	 *
+	 * @param array $classes
+	 *
+	 * @return array
+	 */
+	function presscore_microsite_top_bar_class_filter( $classes ) {
+		// Hide top bar.
+		$classes[] = 'hide-top-bar';
+
+		return $classes;
+	}
+
+endif;
+
 if ( ! function_exists( 'presscore_microsite_logo_meta_convert' ) ) :
 
 	/**
@@ -84,6 +102,10 @@ if ( ! function_exists( 'presscore_microsite_theme_options_filter' ) ) :
 		global $post;
 
 		$field_prefix = '_dt_microsite_';
+
+		/**
+		 * Logo.
+		 */
 		$logo_options_meta = array(
 			'header-logo_regular' => array(
 				'value_meta_id' => 'main_logo_regular',
@@ -111,7 +133,7 @@ if ( ! function_exists( 'presscore_microsite_theme_options_filter' ) ) :
 			),
 			'header-style-floating-logo_regular' => array(
 				'value_meta_id' => 'floating_logo_regular',
-				'type_meta_id' => 'floating_logo_type'
+				'type_meta_id' => 'floating_logo_type',
 			),
 			'header-style-floating-logo_hd' => array(
 				'value_meta_id' => 'floating_logo_hd',
@@ -125,6 +147,14 @@ if ( ! function_exists( 'presscore_microsite_theme_options_filter' ) ) :
 				'value_meta_id' => 'mobile_logo_hd',
 				'type_meta_id' => 'mobile_logo_type'
 			),
+			'header-style-transparent-mobile-logo_regular' => array(
+				'value_meta_id' => 'transparent_mobile_logo_regular',
+				'type_meta_id' => 'transparent_mobile_logo_type'
+			),
+			'header-style-transparent-mobile-logo_hd' => array(
+				'value_meta_id' => 'transparent_mobile_logo_hd',
+				'type_meta_id' => 'transparent_mobile_logo_type'
+			),
 			'bottom_bar-logo_regular' => array(
 				'value_meta_id' => 'bottom_logo_regular',
 				'type_meta_id' => 'bottom_logo_type'
@@ -135,18 +165,32 @@ if ( ! function_exists( 'presscore_microsite_theme_options_filter' ) ) :
 			),
 		);
 
-		/**
-		 * Logo.
-		 */
+		if ( array_key_exists( $name, $logo_options_meta ) ) {
+			$logo_mode_meta_id = $field_prefix . $logo_options_meta[ $name ]['type_meta_id'];
+			if ( presscore_microsite_is_custom_logo( $logo_mode_meta_id ) ) {
+				$logo_value_meta_id = $field_prefix . $logo_options_meta[ $name ]['value_meta_id'];
+				presscore_microsite_logo_meta_convert( $logo_value_meta_id, $options, $name );
+			}
+		}
 
-		if ( array_key_exists( $name, $logo_options_meta ) && presscore_microsite_is_custom_logo( "{$field_prefix}{$logo_options_meta[ $name ]['type_meta_id']}" ) ) {
-			presscore_microsite_logo_meta_convert( "{$field_prefix}{$logo_options_meta[ $name ]['value_meta_id']}", $options, $name );
+		/**
+		 * Logo mode.
+		 */
+		$logo_mode_meta = array(
+			'header-style-floating-choose_logo' => 'floating_logo_type',
+			'header-style-transparent-choose_logo' => 'transparent_logo_type',
+		);
+
+		if ( array_key_exists( $name, $logo_mode_meta ) ) {
+			$logo_mode_meta_id = $field_prefix . $logo_mode_meta[ $name ];
+			if ( presscore_microsite_is_custom_logo( $logo_mode_meta_id ) ) {
+				$options[ $name ] = 'custom';
+			}
 		}
 
 		/**
 		 * Favicon.
 		 */
-
 		if ( 'general-favicon' === $name && presscore_microsite_is_custom_logo( "{$field_prefix}favicon_type" ) ) {
 			$favicon = get_post_meta( $post->ID, "{$field_prefix}favicon", true );
 			if ( $favicon ) {
@@ -262,6 +306,11 @@ if ( ! function_exists( 'presscore_microsite_setup' ) ) :
 			add_filter( 'body_class', 'presscore_microsite_disable_headers' );
 		} else if ( $hide_header ) {
 			add_filter( 'body_class', 'presscore_microsite_hide_header' );
+		}
+
+		// Hide top bar.
+		if ( in_array( 'top_bar', $hidden_parts ) ) {
+			add_filter( 'presscore_top_bar_class', 'presscore_microsite_top_bar_class_filter' );
 		}
 
 		// hide bottom bar

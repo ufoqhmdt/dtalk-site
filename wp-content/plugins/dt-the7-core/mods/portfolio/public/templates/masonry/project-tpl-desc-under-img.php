@@ -29,7 +29,7 @@ switch ( presscore_config()->get( 'post.preview.media.style' ) ) {
 		}
 		break;
 	case 'slideshow':
-		$image = presscore_get_project_media_slider( array( 'alignnone', 'slider-masonry' ) );
+		$image = presscore_get_project_media_slider( array( 'alignnone','owl-carousel', 'dt-owl-carousel-init', 'slider-masonry' ) );
 		break;
 }
 

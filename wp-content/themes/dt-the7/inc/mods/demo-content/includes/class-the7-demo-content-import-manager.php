@@ -28,7 +28,7 @@ class The7_Demo_Content_Import_Manager {
 	/**
 	 * DT_Dummy_Import_Manager constructor.
 	 *
-	 * @param string     $content_dir
+	 * @param string $content_dir
 	 */
 	public function __construct( $content_dir ) {
 		$this->content_dir = trailingslashit( $content_dir );
@@ -37,17 +37,19 @@ class The7_Demo_Content_Import_Manager {
 	/**
 	 * Downloads demo content package.
 	 */
-	public function download_dummy() {
-		$item = basename( $this->content_dir );
-		$code = presscore_get_purchase_code();
-		$download_dir = dirname( $this->content_dir );
-		$the7_remote_api = new The7_demo_Content_Remote_Server_API();
-		$download_response = $the7_remote_api->download_dummy( $item, $code, $download_dir );
+	public function download_dummy( $source ) {
+		$item              = basename( $this->content_dir );
+		$code              = presscore_get_purchase_code();
+		$download_dir      = dirname( $this->content_dir );
+		$the7_remote_api   = new The7_demo_Content_Remote_Server_API();
+		$download_response = $the7_remote_api->download_dummy( $item, $code, $download_dir, $source );
 
 		if ( is_wp_error( $download_response ) ) {
-			$error = ( the7_is_debug_on() ? $download_response->get_error_message() : sprintf( __( 'Import failed due to repository server error. Please try again in 30-60 minutes.
+			$error_code = $download_response->get_error_code();
+			$error      = ( ( the7_is_debug_on() || 'the7_auto_deactivated' === $error_code ) ? $download_response->get_error_message() : sprintf( __( 'Import failed due to repository server error. Please try again in 30-60 minutes.
 If the problem persists, please don\'t hesitate to contact our <a href="%s" target="_blank">support</a>.', 'the7mk2' ), 'http://support.dream-theme.com/' ) );
-			$this->add_error($error);
+			$this->add_error( $error );
+
 			return false;
 		}
 
@@ -89,7 +91,8 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 	 */
 	public function import_post_types() {
 		$import_options = array(
-			'fetch_attachments' => false,
+			'fetch_attachments'    => false,
+			'cache_processed_data' => true,
 		);
 
 		ob_start();
@@ -98,10 +101,52 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		ob_end_clean();
 	}
 
+	/**
+	 * Import one post types dummy.
+	 */
+	public function import_one_post() {
+		if ( empty( $_POST['post_to_import'] ) ) {
+			return 0;
+		}
+
+		$import_options = array(
+			'fetch_attachments'    => true,
+			'cache_processed_data' => true,
+		);
+
+		add_filter( 'wp_import_posts', array( $this, "wp_import_one_post_filter" ) );
+		add_filter( 'wp_import_tags', array( $this, "wp_import_one_post_flush_filter" ) );
+		add_filter( 'wp_import_categories', array( $this, "wp_import_one_post_flush_filter" ) );
+		add_filter( 'wp_import_terms', array( $this, "wp_import_one_post_flush_filter" ) );
+
+		ob_start();
+		$this->import_file( $this->content_dir . 'full-content.xml', $import_options );
+		ob_end_clean();
+
+		return $this->importer_get_processed_post( (int) $_POST['post_to_import'] );
+	}
+
+	public function wp_import_one_post_filter( $posts ) {
+		$post_id  = $_POST['post_to_import'];
+		$post_ids = array();
+		foreach ( $posts as $post ) {
+			$post_ids[] = $post['post_id'];
+		}
+
+		$single_post[] = $posts[ array_search( $post_id, $post_ids ) ];
+
+		return $single_post;
+	}
+
+	public function wp_import_one_post_flush_filter( $data ) {
+		return array();
+	}
+
 	public function import_attachments( $include_attachments = false ) {
 		$import_options = array(
-			'include_attachments' => $include_attachments,
-			'fetch_attachments' => true,
+			'include_attachments'            => $include_attachments,
+			'fetch_attachments'              => true,
+			'read_processed_data_from_cache' => true,
 		);
 
 		add_filter( 'wp_import_post_data_raw', array( $this, 'import_only_attachments' ) );
@@ -123,7 +168,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 				$i       = 0;
 
 				while ( ! is_numeric( $updated ) ) {
-					$i ++;
+					$i++;
 					$args['menu-name']   = __( 'Previously used menu', 'the7mk2' ) . " " . $i;
 					$args['description'] = $menu->description;
 					$args['parent']      = $menu->parent;
@@ -176,18 +221,22 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 
 	private function import_file( $file_name, $options = array() ) {
 		$default_options = array(
-			'include_attachments' => false,
-			'fetch_attachments' => true,
+			'include_attachments'            => false,
+			'fetch_attachments'              => true,
+			'cache_processed_data'           => false,
+			'read_processed_data_from_cache' => false,
 		);
-		$options = wp_parse_args( $options, $default_options );
+		$options         = wp_parse_args( $options, $default_options );
 
 		if ( ! is_file( $file_name ) ) {
 			$this->add_error( __( "The XML file containing the dummy content is not available or could not be read in <pre>{$file_name}</pre>", 'the7mk2' ) );
+
 			return false;
 		}
 
 		if ( ! $this->importer_bootstrap() ) {
 			$this->add_error( __( 'The Auto importing script could not be loaded.', 'the7mk2' ) );
+
 			return false;
 		}
 
@@ -197,11 +246,95 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 
 		$this->do_wc_compatibility_actions( $file_name );
 
+		add_filter( 'wp_import_post_meta', array( $this, 'wp_import_post_meta_filter' ) );
+
 		$this->importer_obj = new The7_Demo_Content_Import();
+
+		if ( $options['read_processed_data_from_cache'] ) {
+			$this->importer_obj->read_processed_data_from_cache();
+		}
+
 		$this->importer_obj->fetch_attachments = $options['fetch_attachments'];
 		$this->importer_obj->import( $file_name );
 
+		if ( $options['cache_processed_data'] ) {
+			$this->importer_obj->cache_processed_data();
+		}
+
 		return true;
+	}
+
+	public function getPostsList( $post_types ) {
+		$file_name = $this->content_dir . 'full-content.xml';
+
+		if ( ! is_file( $file_name ) ) {
+			$this->add_error( __( "The XML file containing the dummy content is not available or could not be read in <pre>{$file_name}</pre>", 'the7mk2' ) );
+
+			return false;
+		}
+
+		if ( ! $this->importer_bootstrap() ) {
+			$this->add_error( __( 'The Auto importing script could not be loaded.', 'the7mk2' ) );
+
+			return false;
+		}
+		$parser      = new WXR_Parser();
+		$import_data = $parser->parse( $file_name );
+
+		$availablePosts = array();
+
+		if ( isset( $import_data['posts'] ) ) {
+			$posts = $import_data['posts'];
+
+			if ( $posts && sizeof( $posts ) > 0 ) {
+				foreach ( $posts as $post ) {
+					if ( isset( $post['status'] ) && $post['status'] == 'publish' ) {
+						if ( in_array( $post['post_type'], $post_types ) ) {
+							$post_info['post_title']                                  = $post['post_title'];
+							$post_info["url"]                                         = $post['link'];
+							$availablePosts[ $post['post_type'] ][ $post['post_id'] ] = $post_info;
+						}
+					}
+				}
+			}
+		}
+		$responce['response'] = 'getPostsList';
+		$responce['data']     = $availablePosts;
+
+		return $responce;
+	}
+
+	/**
+	 * Alter post meta to be imported properly.
+	 *
+	 * Update microsite custom menu fields with new nav_menu term ids.
+	 *
+	 * @since 6.7.0
+	 *
+	 * @param array $post_meta Imported post meta.
+	 *
+	 * @return array
+	 */
+	public function wp_import_post_meta_filter( $post_meta ) {
+		$keys_to_migrate = array(
+			'_dt_microsite_primary_menu',
+			'_dt_microsite_split_left_menu',
+			'_dt_microsite_split_right_menu',
+			'_dt_microsite_mobile_menu',
+		);
+
+		$processed_terms = array();
+		if ( isset( $this->importer_obj->processed_terms ) ) {
+			$processed_terms = $this->importer_obj->processed_terms;
+		}
+
+		foreach ( $post_meta as $meta_index => $meta ) {
+			if ( array_key_exists( $meta['value'], $processed_terms ) && in_array( $meta['key'], $keys_to_migrate, true ) ) {
+				$post_meta[ $meta_index ]['value'] = $processed_terms[ $meta['value'] ];
+			}
+		}
+
+		return $post_meta;
 	}
 
 	/**
@@ -210,8 +343,9 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 	public function do_wc_compatibility_actions( $file ) {
 		global $wpdb;
 
-		if ( ! the7_demo_content_wc_is_active() || ! class_exists( 'WXR_Parser' ) )
+		if ( ! the7_demo_content_wc_is_active() || ! class_exists( 'WXR_Parser' ) ) {
 			return;
+		}
 
 		/**
 		 * Fix Fatal Error while process orphaned variations.
@@ -219,45 +353,49 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		remove_filter( 'post_type_link', array( 'WC_Post_Data', 'variation_post_link' ) );
 		add_filter( 'post_type_link', array( $this, 'variation_post_link' ), 10, 2 );
 
-		$parser = new WXR_Parser();
+		$parser      = new WXR_Parser();
 		$import_data = $parser->parse( $file );
 
 		if ( isset( $import_data['posts'] ) ) {
 			$posts = $import_data['posts'];
 
-			if ( $posts && sizeof( $posts ) > 0 ) foreach ( $posts as $post ) {
+			if ( $posts && sizeof( $posts ) > 0 ) {
+				foreach ( $posts as $post ) {
 
-				if ( $post['post_type'] == 'product' ) {
+					if ( $post['post_type'] == 'product' ) {
 
-					if ( $post['terms'] && sizeof( $post['terms'] ) > 0 ) {
+						if ( $post['terms'] && sizeof( $post['terms'] ) > 0 ) {
 
-						foreach ( $post['terms'] as $term ) {
+							foreach ( $post['terms'] as $term ) {
 
-							$domain = $term['domain'];
+								$domain = $term['domain'];
 
-							if ( strstr( $domain, 'pa_' ) ) {
+								if ( strstr( $domain, 'pa_' ) ) {
 
-								// Make sure it exists!
-								if ( ! taxonomy_exists( $domain ) ) {
+									// Make sure it exists!
+									if ( ! taxonomy_exists( $domain ) ) {
 
-									$nicename = strtolower( sanitize_title( str_replace( 'pa_', '', $domain ) ) );
+										$nicename = strtolower( sanitize_title( str_replace( 'pa_', '', $domain ) ) );
 
-									$exists_in_db = $wpdb->get_var( $wpdb->prepare( "SELECT attribute_id FROM " . $wpdb->prefix . "woocommerce_attribute_taxonomies WHERE attribute_name = %s;", $nicename ) );
+										$exists_in_db = $wpdb->get_var( $wpdb->prepare( "SELECT attribute_id FROM " . $wpdb->prefix . "woocommerce_attribute_taxonomies WHERE attribute_name = %s;", $nicename ) );
 
-									// Create the taxonomy
-									if ( ! $exists_in_db )
-										$wpdb->insert( $wpdb->prefix . "woocommerce_attribute_taxonomies", array( 'attribute_name' => $nicename, 'attribute_type' => 'select', 'attribute_orderby' => 'menu_order' ), array( '%s', '%s', '%s' ) );
+										// Create the taxonomy
+										if ( ! $exists_in_db ) {
+											$wpdb->insert( $wpdb->prefix . "woocommerce_attribute_taxonomies", array(
+												'attribute_name'    => $nicename,
+												'attribute_type'    => 'select',
+												'attribute_orderby' => 'menu_order',
+											), array( '%s', '%s', '%s' ) );
+										}
 
-									// Register the taxonomy now so that the import works!
-									register_taxonomy( $domain,
-										apply_filters( 'woocommerce_taxonomy_objects_' . $domain, array('product') ),
-										apply_filters( 'woocommerce_taxonomy_args_' . $domain, array(
+										// Register the taxonomy now so that the import works!
+										register_taxonomy( $domain, apply_filters( 'woocommerce_taxonomy_objects_' . $domain, array( 'product' ) ), apply_filters( 'woocommerce_taxonomy_args_' . $domain, array(
 											'hierarchical' => true,
-											'show_ui' => false,
-											'query_var' => true,
-											'rewrite' => false,
-										) )
-									);
+											'show_ui'      => false,
+											'query_var'    => true,
+											'rewrite'      => false,
+										) ) );
+									}
 								}
 							}
 						}
@@ -284,6 +422,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 				return $variation->get_permalink();
 			}
 		}
+
 		return $permalink;
 	}
 
@@ -305,7 +444,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 
 			// Import widgets settings.
 			if ( ! empty( $site_meta['widgets_settings'] ) && is_array( $site_meta['widgets_settings'] ) ) {
-				foreach( $site_meta['widgets_settings'] as $key => $setting) {
+				foreach ( $site_meta['widgets_settings'] as $key => $setting ) {
 					update_option( $key, $setting );
 				}
 			}
@@ -321,8 +460,8 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		// Import wp settings.
 		if ( isset( $site_meta['wp_settings'] ) ) {
 			$wp_settings = wp_parse_args( $site_meta['wp_settings'], array(
-				'show_on_front' => false,
-				'page_on_front' => false,
+				'show_on_front'  => false,
+				'page_on_front'  => false,
 				'page_for_posts' => false,
 			) );
 
@@ -362,6 +501,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		// If fonts not set yet.
 		if ( empty( $site_fonts ) ) {
 			update_option( 'ultimate_selected_google_fonts', $demo_fonts );
+
 			return;
 		}
 
@@ -387,7 +527,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 						$variant['variant_selected'] = 'true';
 					}
 				}
-				unset($variant);
+				unset( $variant );
 			}
 
 			// Set subsets.
@@ -400,10 +540,10 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 						$subset['subset_selected'] = 'true';
 					}
 				}
-				unset($subset);
+				unset( $subset );
 			}
 		}
-		unset($variants, $subsets);
+		unset( $variants, $subsets );
 
 		update_option( 'ultimate_selected_google_fonts', $site_fonts );
 	}
@@ -427,9 +567,9 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		}
 
 		$from_folder = trailingslashit( $this->content_dir ) . untrailingslashit( $site_meta['schema']['folders']['ultimate_icon_fonts'] );
-		$demo_icons = (array) $site_meta['ultimate_icon_fonts'];
-		$uploads = wp_get_upload_dir();
-		$uploads = trailingslashit( $uploads['basedir'] );
+		$demo_icons  = (array) $site_meta['ultimate_icon_fonts'];
+		$uploads     = wp_get_upload_dir();
+		$uploads     = trailingslashit( $uploads['basedir'] );
 
 		// Extract icons zip.
 		foreach ( $demo_icons as $info ) {
@@ -437,9 +577,9 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 				return false;
 			}
 
-			$zip_name = basename( $info['include'] );
+			$zip_name   = basename( $info['include'] );
 			$extract_to = $uploads . dirname( $info['include'] );
-			$res = unzip_file( "{$from_folder}/{$zip_name}.zip", $extract_to );
+			$res        = unzip_file( "{$from_folder}/{$zip_name}.zip", $extract_to );
 
 			if ( is_wp_error( $res ) ) {
 				return false;
@@ -468,12 +608,11 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 			return;
 		}
 
-		include_once 'class-the7-demo-content-revslider-importer.php';
+		include_once dirname( __FILE__ ) . '/class-the7-demo-content-revslider-importer.php';
 		$rev_slider_importer = new The7_Demo_Content_Revslider_Importer();
 
-		$rev_sliders = (array) $site_meta['revolution_sliders'];
-		foreach ( $rev_sliders as $rev_slider ) {
-			$rev_slider_importer->import_slider( $this->content_dir . "{$rev_slider}.zip" );
+		foreach ( (array) $site_meta['revolution_sliders'] as $rev_slider ) {
+			$rev_slider_importer->import_slider( $rev_slider, $this->content_dir . "{$rev_slider}.zip" );
 		}
 	}
 
@@ -491,6 +630,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		$vc_importer = new The7_Demo_Content_VC_Importer();
 		if ( $vc_importer->import_settings( $site_meta['vc_settings'] ) ) {
 			$vc_importer->show_notification();
+
 			return true;
 		}
 
@@ -519,44 +659,55 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 	 */
 	protected function filter_theme_options( $theme_options ) {
 		// Big logo.
-		$theme_options = $this->theme_options_replace_logo(
-			$theme_options,
-			array(
-				'header-logo',
-				'header-style-transparent-logo',
+		$theme_options = $this->theme_options_replace_logo( $theme_options, array(
+			'header-logo',
+			'header-style-transparent-logo',
+		), array(
+			'regular' => array(
+				'/images/logo-main-dummy.png?w=57&h=57',
+				0,
 			),
-			array(
-				'regular' => array(
-					'/images/logo-main-dummy.png?w=80&h=80',
-					0,
-				),
-				'hd' => array(
-					'/images/logo-main-dummy-hd.png?w=160&h=160',
-					0,
-				),
-			)
-		);
+			'hd'      => array(
+				'/images/logo-main-dummy-hd.png?w=114&h=114',
+				0,
+			),
+		) );
 
 		// Small logo.
-		$theme_options = $this->theme_options_replace_logo(
-			$theme_options,
-			array(
-				'header-style-mixed-logo',
-				'header-style-floating-logo',
-				'header-style-mobile-logo',
-				'bottom_bar-logo',
+		$theme_options = $this->theme_options_replace_logo( $theme_options, array(
+			'header-style-mixed-logo',
+			'header-style-floating-logo',
+			'header-style-mobile-logo',
+		), array(
+			'regular' => array(
+				'/images/logo-small-dummy.png?w=42&h=42',
+				0,
 			),
-			array(
-				'regular' => array(
-					'/images/logo-small-dummy.png?w=60&h=60',
-					0,
-				),
-				'hd' => array(
-					'/images/logo-small-dummy-hd.png?w=120&h=120',
-					0,
-				),
-			)
-		);
+			'hd'      => array(
+				'/images/logo-small-dummy-hd.png?w=84&h=84',
+				0,
+			),
+		) );
+
+		// Bottom Bar logo.
+		$theme_options = $this->theme_options_replace_logo( $theme_options, array(
+			'bottom_bar-logo',
+		), array(
+			'regular' => array(
+				'/inc/presets/images/full/wizard01.bottom-bar-logo-regular.png?w=27&h=27',
+				0,
+			),
+			'hd'      => array(
+				'/inc/presets/images/full/wizard01.bottom-bar-logo-hd.png?w=54&h=54',
+				0,
+			),
+		) );
+
+		// Fav icon.
+		$theme_options = $this->theme_options_replace_logo( $theme_options, array( 'general-favicon' ), array(
+			''   => '',
+			'hd' => '',
+		) );
 
 		return $theme_options;
 	}
@@ -565,7 +716,10 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 		foreach ( $fields_ids as $base_id ) {
 			// Logo prefix 'regular', 'hd'.
 			foreach ( $logo as $prefix => $val ) {
-				$field_id = "{$base_id}_{$prefix}";
+				$field_id = $base_id;
+				if ( $prefix ) {
+					$field_id .= "_{$prefix}";
+				}
 				// If not empty - replace.
 				if ( isset( $options[ $field_id ] ) && ( ! empty( $options[ $field_id ][0] ) || ! empty( $options[ $field_id ][1] ) ) ) {
 					$options[ $field_id ] = $val;
@@ -601,7 +755,7 @@ If the problem persists, please don\'t hesitate to contact our <a href="%s" targ
 			return $this->importer_obj->processed_posts[ $post_id ];
 		}
 
-		return false;
+		return 0;
 	}
 
 	/**

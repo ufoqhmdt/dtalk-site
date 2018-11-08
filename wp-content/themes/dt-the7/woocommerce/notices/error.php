@@ -11,13 +11,12 @@
  * the readme will list any important changes.
  *
  * @see 	    https://docs.woocommerce.com/document/template-structure/
- * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     1.6.4
+ * @version     3.5.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
 if ( ! $messages ){
@@ -25,10 +24,17 @@ if ( ! $messages ){
 }
 
 ?>
-<div class="woocommerce-error">
+<div class="woocommerce-error" role="alert">
 <ul class="woocommerce-error-text">
 	<?php foreach ( $messages as $message ) : ?>
-		<li><?php echo wp_kses_post( $message ); ?></li>
+		<li><?php
+            if ( function_exists( 'wc_kses_notice' ) ) {
+	            echo wc_kses_notice( $message );
+            } else {
+	            echo wp_kses_post( $message );
+            }
+            ?></li>
 	<?php endforeach; ?>
 </ul>
+<span class="close-message"></span>
 </div>

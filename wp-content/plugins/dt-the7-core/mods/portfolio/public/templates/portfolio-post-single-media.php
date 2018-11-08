@@ -53,7 +53,7 @@ if ( 'disabled' != $config->get( 'post.media.layout' ) ) {
 		$scale_mode = ( 'fit' === $scale_mode ? 'fit' : 'fill' );
 
 		$media_html = presscore_get_photo_slider( $attachments_data, array(
-			'class' 	=> array('slider-post'),
+			'class' 	=> array('slider-post  owl-carousel dt-owl-carousel-init slider-simple'),
 			'width' 	=> absint( $slider_proportions['width'] ),
 			'height'	=> absint( $slider_proportions['height'] ),
 			'style'		=> ' style="width: 100%;" data-img-mode="' . $scale_mode . '"',

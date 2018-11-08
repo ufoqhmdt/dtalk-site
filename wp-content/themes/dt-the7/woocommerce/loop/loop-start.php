@@ -13,7 +13,7 @@
  * @see 	    https://docs.woothemes.com/document/template-structure/
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     2.0.0
+ * @version     3.3.0
  */
 //Responsiveness mode:Browser width based data atts
 
@@ -49,9 +49,16 @@ do_action( 'presscore_before_loop' );
 // fullwidth wrap open
 if ( presscore_config()->get( 'full_width' ) ) { echo '<div class="full-width-wrap">'; }
 if ( 'list' === presscore_config()->get( 'layout' )) {
-	echo '<div class="wc-layout-list '. $wc_list_html_class .  $hide_desc_class .'" >';
+	echo '<div class="wc-layout-list dt-products '. $wc_list_html_class .  $hide_desc_class .'" >';
 
 }else{
 // masonry container open
-	echo '<div ' . presscore_masonry_container_class( array( 'wf-container', 'woo-hover' ) ) . presscore_masonry_container_data_atts($data_atts) . '>';
+
+	if ( 'grid' === presscore_config()->get( 'layout' )) {
+		$classes = array_diff( presscore_masonry_container_classes_array(), array( 'iso-grid') );
+		echo '<div class="dt-css-grid-wrap woo-hover wc-grid dt-products ' . esc_attr( implode( ' ', $classes ) ) . '" ' . presscore_masonry_container_data_atts($data_atts) . '>';
+		echo '<div class="dt-css-grid">';
+	}else{
+		echo '<div ' . presscore_masonry_container_class( array( 'wf-container dt-products ', 'woo-hover' ) ) . presscore_masonry_container_data_atts($data_atts) . '>';
+	}
 }

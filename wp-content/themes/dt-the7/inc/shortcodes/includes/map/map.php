@@ -22,11 +22,7 @@ class DT_Shortcode_Map extends DT_Shortcode {
 	}
 
 	protected function __construct() {
-
 		add_shortcode( $this->shortcode_name, array($this, 'shortcode') );
-
-		// add shortcode button
-		// $tinymce_button = new DT_ADD_MCE_BUTTON( $this->plugin_name, basename(dirname(__FILE__)), false, 4 );
 	}
 
 	public function shortcode( $atts, $content = null ) {
@@ -65,7 +61,7 @@ class DT_Shortcode_Map extends DT_Shortcode {
 
 			if ( preg_match('/iframe/', $content ) ) {
 				$content = str_replace( array('&#8221;', '&#8243;'), '"', $content );
-				preg_match('/src=(["\'])(.*?)\1/', htmlspecialchars_decode($content), $match);
+				preg_match( '/src=(["\'])(.*?)\1/', wp_specialchars_decode( $content ), $match );
 
 				if ( !empty($match[2]) ) {
 					$src = $match[2];

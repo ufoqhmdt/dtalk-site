@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 
+	const INLINE_CSS_META_KEY = 'the7_shortcodes_inline_css';
+
 	/**
 	 * Shortcode name.
 	 *
@@ -54,13 +56,26 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 	/**
 	 * @var bool
 	 */
-	protected static $inline_css_printed = false;
+	protected $doing_shortcode = false;
+
+	/**
+	 * @var bool
+	 */
+	protected static $inline_css_printed = true;
 
 	/**
 	 * DT_Shortcode_With_Inline_Css constructor.
 	 */
 	public function __construct() {
 		add_filter( "the7_generate_sc_{$this->sc_name}_css", array( $this, 'generate_inline_css' ), 10, 2 );
+	}
+
+	public function get_tag() {
+		return $this->sc_name;
+	}
+
+	public function reset_id() {
+		$this->sc_id = 1;
 	}
 
 	/**
@@ -72,8 +87,13 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 	 * @return string
 	 */
 	public function shortcode( $atts, $content = '' ) {
-		$this->reset_shortcode();
-		$this->sanitize_attributes( $atts );
+		if ( $this->doing_shortcode ) {
+			return '';
+		}
+
+		$this->init_shortcode( $atts );
+
+		do_action( 'the7_after_shortcode_init', $this );
 
 		if ( presscore_vc_is_inline() && $vc_inline_html = $this->get_vc_inline_html() ) {
 			return $vc_inline_html;
@@ -81,11 +101,19 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 
 		$this->backup_post_object();
 		$this->backup_theme_config();
-		$this->setup_config();
 
 		ob_start();
+		$this->doing_shortcode = true;
+
+		do_action( 'the7_before_shortcode_output', $this );
+
+		$this->setup_config();
 		$this->print_inline_css();
 		$this->do_shortcode( $atts, $content );
+
+		do_action( 'the7_after_shortcode_output', $this );
+
+		$this->doing_shortcode = false;
 		$output = ob_get_clean();
 
 		$this->restore_theme_config();
@@ -103,23 +131,26 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 	 * @return string
 	 */
 	public function generate_inline_css( $css = '', $atts = array() ) {
-		if ( ! class_exists( 'lessc', false ) ) {
+		if ( ! class_exists( 'the7_lessc', false ) ) {
 			return $css;
 		}
 
-		$this->reset_shortcode();
-		$this->sanitize_attributes( $atts );
+		$this->init_shortcode( $atts );
+
+		do_action( 'the7_after_shortcode_init', $this );
 
 		$less_file_name = $this->get_less_file_name();
 
 		try {
-			$lessc = new lessc();
+			$lessc = new the7_lessc();
 
 			// Include custom lessphp functions.
-			require_once trailingslashit( PRESSCORE_EXTENSIONS_DIR ) . 'less-vars/class-lessphp-functions.php';
+			require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/less-functions.php';
+			require_once PRESSCORE_EXTENSIONS_DIR . '/less-vars/class-lessphp-functions.php';
 
 			DT_LessPHP_Functions::register_functions( $lessc );
 
+			$lessc->setImportDir( array( PRESSCORE_THEME_DIR . '/css/dynamic-less/shortcodes' ) );
 			$lessc->setVariables( (array) $this->get_less_vars() );
 			$css .= $lessc->compileFile( $less_file_name );
 		} catch ( Exception $e ) {
@@ -175,20 +206,13 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 	abstract protected function get_vc_inline_html();
 
 	/**
-	 * Reset shortcode params. Used for unique class forming.
-	 */
-	protected function reset_shortcode() {
-		$this->unique_class = '';
-		$this->atts = array();
-	}
-
-	/**
-	 * Sanitize shortcode attributes.
+	 * Initialize shortcode.
 	 *
 	 * @param array $atts
 	 */
-	protected function sanitize_attributes( $atts ) {
+	protected function init_shortcode( $atts = array() ) {
 		$this->atts = shortcode_atts( $this->default_atts, $atts );
+		$this->unique_class = '';
 	}
 
 	/**
@@ -196,12 +220,20 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 	 *
 	 * @return string
 	 */
-	protected function get_unique_class() {
+	public function get_unique_class() {
 		if ( ! $this->unique_class ) {
-			$this->unique_class = $this->unique_class_base . '-' . $this->sc_id++;
+			$this->unique_class = $this->unique_class_base . '-' . md5( $this->get_tag() . json_encode( $this->atts ) );
 		}
 
 		return $this->unique_class;
+	}
+
+	public function set_unique_class( $class ) {
+		$this->unique_class = $class;
+	}
+
+	public function allow_to_print_inline_css() {
+		self::$inline_css_printed = false;
 	}
 
 	/**
@@ -228,6 +260,10 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 		return '';
 	}
 
+	public function get_atts() {
+		return $this->atts;
+	}
+
 	/**
 	 * Return sanitized boolean value.
 	 *
@@ -252,7 +288,15 @@ abstract class DT_Shortcode_With_Inline_Css extends DT_Shortcode {
 
 		self::$inline_css_printed = true;
 
-		$inline_css = get_post_meta( get_the_ID(), 'the7_shortcodes_inline_css', true );
+		$inline_css = get_post_meta( get_the_ID(), self::INLINE_CSS_META_KEY, true );
+
+		/**
+		 * Allow to change shortcodes inline css before output.
+		 *
+		 * @since 6.0.0
+		 */
+		$inline_css = apply_filters( 'the7_shortcodes_get_inline_css', $inline_css, $this );
+
 		if ( $inline_css ) {
 			echo '<style type="text/css" data-type="the7_shortcodes-inline-css">';
 			echo $inline_css;

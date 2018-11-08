@@ -501,8 +501,9 @@ $DT_META_BOXES[] = array(
 
 		// IMAGE ADVANCED (WP 3.5+)
 		array(
-			'id'               => "{$prefix}items",
-			'type'             => 'image_advanced_mk2',
+			'id'                   => "{$prefix}items",
+			'type'                 => 'image_advanced_mk2',
+			'exclude_from_presets' => true,
 		),
 
 	),
@@ -590,7 +591,7 @@ $DT_META_BOXES[] = array(
 
 		array(
 			// container begin !!!
-			'before'		=> '<div class="rwmb-input-' . $prefix . 'gallery_container rwmb-flickering-field">',
+			'before'		=> '<div class="the7-mb-input-' . $prefix . 'gallery_container the7-mb-flickering-field">',
 
 			'name'     		=> _x('Columns:', 'backend metabox', 'dt-the7-core'),
 			'id'       		=> "{$prefix}gallery_columns",
@@ -629,7 +630,7 @@ $DT_META_BOXES[] = array(
 
 		array(
 			// container begin !!!
-			'before'	=> '<div class="rwmb-input-' . $prefix . 'photo_scroller_container rwmb-flickering-field">',
+			'before'	=> '<div class="the7-mb-input-' . $prefix . 'photo_scroller_container the7-mb-flickering-field">',
 
 			'name'		=> _x( 'Layout:', 'backend metabox', 'dt-the7-core' ),
 			'id'		=> "{$prefix}photo_scroller_layout",
@@ -846,7 +847,7 @@ $DT_META_BOXES[] = array(
 		// Masonry layout
 		Presscore_Meta_Box_Field_Template::get_as_array( 'masonry layout', array(
 			// container begin !!!
-			'before' => '<div class="rwmb-input-' . $prefix . 'masonry_grid_container rwmb-flickering-field">',
+			'before' => '<div class="the7-mb-input-' . $prefix . 'masonry_grid_container the7-mb-flickering-field">',
 
 			'id' => "{$prefix}mg_layout",
 			'divider' => 'top',
@@ -906,7 +907,7 @@ $DT_META_BOXES[] = array(
 		// Gap between images
 		Presscore_Meta_Box_Field_Template::get_as_array( 'gap between images', array(
 			// container begin !!!
-			'before' => '<div class="rwmb-input-' . $prefix . 'jgrid_container rwmb-flickering-field">',
+			'before' => '<div class="the7-mb-input-' . $prefix . 'jgrid_container the7-mb-flickering-field">',
 
 			'id' => "{$prefix}jg_item_padding",
 			'divider' => 'top'

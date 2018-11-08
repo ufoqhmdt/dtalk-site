@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Heading_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Heading_Field' ) )
 {
-	class RWMB_Heading_Field
+	class THE7_RWMB_Heading_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -13,7 +13,7 @@ if ( ! class_exists( 'RWMB_Heading_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'rwmb-heading', RWMB_CSS_URL . 'heading.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-heading', THE7_RWMB_CSS_URL . 'heading.css', array(), THE7_RWMB_VER );
 		}
 
 		/**
@@ -45,6 +45,15 @@ if ( ! class_exists( 'RWMB_Heading_Field' ) )
 		static function end_html( $html, $meta, $field )
 		{
 			return '';
+		}
+
+		/**
+		 * Define this field as decorative.
+		 *
+		 * @return bool
+		 */
+		static function is_decorative() {
+			return true;
 		}
 	}
 }

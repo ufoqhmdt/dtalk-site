@@ -9,6 +9,46 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+if ( ! class_exists( 'Presscore_Lib_Options_MicrowidgetFontTemplate', false ) ) :
+
+	/**
+	 * Logo options template class.
+	 */
+	class Presscore_Lib_Options_MicrowidgetFontTemplate extends Presscore_Lib_Options_Template {
+
+		/**
+		 * @return array
+		 */
+		protected function do_execute() {
+			$_fields = array();
+
+			$_fields['font_family'] = array(
+				'name'      => _x( 'Font', 'theme-options', 'the7mk2' ),
+				'type'      => 'web_fonts',
+				'std'       => 'Arial',
+				'fonts'     => 'all',
+			);
+
+			$_fields['font_size'] = array(
+				'name'      => _x( 'Font size', 'theme-options', 'the7mk2' ),
+				'type'      => 'slider',
+				'sanitize'  => 'font_size',
+				'std'       => 14,
+				'options'   => array( 'min' => 9, 'max' => 120 ),
+			);
+
+			$_fields['font_color'] = array(
+				'name'  => _x( 'Font color', 'theme-options', 'the7mk2' ),
+				'type'  => 'color',
+				'std'   => '#888888',
+			);
+
+			return $_fields;
+		}
+	}
+
+endif;
+
 if ( ! class_exists( 'Presscore_Lib_Options_LogoTemplate', false ) ) :
 
 	/**
@@ -196,7 +236,7 @@ if ( ! class_exists( 'Presscore_Lib_Options_SideHeaderMenuTemplate', false ) ) :
 			);
 
 			$_fields['logo-position'] = array(
-				'name'    => _x( 'Logo and additional info position', 'theme-options', 'the7mk2' ),
+				'name'    => _x( 'Logo and microwidgets position', 'theme-options', 'the7mk2' ),
 				'type'    => 'images',
 				'std'     => 'fully_inside',
 				'options' => array(
@@ -205,24 +245,12 @@ if ( ! class_exists( 'Presscore_Lib_Options_SideHeaderMenuTemplate', false ) ) :
 						'src'   => '/inc/admin/assets/images/header-side-logo-position-fullyinside.gif',
 					),
 					'inside'       => array(
-						'title' => _x( 'Along the edges of entire content', 'theme-options', 'the7mk2' ),
+						'title' => _x( 'Along the edges of navigation area', 'theme-options', 'the7mk2' ),
 						'src'   => '/inc/admin/assets/images/header-side-logo-position-inside.gif',
 					),
 				),
 				'class'   => 'small',
 			);
-
-			$_fields[] = array( 'type' => 'divider' );
-
-			$_fields[] = array( 'name' => _x( 'Menu paddings', 'theme-options', 'the7mk2' ), 'type' => 'title' );
-
-			if ( class_exists( 'Presscore_Lib_Options_IndentsVTemplate', false ) ) {
-
-				$template = new Presscore_Lib_Options_IndentsVTemplate();
-				$template->execute( $_fields, 'menu-padding' );
-				unset( $template );
-
-			}
 
 			$_fields['menu-items_alignment'] = array(
 				'name'    => _x( 'Menu items alignment', 'theme-options', 'the7mk2' ),
@@ -278,10 +306,10 @@ if ( ! class_exists( 'Presscore_Lib_Options_SideHeaderContentTemplate', false ) 
 			$_fields = array();
 
 			$_fields['content-width'] = array(
-				'name'     => _x( 'Width of header content (px or %)', 'theme-options', 'the7mk2' ),
-				'type'     => 'text',
-				'std'      => '220px', 
-				'sanitize' => 'css_width',
+				'name'  => _x( 'Width of header content', 'theme-options', 'the7mk2' ),
+				'std'   => '220px',
+				'type'  => 'number',
+				'units' => 'px|%',
 			);
 
 			$_fields['content-position'] = array(
@@ -324,168 +352,6 @@ if ( ! class_exists( 'Presscore_Lib_Options_SlideoutHeaderLayoutTemplate', false
 		protected function do_execute() {
 			$_fields = array();
 
-			$_fields['layout'] = array(
-				'name'    => _x( 'Layout', 'theme-options', 'the7mk2' ),
-				'type'    => 'images',
-				'std'     => 'menu_icon',
-				'options' => array(
-					'menu_icon'     => array(
-						'title' => _x( 'Menu icon only', 'theme-options', 'the7mk2' ),
-						'src'   => '/inc/admin/assets/images/header-slideout-layout-menuicon.gif',
-					),
-					'top_line'      => array(
-						'title' => _x( 'Top line', 'theme-options', 'the7mk2' ),
-						'src'   => '/inc/admin/assets/images/header-slideout-layout-topline.gif',
-					),
-					'side_line'     => array(
-						'title' => _x( 'Side line', 'theme-options', 'the7mk2' ),
-						'src'   => '/inc/admin/assets/images/header-slideout-layout-sideline.gif',
-					),
-				),
-				'class'   => 'small',
-			);
-
-				// Menu icons.
-				$_fields['layout-menu_icon-show_floating_logo'] = array(
-					'name'    => _x( 'Floating logo', 'theme-options', 'the7mk2' ),
-					'type'    => 'images',
-					'std'     => '1',
-					'options' => array(
-						'1' => array(
-							'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-menuicon-showfloatinglogo-enabled.gif',
-						),
-						'0' => array(
-							'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-menuicon-showfloatinglogo-disabled.gif',
-						),
-					),
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'menu_icon',
-							),
-						),
-					),
-					'class'      => 'small',
-				);
-
-				// Top line.
-				$_fields['layout-top_line-height'] = array(
-					'name'       => _x( 'Height (px)', 'theme-options', 'the7mk2' ),
-					'type'       => 'text',
-					'std'        => '130',
-					'class'      => 'mini',
-					'sanitize'   => 'dimensions',
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'top_line',
-							),
-						),
-					),
-				);
-
-				$_fields['layout-top_line-is_fullwidth'] = array(
-					'name' => _x( 'Full width', 'theme-options', 'the7mk2' ),
-					'type'		=> 'images',
-					'class'     => 'small',
-					'std'  => '0',
-					'options'	=> array(
-						'1'    => array(
-							'title' => _x( 'Enabled', 'theme-options', 'the7mk2' ),
-							'src' => '/inc/admin/assets/images/header-topline-fullwidth-enabled.gif',
-						),
-						'0'    => array(
-							'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
-							'src' => '/inc/admin/assets/images/header-topline-fullwidth-disabled.gif',
-						),
-					),
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'top_line',
-							),
-						),
-					),
-				);
-
-				$_fields['layout-top_line-logo-position'] = array(
-					'name'    => _x( 'Logo position', 'theme-options', 'the7mk2' ),
-					'type'    => 'images',
-					'std'     => 'left',
-					'options' => array(
-						'center'    => array(
-							'title' => _x( 'Center', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-topline-logo-position-center.gif',
-						),
-						'left'      => array(
-							'title' => _x( 'Side', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-topline-logo-position-left.gif',
-						),
-					),
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'top_line',
-							),
-						),
-					),
-					'class'      => 'small',
-				);
-
-				// Side line.
-				$_fields['layout-side_line-width'] = array(
-					'name'       => _x( 'Width (px)', 'theme-options', 'the7mk2' ),
-					'type'       => 'text',
-					'std'        => '60',
-					'class'      => 'mini',
-					'sanitize'   => 'dimensions',
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'side_line',
-							),
-						),
-					),
-				);
-
-				$_fields['layout-side_line-position'] = array(
-					'name'    => _x( 'Show header', 'theme-options', 'the7mk2' ),
-					'type'    => 'images',
-					'std'     => 'above',
-					'options' => array(
-						'above'    => array(
-							'title' => _x( 'Above the line', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-sideline-position-above.gif',
-						),
-						'under'    => array(
-							'title' => _x( 'Under the line', 'theme-options', 'the7mk2' ),
-							'src'   => '/inc/admin/assets/images/header-slideout-layout-sideline-position-under.gif',
-						),
-					),
-					'dependency' => array(
-						array(
-							array(
-								'field' => 'layout',
-								'operator' => '==',
-								'value' => 'side_line',
-							),
-						),
-					),
-					'class'      => 'small',
-				);
-
 			return $_fields;
 		}
 	}
@@ -506,11 +372,10 @@ if ( ! class_exists( 'Presscore_Lib_Options_MobileHeaderTemplate', false ) ) :
 			$_fields = array();
 
 			$_fields['after'] = array(
-				'name'     => _x( 'Switch after (px)', 'theme-options', 'the7mk2' ),
-				'type'     => 'text',
-				'std'      => '1024',
-				'class'    => 'mini',
-				'sanitize' => 'dimensions',
+				'name'  => _x( 'Switch after', 'theme-options', 'the7mk2' ),
+				'std'   => '1024px',
+				'type'  => 'number',
+				'units' => 'px',
 			);
 
 			$_fields['layout'] = array(
@@ -523,16 +388,13 @@ if ( ! class_exists( 'Presscore_Lib_Options_MobileHeaderTemplate', false ) ) :
 					'right_left'   => _x( 'Right menu + left logo', 'theme-options', 'the7mk2' ),
 					'right_center' => _x( 'Right menu + centered logo', 'theme-options', 'the7mk2' ),
 				),
-				'divider' => 'top',
 			);
 
 			$_fields['height'] = array(
-				'name'     => _x( 'Header height (px)', 'theme-options', 'the7mk2' ),
-				'type'     => 'text',
-				'std'      => '150',
-				'class'    => 'mini',
-				'sanitize' => 'dimensions',
-				'divider'  => 'top',
+				'name'  => _x( 'Header height', 'theme-options', 'the7mk2' ),
+				'std'   => '150px',
+				'type'  => 'number',
+				'units' => 'px',
 			);
 
 			return $_fields;
@@ -569,8 +431,10 @@ if ( ! class_exists( 'Presscore_Lib_Options_HeaderElementMobileLayoutTemplate', 
 				'type'    => 'radio',
 				'std'     => 'near_logo',
 				'options' => array(
-					'near_logo' => _x( 'Leave as is', 'theme-options', 'the7mk2' ),
-					'in_menu'   => _x( 'Show in the menu', 'theme-options', 'the7mk2' ),
+					'near_logo' => _x( 'Mobile header', 'theme-options', 'the7mk2' ),
+					'top_bar_left' => _x( 'Top bar (left)', 'theme-options', 'the7mk2' ),
+					'top_bar_right' => _x( 'Top bar (right)', 'theme-options', 'the7mk2' ),
+					'in_menu'   => _x( 'Mobile navigation', 'theme-options', 'the7mk2' ),
 					'hidden'    => _x( 'Hide', 'theme-options', 'the7mk2' ),
 				),
 			);
@@ -580,8 +444,9 @@ if ( ! class_exists( 'Presscore_Lib_Options_HeaderElementMobileLayoutTemplate', 
 				'type'    => 'radio',
 				'std'     => 'in_menu',
 				'options' => array(
-					'in_menu'   => _x( 'Show in the menu', 'theme-options', 'the7mk2' ),
-					'near_logo' => _x( 'Show near logo', 'theme-options', 'the7mk2' ),
+					'near_logo' => _x( 'Mobile header', 'theme-options', 'the7mk2' ),
+					'in_top_bar' => _x( 'Top bar', 'theme-options', 'the7mk2' ),
+					'in_menu'   => _x( 'Mobile navigation', 'theme-options', 'the7mk2' ),
 					'hidden'    => _x( 'Hide', 'theme-options', 'the7mk2' ),
 				),
 			);
@@ -684,8 +549,8 @@ if ( ! class_exists( 'Presscore_Lib_Options_ExtConditionalColorTemplate', false 
 
 				$_fields['gradient'] = array(
 					'name'	=> _x( 'Gradient', 'theme-options', 'the7mk2' ),
-					'type'	=> 'gradient',
-					'std'	=> array( '#ffffff', '#000000' ),
+					'type'	=> 'gradient_picker',
+					'std'        => '135deg|#ffffff 30%|#000000 100%',
 					'dependency' => array(
 						array(
 							array(
@@ -696,6 +561,401 @@ if ( ! class_exists( 'Presscore_Lib_Options_ExtConditionalColorTemplate', false 
 						),
 					),
 				);
+
+			return $_fields;
+		}
+	}
+
+endif;
+
+if ( ! class_exists( 'Presscore_Lib_Options_HeaderElementButtonTemplate', false ) ) :
+
+	/**
+	 * Header element buttom micro widget options template class.
+	 */
+	class Presscore_Lib_Options_HeaderElementButtonTemplate extends Presscore_Lib_Options_Template {
+
+		/**
+		 * @return array
+		 */
+		protected function do_execute() {
+			$_fields = array();
+
+			$_fields[] = array(
+				'name' => _x( 'Button settings', 'theme-options', 'the7mk2' ),
+				'type' => 'title',
+			);
+
+			$_fields['name'] = array(
+				'name' => _x( 'Button name', 'theme-options', 'the7mk2' ),
+				'type' => 'text',
+				'std'  => _x( 'Button', 'theme-options', 'the7mk2' ),
+			);
+
+			$_fields['url'] = array(
+				'name' => _x( 'Link', 'theme-options', 'the7mk2' ),
+				'type' => 'text',
+				'std'  => '',
+			);
+
+			$_fields['target'] = array(
+				'name' => _x( 'Open link in a new tab', 'theme-options', 'the7mk2' ),
+				'type' => 'checkbox',
+				'std'  => '0',
+			);
+
+			$_fields['smooth-scroll'] = array(
+				'name' => _x( 'Enable smooth scroll for anchor navigation', 'theme-options', 'the7mk2' ),
+				'type' => 'checkbox',
+				'std'  => '0',
+			);
+
+			$_fields['font-family'] = array(
+				'name'  => _x( 'Font family', 'theme-options', 'the7mk2' ),
+				'type'  => 'web_fonts',
+				'std'   => 'Roboto:700',
+				'fonts' => 'all',
+			);
+
+			$_fields['font-size'] = array(
+				'name'     => _x( 'Font size', 'theme-options', 'the7mk2' ),
+				'type'     => 'slider',
+				'sanitize' => 'font_size',
+				'std'      => 14,
+				'options'  => array( 'min' => 9, 'max' => 120 ),
+			);
+
+			$_fields['border_radius'] = array(
+				'name'  => _x( 'Border radius', 'theme-options', 'the7mk2' ),
+				'std'   => '0px',
+				'type'  => 'number',
+				'units' => 'px',
+			);
+
+			$_fields['border_width'] = array(
+				'name'  => _x( 'Border width', 'theme-options', 'the7mk2' ),
+				'std'   => '1px',
+				'type'  => 'number',
+				'units' => 'px',
+			);
+
+			$_fields['padding'] = array(
+				'name' => _x( 'Paddings', 'theme-options', 'the7mk2' ),
+				'type' => 'spacing',
+				'std'  => '10px 20px 10px 20px',
+			);
+
+			$_fields[] = array( 'type' => 'divider' );
+
+			$_fields[] = array(
+				'name' => _x( 'Icon settings', 'theme-options', 'the7mk2' ),
+				'type' => 'title',
+			);
+
+			$_fields['icon'] = array(
+				'name' => _x( 'Show icon', 'theme-options', 'the7mk2' ),
+				'type' => 'checkbox',
+				'std'  => '0',
+			);
+
+			$_fields['icon-size'] = array(
+				'name'       => _x( 'Icon size', 'theme-options', 'the7mk2' ),
+				'type'       => 'slider',
+				'std'        => 14,
+				'options'    => array( 'min' => 8, 'max' => 50 ),
+				'dependency' => array(
+					'field'    => 'icon',
+					'operator' => '==',
+					'value'    => '1',
+				),
+			);
+
+			$_fields['choose-icon'] = array(
+				'name'       => 'Select icon',
+				'type'       => 'icons_picker',
+				'std'        => false,
+				'dependency' => array(
+					'field'    => 'icon',
+					'operator' => '==',
+					'value'    => '1',
+				),
+			);
+
+			$_fields['icon-position'] = array(
+				'name'       => _x( 'Icon alignment', 'theme-options', 'the7mk2' ),
+				'type'       => 'select',
+				'class'      => 'middle',
+				'std'        => 'right',
+				'options'    => array(
+					'right' => _x( 'Right', 'theme-options', 'the7mk2' ),
+					'left'  => _x( 'Left', 'theme-options', 'the7mk2' ),
+				),
+				'dependency' => array(
+					'field'    => 'icon',
+					'operator' => '==',
+					'value'    => '1',
+				),
+			);
+
+			$_fields[] = array( 'type' => 'divider' );
+
+			$_fields[] = array(
+				'name' => _x( 'Normal state', 'theme-options', 'the7mk2' ),
+				'type' => 'title',
+			);
+
+			$_fields['icon-color'] = array(
+				'name'    => _x( 'Text & icon color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'color',
+				'options' => array(
+					'accent'   => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'    => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+					'gradient' => array(
+						'title' => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom-gradient.gif',
+					),
+				),
+			);
+
+			$_fields['icon-color-mono'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'icon-color',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['icon-color-gradient'] = array(
+				'name'        => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+				'type'        => 'gradient_picker',
+				'std'         => '90deg|#ffffff 30%|#000000 100%',
+				'fixed_angle' => '90deg',
+				'dependency'  => array(
+					'field'    => 'icon-color',
+					'operator' => '==',
+					'value'    => 'gradient',
+				),
+			);
+
+			$_fields['border-color'] = array(
+				'name'    => _x( 'Border color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'accent',
+				'options' => array(
+					'disabled' => array(
+						'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-disabled.gif',
+					),
+					'accent' => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'  => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+				),
+			);
+
+			$_fields['border-color-mono'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'border-color',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['bg'] = array(
+				'name'    => _x( 'Button background color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'accent',
+				'options' => array(
+					'disabled' => array(
+						'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-disabled.gif',
+					),
+					'accent'   => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'    => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+					'gradient' => array(
+						'title' => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom-gradient.gif',
+					),
+				),
+			);
+
+			$_fields['bg-color'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'bg',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['bg-gradient'] = array(
+				'name'       => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+				'type'       => 'gradient_picker',
+				'std'        => '135deg|#ffffff 30%|#000000 100%',
+				'dependency' => array(
+					'field'    => 'bg',
+					'operator' => '==',
+					'value'    => 'gradient',
+				),
+			);
+
+			$_fields[] = array( 'type' => 'divider' );
+
+			$_fields[] = array(
+				'name' => _x( 'Hover state', 'theme-options', 'the7mk2' ),
+				'type' => 'title',
+			);
+
+			$_fields['hover-icon-color'] = array(
+				'name'    => _x( 'Text & icon color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'color',
+				'options' => array(
+					'accent'   => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'    => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+					'gradient' => array(
+						'title' => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom-gradient.gif',
+					),
+				),
+			);
+
+			$_fields['hover-icon-color-mono'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'hover-icon-color',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['hover-icon-color-gradient'] = array(
+				'name'        => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+				'type'        => 'gradient_picker',
+				'std'         => '90deg|#ffffff 30%|#000000 100%',
+				'fixed_angle' => '90deg',
+				'dependency'  => array(
+					'field'    => 'hover-icon-color',
+					'operator' => '==',
+					'value'    => 'gradient',
+				),
+			);
+
+			$_fields['hover-border-color'] = array(
+				'name'    => _x( 'Border color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'accent',
+				'options' => array(
+					'disabled' => array(
+						'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-disabled.gif',
+					),
+					'accent' => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'  => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+				),
+			);
+
+			$_fields['hover-border-color-mono'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'hover-border-color',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['hover-bg'] = array(
+				'name'    => _x( 'Button background color', 'theme-options', 'the7mk2' ),
+				'type'    => 'images',
+				'class'   => 'small',
+				'std'     => 'accent',
+				'options' => array(
+					'disabled' => array(
+						'title' => _x( 'Disabled', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-disabled.gif',
+					),
+					'accent'   => array(
+						'title' => _x( 'Accent', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-accent.gif',
+					),
+					'color'    => array(
+						'title' => _x( 'Mono color', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom.gif',
+					),
+					'gradient' => array(
+						'title' => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+						'src'   => '/inc/admin/assets/images/color-custom-gradient.gif',
+					),
+				),
+			);
+
+			$_fields['hover-bg-color'] = array(
+				'name'       => _x( 'Choose color', 'theme-options', 'the7mk2' ),
+				'type'       => 'alpha_color',
+				'std'        => '#ffffff',
+				'dependency' => array(
+					'field'    => 'hover-bg',
+					'operator' => '==',
+					'value'    => 'color',
+				),
+			);
+
+			$_fields['hover-bg-gradient'] = array(
+				'name'       => _x( 'Gradient', 'theme-options', 'the7mk2' ),
+				'type'       => 'gradient_picker',
+				'std'        => '135deg|#ffffff 30%|#000000 100%',
+				'dependency' => array(
+					'field'    => 'hover-bg',
+					'operator' => '==',
+					'value'    => 'gradient',
+				),
+			);
 
 			return $_fields;
 		}

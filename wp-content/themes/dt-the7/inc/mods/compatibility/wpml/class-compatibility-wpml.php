@@ -99,19 +99,43 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_WPML', false ) ) :
 			 */
 
 			// Template category.
-			add_filter( 'rwmb_fancy_category_meta', array( __CLASS__, 'rwmb_fancy_category_meta_filter' ), 10, 2 );
+			add_filter( 'the7_mb_fancy_category_meta', array( __CLASS__, 'the7_mb_fancy_category_meta_filter' ), 10, 2 );
 
 			// Images list.
-			add_filter( 'rwmb_image_advanced_mk2_meta', array( __CLASS__, 'rwmb_image_advanced_mk2_meta_filter' ) );
+			add_filter( 'the7_mb_image_advanced_mk2_meta', array( __CLASS__, 'the7_mb_image_advanced_mk2_meta_filter' ) );
 
 			// Related posts.
-			add_filter( 'rwmb_taxonomy_list_meta', array( __CLASS__, 'rwmb_taxonomy_list_meta_filter' ), 10, 2 );
+			add_filter( 'the7_mb_taxonomy_list_meta', array( __CLASS__, 'the7_mb_taxonomy_list_meta_filter' ), 10, 2 );
 
 			// Slideshow.
-			add_filter( 'rwmb__dt_slideshow_sliders_meta', array( __CLASS__, 'rwmb__dt_slideshow_sliders_meta_filter' ) );
+			add_filter( 'the7_mb__dt_slideshow_sliders_meta', array( __CLASS__, 'the7_mb__dt_slideshow_sliders_meta_filter' ) );
 
 			// Back button page.
-			add_filter( 'rwmb_dropdown_pages_meta', array( __CLASS__, 'rwmb_dropdown_pages_meta_filter' ), 10, 2 );
+			add_filter( 'the7_mb_dropdown_pages_meta', array( __CLASS__, 'the7_mb_dropdown_pages_meta_filter' ), 10, 2 );
+
+			if ( is_admin() && ! wp_doing_ajax() && ! wp_doing_cron() ) {
+				// Setup WPML settings.
+				self::setup_wpml_settings();
+			}
+		}
+
+		/**
+		 * Setup WPML settings.
+		 */
+		public static function setup_wpml_settings() {
+			global $sitepress;
+
+			if ( ! is_a( $sitepress, 'SitePress' ) ) {
+				return;
+			}
+
+			// Enable language cookies by default.
+			if ( class_exists( 'WPML_Cookie_Setting' ) ) {
+				$wpml_cookie = new WPML_Cookie_Setting( $sitepress );
+				if ( $wpml_cookie->get_setting() === false ) {
+					$wpml_cookie->set_setting( 1 );
+				}
+			}
 		}
 
 		public static function register_social_icons_strings( $options ) {
@@ -182,17 +206,17 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_WPML', false ) ) :
 				'src' => PRESSCORE_THEME_URI . '/css/compatibility/wpml.less',
 				'fallback_src' => '',
 				'deps' => array(),
-				'ver' => wp_get_theme()->get( 'Version' ),
+				'ver' => THE7_VERSION,
 				'media' => 'all'
 			);
 			return $dynamic_stylesheets;
 		}
 
 		public static function add_header_searchform_lang_action() {
-			echo '<input type="hidden" name="lang" value="' . apply_filters( 'wpml_current_langauge', null ) .'"/>';
+			echo '<input type="hidden" name="lang" value="' . apply_filters( 'wpml_current_language', null ) .'"/>';
 		}
 
-		public static function rwmb_fancy_category_meta_filter( $meta, $field = array() ) {
+		public static function the7_mb_fancy_category_meta_filter( $meta, $field = array() ) {
 			// Translate terms.
 			if ( isset( $meta['terms_ids'], $field['taxonomy'] ) ) {
 				$meta['terms_ids'] = presscore_translate_object_id( $meta['terms_ids'], $field['taxonomy'] );
@@ -206,15 +230,15 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_WPML', false ) ) :
 			return $meta;
 		}
 
-		public static function rwmb_image_advanced_mk2_meta_filter( $meta ) {
+		public static function the7_mb_image_advanced_mk2_meta_filter( $meta ) {
 			return presscore_translate_object_id( $meta, 'attachment' );
 		}
 
-		public static function rwmb__dt_slideshow_sliders_meta_filter( $meta ) {
+		public static function the7_mb__dt_slideshow_sliders_meta_filter( $meta ) {
 			return presscore_translate_object_id( $meta, 'dt_slideshow' );
 		}
 
-		public static function rwmb_taxonomy_list_meta_filter( $meta, $field ) {
+		public static function the7_mb_taxonomy_list_meta_filter( $meta, $field ) {
 			if ( isset( $field['options']['taxonomy'] ) ) {
 				return presscore_translate_object_id( $meta, $field['options']['taxonomy'] );
 			}
@@ -222,7 +246,7 @@ if ( ! class_exists( 'Presscore_Modules_Compatibility_WPML', false ) ) :
 			return $meta;
 		}
 
-		public static function rwmb_dropdown_pages_meta_filter( $meta, $field ) {
+		public static function the7_mb_dropdown_pages_meta_filter( $meta, $field ) {
 			return presscore_translate_object_id( $meta, 'page' );
 		}
 

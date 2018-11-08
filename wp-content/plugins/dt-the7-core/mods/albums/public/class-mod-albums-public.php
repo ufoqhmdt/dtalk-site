@@ -24,7 +24,7 @@ class Presscore_Mod_Albums_Public {
 	}
 
 	public function register_shortcodes() {
-		foreach ( array( 'albums', 'albums-jgrid', 'albums-slider', 'photos-masonry', 'photos-jgrid', 'photos-slider' ) as $shortcode_name ) {
+		foreach ( array( 'albums', 'albums-jgrid', 'albums-slider', 'photos-masonry', 'photos-jgrid', 'photos-slider', 'gallery-masonry', 'photos-carousel', 'albums-masonry', 'albums-carousel' ) as $shortcode_name ) {
 			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
 		}
 	}
@@ -92,9 +92,14 @@ class Presscore_Mod_Albums_Public {
 	}
 
 	public function archive_page_id( $page_id ) {
+		if ( $page_id ) {
+			return $page_id;
+		}
+
 		if ( is_tax( 'dt_gallery_category' ) || is_post_type_archive( 'dt_gallery' ) ) {
 			$page_id = of_get_option( 'template_page_id_gallery_category', null );
 		}
+
 		return $page_id;
 	}
 
@@ -122,15 +127,7 @@ class Presscore_Mod_Albums_Public {
 			$classes[] = 'photo-scroller-album';
 		}
 
-		// miniatures style
-		switch ( presscore_config()->get( 'post.preview.mini_images.style' ) ) {
-			case 'style_1':
-				$classes[] = 'album-minuatures-style-1';
-				break;
-			case 'style_2':
-				$classes[] = 'album-minuatures-style-2';
-				break;
-		}
+
 
 		return $classes;
 	}

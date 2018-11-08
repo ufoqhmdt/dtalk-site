@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Button_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Button_Field' ) )
 {
-	class RWMB_Button_Field
+	class THE7_RWMB_Button_Field
 	{
 		/**
 		 * Get field HTML
@@ -33,7 +33,7 @@ if ( ! class_exists( 'RWMB_Button_Field' ) )
 		 */
 		static function normalize_field( $field )
 		{
-			$field['std'] = $field['std'] ? $field['std'] : __( 'Click me', 'rwmb' );
+			$field['std'] = $field['std'] ? $field['std'] : __( 'Click me', 'the7mk2' );
 			return $field;
 		}
 	}

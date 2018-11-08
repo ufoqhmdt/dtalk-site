@@ -77,13 +77,8 @@ function optionsframework_uploader( $_id, $_value, $_mode = 'uri_only', $_desc =
 
 		$image = preg_match( '/(^.*\.jpg|jpeg|png|gif|ico*)/i', $value );
 		if ( $image ) {
-			$output .= '<img src="' . dt_get_of_uploaded_image($value) . '" alt="" />' . $remove;
+			$output .= '<img src="' . dt_get_of_uploaded_image($value) . '" alt="' . esc_attr( __( 'Image preview', 'the7mk2' ) ) . '" />' . $remove;
 		} else {
-			$parts = explode( "/", $value );
-			for( $i = 0; $i < sizeof( $parts ); ++$i ) {
-				$title = $parts[$i];
-			}
-
 			// No output preview if it's not an image.			
 			$output .= '';
 		
@@ -104,17 +99,7 @@ endif;
 
 if ( ! function_exists( 'optionsframework_media_scripts' ) ) :
 
-// add_action( 'admin_enqueue_scripts', 'optionsframework_media_scripts' );
-
 function optionsframework_media_scripts() {
-	if ( function_exists( 'wp_enqueue_media' ) )
-		wp_enqueue_media();
-	wp_register_script( 'of-media-uploader', OPTIONS_FRAMEWORK_URL .'js/media-uploader.js', array( 'jquery' ), false, true );
-	wp_enqueue_script( 'of-media-uploader' );
-	wp_localize_script( 'of-media-uploader', 'optionsframework_l10n', array(
-		'upload' => __( 'Upload', 'the7mk2' ),
-		'remove' => __( 'Remove', 'the7mk2' )
-	) );
 }
 
 endif;

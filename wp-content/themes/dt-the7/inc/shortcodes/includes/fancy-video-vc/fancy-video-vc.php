@@ -91,21 +91,17 @@ class DT_Shortcode_FancyVideoVc extends DT_Shortcode {
 		}
 
 		if ( $content ) {
-
 			$container_classes[] = 'caption-on';
 			$content_block = '<div class="shortcode-single-caption">' . $content . '</div>';
 		}
 
-		$default_image_src = $attributes['image'] ? $attributes['image'] : $attributes['hd_image'];
-
-		$image_src = dt_is_hd_device() ? $attributes['hd_image'] : $attributes['image'];
-
-		if ( empty($image_src) ) {
-
-			$image_src = $default_image_src;
+		if ( $attributes['image'] && $attributes['hd_image'] ) {
+			$image_src = sprintf( 'src="%1$s" srcset="%1$s 1x, %2$s 2x"', $attributes['image'], $attributes['hd_image'] );
+		} else {
+			$image_src = sprintf( 'src="%s"', $attributes['image'] ? $attributes['image'] : $attributes['hd_image'] );
 		}
 
-		$media = sprintf( '<img src="%s" alt="%s" />', $image_src, $attributes['image_alt'] );
+		$media = sprintf( '<img %s alt="%s" />', $image_src, $attributes['image_alt'] );
 
 		$media = sprintf(
 			'<div class="rollover-video">%s<a class="video-icon dt-pswp-item pswp-video" href="%s" title="%s" data-dt-img-description="%s"></a></div>',

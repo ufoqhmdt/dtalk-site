@@ -21,15 +21,15 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 
 			// vc inline dummy
 			if ( presscore_vc_is_inline() ) {
-				$terms_title = _x( 'Display categories', 'vc inline dummy', 'dt-the7-core' );
-				$terms_list = presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => $this->taxonomy ) );
+			    return $this->vc_inline_dummy( array(
+	                'class'  => 'dt_vc-albums_scroller',
+	                'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_album_carousel_editor_ico.gif', 131, 104 ),
+	                'title'  => _x( 'Albums Scroller', 'vc inline dummy', 'dt-the7-core' ),
 
-				return $this->vc_inline_dummy( array(
-					'class' => 'dt_vc-albums_scroller',
-					'title' => _x( 'Albums posts scroller', 'vc inline dummy', 'dt-the7-core' ),
-					'fields' => array( $terms_title => $terms_list )
-				) );
+	                'style' => array( 'height' => 'auto' )
+	            ) );
 			}
+
 
 			return $this->slider();
 		}
@@ -46,6 +46,14 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 				'select' => $attributes['select'],
 				'category' => $attributes['category']
 			) );
+			switch ( presscore_config()->get( 'post.preview.mini_images.style' ) ) {
+				case 'style_1':
+					$classes = 'album-minuatures-style-1';
+					break;
+				case 'style_2':
+					$classes = 'album-minuatures-style-2';
+					break;
+			}
 
 			if ( $dt_query->have_posts() ) {
 
@@ -59,12 +67,9 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 
 				// loop
 				while( $dt_query->have_posts() ) { $dt_query->the_post();
-					echo '<li class="fs-entry">';
 
 					presscore_populate_album_post_config();
 					presscore_get_template_part( 'mod_albums', 'album-masonry/album' );
-
-					echo '</li>';
 				}
 
 				// store loop html
@@ -72,11 +77,8 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 				ob_end_clean();
 
 				// shape output
-				$output = '<div ' . $this->get_container_html_class( array( 'dt-albums-shortcode', 'slider-wrapper' ) ) . ' ' . $this->get_container_data_atts() . '>';
-				$output .= '<div class="frame fullwidth-slider"><ul class="clearfix">' . $posts_html . '</ul></div>';
-				if ( $attributes['arrows'] ) {
-					$output .= '<div class="prev"><i></i></div><div class="next"><i></i></div>';
-				}
+				$output = '<div ' . $this->get_container_html_class( array( 'dt-albums-shortcode', 'slider-wrapper owl-carousel dt-owl-carousel-init ' .$classes. '' ) ) . ' ' . $this->get_container_data_atts() . '>';
+				$output .= $posts_html;
 				$output .= '</div>';
 
 				// cleanup
@@ -116,7 +118,7 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 				'hover_animation'             => 'fade',
 				'bgwl_animation_effect'       => '1',
 				'hover_content_visibility'    => 'on_hover',
-				'autoslide'                   => '',
+				'autoslide'                   => '3000',
 				'loop'                        => '',
 				'arrows'                      => 'light',
 				'arrows_on_mobile' => 'on',
@@ -253,9 +255,12 @@ if ( ! class_exists( 'DT_Shortcode_Albums_Slider', false ) ) {
 				'delay' => $this->atts['autoslide'],
 				'loop' => $this->atts['loop'] ? 'true' : 'false'
 			);
-
 			if ( $this->atts['max_width'] ) {
 				$data_atts['max-width'] = $this->atts['max_width'];
+			}
+			
+			if (  $this->atts['arrows'] ) {
+				$data_atts['arrows'] = $this->atts['arrows'] ? 'true' : 'false';
 			}
 
 			return presscore_get_inlide_data_attr( $data_atts );

@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer admin editor
+ * WPBakery WPBakery Page Builder admin editor
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  *
  */
 
@@ -51,6 +51,14 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 		), 5 );
 		add_action( 'admin_print_scripts-post.php', array(
 			$this,
+			'registerScripts',
+		) );
+		add_action( 'admin_print_scripts-post-new.php', array(
+			$this,
+			'registerScripts',
+		) );
+		add_action( 'admin_print_scripts-post.php', array(
+			$this,
 			'printScriptsMessages',
 		) );
 		add_action( 'admin_print_scripts-post-new.php', array(
@@ -60,6 +68,13 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 
 	}
 
+	public function registerScripts() {
+		$this->registerBackendJavascript();
+		$this->registerBackendCss();
+		// B.C:
+		visual_composer()->registerAdminCss();
+		visual_composer()->registerAdminJavascript();
+	}
 	/**
 	 *    Calls add_meta_box to create Editor block. Block is rendered by WPBakeryVisualComposerLayout.
 	 *
@@ -71,14 +86,8 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 	 */
 	public function render( $post_type ) {
 		if ( $this->isValidPostType( $post_type ) ) {
-			$this->registerBackendJavascript();
-			$this->registerBackendCss();
-			// B.C:
-			visual_composer()->registerAdminCss();
-			visual_composer()->registerAdminJavascript();
-
 			// meta box to render
-			add_meta_box( 'wpb_visual_composer', __( 'Visual Composer', 'js_composer' ), array(
+			add_meta_box( 'wpb_visual_composer', __( 'WPBakery Page Builder', 'js_composer' ), array(
 				$this,
 				'renderEditor',
 			), $post_type, 'normal', 'high' );
@@ -136,11 +145,12 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 	 * @return bool
 	 */
 	public function isValidPostType( $type = '' ) {
+		$type = ! empty( $type ) ? $type : get_post_type();
 		if ( 'vc_grid_item' === $type ) {
 			return false;
 		}
 
-		return vc_check_post_type( ! empty( $type ) ? $type : get_post_type() );
+		return apply_filters( 'vc_is_valid_post_type_be', vc_check_post_type( $type ), $type );
 	}
 
 	/**
@@ -194,7 +204,7 @@ class Vc_Backend_Editor implements Vc_Editor_Interface {
 		wp_register_script( 'wpb_json-js', vc_asset_url( 'lib/bower/json-js/json2.min.js' ), array(), WPB_VC_VERSION, true );
 		// used in post settings editor
 		wp_register_script( 'ace-editor', vc_asset_url( 'lib/bower/ace-builds/src-min-noconflict/ace.js' ), array( 'jquery' ), WPB_VC_VERSION, true );
-		wp_register_script( 'webfont', '//ajax.lug.ustc.edu.cn/ajax/libs/webfont/1.4.7/webfont.js' ); // Google Web Font CDN
+		wp_register_script( 'webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js' ); // Google Web Font CDN
 
 		wp_localize_script( 'vc-backend-actions-js', 'i18nLocale', visual_composer()->getEditorsLocale() );
 	}

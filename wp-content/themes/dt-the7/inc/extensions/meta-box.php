@@ -18,7 +18,7 @@ require_once( PRESSCORE_EXTENSIONS_DIR . '/custom-meta-boxes/override-fields.php
  * Include Meta-Box framework.
  *
  */
-require_once( RWMB_DIR . 'meta-box.php' );
+require_once( THE7_RWMB_DIR . 'meta-box.php' );
 
 /**
  * Include custom metaboxes.
@@ -31,31 +31,19 @@ require_once( PRESSCORE_EXTENSIONS_DIR . '/custom-meta-boxes/metabox-fields.php'
  */
 function presscore_register_meta_boxes() {
 	// Make sure there's no errors when the plugin is deactivated or during upgrade
-	if ( !class_exists( 'RW_Meta_Box' ) ) {
+	if ( !class_exists( 'The7_RW_Meta_Box' ) ) {
 		return;
 	}
 
 	global $DT_META_BOXES;
+
+	do_action( 'the7_before_meta_box_registration' );
+
 	foreach ( $DT_META_BOXES as $meta_box ) {
-		new RW_Meta_Box( $meta_box );
+		new The7_RW_Meta_Box( $meta_box );
 	}
 }
 add_action( 'admin_init', 'presscore_register_meta_boxes', 30 );
-
-/**
- * Localize meta boxes
- */
-function presscore_localize_meta_boxes() {
-	global $DT_META_BOXES;
-
-	$localized_meta_boxes = array();
-
-	foreach ( $DT_META_BOXES as $meta_box ) {
-		$localized_meta_boxes[ $meta_box['id'] ] = isset($meta_box['only_on'], $meta_box['only_on']['template']) ? (array) $meta_box['only_on']['template'] : array(); 
-	}
-	wp_localize_script( 'dt-mb-switcher', 'dtMetaboxes', $localized_meta_boxes );
-}
-add_action( 'admin_enqueue_scripts', 'presscore_localize_meta_boxes', 15 );
 
 /**
  * Define default meta boxes for templates

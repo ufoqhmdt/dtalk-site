@@ -1,12 +1,12 @@
 <?php
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
-require_once RWMB_FIELDS_DIR . 'select-advanced.php';
-require_once RWMB_FIELDS_DIR . 'checkbox-list.php';
+require_once THE7_RWMB_FIELDS_DIR . 'select-advanced.php';
+require_once THE7_RWMB_FIELDS_DIR . 'checkbox-list.php';
 
-if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Taxonomy_Field' ) )
 {
-	class RWMB_Taxonomy_Field
+	class THE7_RWMB_Taxonomy_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -15,9 +15,9 @@ if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			RWMB_Select_Advanced_Field::admin_enqueue_scripts();
-			wp_enqueue_style( 'rwmb-taxonomy', RWMB_CSS_URL . 'taxonomy.css', array(), RWMB_VER );
-			wp_enqueue_script( 'rwmb-taxonomy', RWMB_JS_URL . 'taxonomy.js', array( 'jquery', 'rwmb-select-advanced', 'wp-ajax-response' ), RWMB_VER, true );
+//			THE7_RWMB_Select_Advanced_Field::admin_enqueue_scripts();
+			wp_enqueue_style( 'the7-mb-taxonomy', THE7_RWMB_CSS_URL . 'taxonomy.css', array(), THE7_RWMB_VER );
+//			wp_enqueue_script( 'the7-mb-taxonomy', THE7_RWMB_JS_URL . 'taxonomy.js', array( 'jquery', 'the7-mb-select-advanced', 'wp-ajax-response' ), THE7_RWMB_VER, true );
 		}
 
 		/**
@@ -37,24 +37,24 @@ if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
 			$field['options']['args'] = ! isset( $field['options']['args'] ) ? $default_args : wp_parse_args( $field['options']['args'], $default_args );
 
 			$tax = get_taxonomy( $field['options']['taxonomy'] );
-			$field['placeholder'] = empty( $field['placeholder'] ) ? sprintf( __( 'Select a %s' , 'rwmb' ), $tax->labels->singular_name ) : $field['placeholder'];
+			$field['placeholder'] = empty( $field['placeholder'] ) ? sprintf( __( 'Select a %s' , 'the7mk2' ), $tax->labels->singular_name ) : $field['placeholder'];
 
 			switch( $field['options']['type'] )
 			{
 				case 'select_advanced':
-					$field = RWMB_Select_Advanced_Field::normalize_field( $field );
+					$field = THE7_RWMB_Select_Advanced_Field::normalize_field( $field );
 					break;
 				case 'checkbox_list':
 				case 'checkbox_tree':
-					$field = RWMB_Checkbox_List_Field::normalize_field( $field );
+					$field = THE7_RWMB_Checkbox_List_Field::normalize_field( $field );
 					break;
 				case 'select':
 				case 'select_tree':
-					$field = RWMB_Select_Field::normalize_field( $field );
+					$field = THE7_RWMB_Select_Field::normalize_field( $field );
 					break;
 				default:
 					$field['options']['type'] = 'select';
-					$field = RWMB_Select_Field::normalize_field( $field );
+					$field = THE7_RWMB_Select_Field::normalize_field( $field );
 			}
 
 			if ( in_array( $field['options']['type'], array( 'checkbox_tree', 'select_tree' ) ) )
@@ -96,7 +96,7 @@ if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
 			switch( $options['type'] )
 			{
 				case 'checkbox_list':
-					$html = RWMB_Checkbox_List_Field::html( $html, $meta, $field );
+					$html = THE7_RWMB_Checkbox_List_Field::html( $html, $meta, $field );
 					break;
 				case 'checkbox_tree':
 					$elements = self::process_terms( $terms );
@@ -107,11 +107,11 @@ if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
 					$html    .= self::walk_select_tree( $meta, $field, $elements, $options['parent'], true );
 					break;
 				case 'select_advanced':
-					$html = RWMB_Select_Advanced_Field::html( $html, $meta, $field );
+					$html = THE7_RWMB_Select_Advanced_Field::html( $html, $meta, $field );
 					break;
 				case 'select':
 				default:
-					$html = RWMB_Select_Field::html( $html, $meta, $field );
+					$html = THE7_RWMB_Select_Field::html( $html, $meta, $field );
 			}
 
 			return $html;
@@ -174,10 +174,10 @@ if ( ! class_exists( 'RWMB_Taxonomy_Field' ) )
 
 			$classes = array( 'rw-taxonomy-tree' );
 			$classes[] = $active ? 'active' : 'disabled';
-			$classes[] = "rwmb-taxonomy-{$parent}";
+			$classes[] = "the7-mb-taxonomy-{$parent}";
 
 			$html  = '<div class="' . implode( ' ', $classes ) . '">';
-			$html .= RWMB_Select_Field::html( $html, $meta, $field );
+			$html .= THE7_RWMB_Select_Field::html( $html, $meta, $field );
 			foreach ( $terms as $term )
 			{
 				$html .= self::walk_select_tree( $meta, $field, $elements, $term->term_id, $active && in_array( $term->term_id, $meta )  );

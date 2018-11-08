@@ -13,7 +13,7 @@
  * @see 	    https://docs.woocommerce.com/document/template-structure/
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     3.0.0
+ * @version     3.2.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,31 +39,43 @@ if ( $order ) : ?>
 				<h4 class="woocommerce-thankyou-order-received"><?php echo apply_filters( 'woocommerce_thankyou_order_received_text', __( 'Thank you! Your order has been received.', 'the7mk2' ), $order ); ?></h4>
 
 				<ul class="woocommerce-thankyou-order-details order_details">
+
 					<li class="order">
 						<?php _e( 'Order Number', 'the7mk2' ); ?>
 						<strong><?php echo $order->get_order_number(); ?></strong>
 					</li>
-					<li class="date">
-						<?php _e( 'Date', 'the7mk2' ); ?>
-						<strong><?php echo date_i18n( get_option( 'date_format' ), strtotime( $order->order_date ) ); ?></strong>
+
+					<li class="woocommerce-order-overview__date date">
+						<?php _e( 'Date:', 'the7mk2' ); ?>
+						<strong><?php echo wc_format_datetime( $order->get_date_created() ); ?></strong>
 					</li>
+
+                    <?php if ( is_user_logged_in() && $order->get_user_id() === get_current_user_id() && $order->get_billing_email() ) : ?>
+                        <li class="woocommerce-order-overview__email email">
+                            <?php _e( 'Email:', 'the7mk2' ); ?>
+                            <strong><?php echo $order->get_billing_email(); ?></strong>
+                        </li>
+                    <?php endif; ?>
+
 					<li class="total">
 						<?php _e( 'Total', 'the7mk2' ); ?>
 						<strong><?php echo $order->get_formatted_order_total(); ?></strong>
 					</li>
-					<?php if ( $order->payment_method_title ) : ?>
-					<li class="method">
-						<?php _e( 'Payment Method', 'the7mk2' ); ?>
-						<strong><?php echo $order->payment_method_title; ?></strong>
+
+					<?php if ( $order->get_payment_method_title() ) : ?>
+					<li class="woocommerce-order-overview__payment-method method">
+						<?php _e( 'Payment method:', 'the7mk2' ); ?>
+						<strong><?php echo wp_kses_post( $order->get_payment_method_title() ); ?></strong>
 					</li>
 					<?php endif; ?>
+
 				</ul>
 			</div>
 			<div class="clear"></div>
 
 		<?php endif; ?>
 
-		<?php do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->id ); ?>
+		<?php do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id()); ?>
 		<?php do_action( 'woocommerce_thankyou', $order->get_id() ); ?>
 	</div>
 

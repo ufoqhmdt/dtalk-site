@@ -9,7 +9,9 @@
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 $config = presscore_config();
 $config->set( 'template', 'albums' );
@@ -41,12 +43,20 @@ if ( presscore_is_content_visible() ): ?>
 							'taxonomy' => 'dt_gallery_category',
 							'query' => $page_query
 						) );
+						switch ( presscore_config()->get( 'post.preview.mini_images.style' ) ) {
+							case 'style_1':
+								$classes = 'album-minuatures-style-1';
+								break;
+							case 'style_2':
+								$classes = 'album-minuatures-style-2';
+								break;
+						}
 
 						// Fullwidth wrap open.
 						if ( $config->get( 'full_width' ) ) { echo '<div class="full-width-wrap">'; }
 
 						// Masonry container open.
-						echo '<div ' . presscore_masonry_container_class( array( 'wf-container', 'dt-albums-template' ) ) . presscore_masonry_container_data_atts() . '>';
+						echo '<div ' . presscore_masonry_container_class( array( 'wf-container', 'dt-albums-template', $classes ) ) . presscore_masonry_container_data_atts() . '>';
 
                         if ( $page_query->have_posts() ) {
 	                        add_filter( 'presscore_get_images_gallery_hoovered-title_img_args', 'presscore_gallery_post_exclude_featured_image_from_gallery', 15, 3 );

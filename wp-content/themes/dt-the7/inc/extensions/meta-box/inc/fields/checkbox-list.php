@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'RWMB_Checkbox_List_Field' ) )
+if ( ! class_exists( 'THE7_RWMB_Checkbox_List_Field' ) )
 {
-	class RWMB_Checkbox_List_Field
+	class THE7_RWMB_Checkbox_List_Field
 	{
 		/**
 		 * Get field HTML
@@ -19,7 +19,7 @@ if ( ! class_exists( 'RWMB_Checkbox_List_Field' ) )
 		{
 			$meta = (array) $meta;
 			$html = array();
-			$tpl = '<label><input type="checkbox" class="rwmb-checkbox-list" name="%s" value="%s" %s /> %s</label>';
+			$tpl = '<label><input type="checkbox" class="the7-mb-checkbox-list" name="%s" value="%s" %s /> %s</label>';
 
 			foreach ( $field['options'] as $value => $label )
 			{
@@ -77,7 +77,7 @@ if ( ! class_exists( 'RWMB_Checkbox_List_Field' ) )
 		{
 			if ( !$field['clone'] )
 			{
-				RW_Meta_Box::save( $new, $old, $post_id, $field );
+				The7_RW_Meta_Box::save( (array) $new, $old, $post_id, $field );
 				return;
 			}
 

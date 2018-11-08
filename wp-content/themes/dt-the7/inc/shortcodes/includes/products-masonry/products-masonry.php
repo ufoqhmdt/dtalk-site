@@ -6,8 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'abstract-dt-shortcode-with-inline-css.php';
-// require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-dt-products-lessvars-manager.php';
-// require_once trailingslashit( PRESSCORE_SHORTCODES_INCLUDES_DIR ) . 'class-dt-products-shortcode-html.php';
 
 if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 
@@ -44,26 +42,21 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 		public function __construct() {
 			$this->sc_name = 'dt_products_masonry';
 			$this->unique_class_base = 'products-masonry-shortcode-id';
-			//$this->taxonomy = 'category';
 			$this->post_type = 'product';
 			$this->default_atts = array(
 				'show_products' => 'all_products',
 				'orderby' => 'date',
-				
+				'order' => 'desc',
 				'layout' => 'content_below_img',
 				'ids' => '',
 				'skus' => '',
 				'category_ids'    => '',
-
 				'mode' => 'masonry',
-				
 				'gap_between_posts' => '15px',
-				
 				'responsiveness' => 'browser_width_based',
 				'bwb_columns' => 'desktop:4|h_tablet:3|v_tablet:2|phone:1',
 				'pwb_column_min_width' => '',
-				'pwb_columns' => '',
-				
+				'pwb_columns'                    => '',
 				'loading_mode' => 'disabled',
 				'dis_posts_total' => '-1',
 				'st_posts_per_page' => '',
@@ -78,7 +71,6 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 				'jsm_gap_before_pagination' => '',
 				'jsl_posts_total' => '-1',
 				'jsl_posts_per_page' => '',
-				
 				'custom_title_color' => '',
 				'custom_content_color' => '',
 				'custom_price_color' => '',
@@ -86,6 +78,8 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 				'product_rating' => 'y',
 				'navigation_font_color' => '',
 				'navigation_accent_color' => '',
+				'show_categories_filter' => 'n',
+				'gap_below_category_filter' => '',
 			);
 
 			parent::__construct();
@@ -99,14 +93,10 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 			$query = new WP_Query( $this->get_query_args() );
 
 			do_action( 'presscore_before_shortcode_loop', $this->sc_name, $this->atts );
-
 			add_action( 'dt_wc_loop_start', array( $this, '_setup_config' ), 15 );
-
             do_action( 'dt_wc_loop_start' );
-
-           remove_action( 'dt_wc_loop_start', array( $this, '_setup_config' ), 15 );
-           $this->_setup_config();
-
+            remove_action( 'dt_wc_loop_start', array( $this, '_setup_config' ), 15 );
+            $this->_setup_config();
 			do_action( 'presscore_before_loop' );
 
 			// Remove default masonry posts wrap.
@@ -143,6 +133,37 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 
 			echo '<div ' . $this->container_class( 'products-shortcode' ) . presscore_masonry_container_data_atts( $data_atts ) . '>';
 
+			$filter_class = array( 'iso-filter' );
+
+			if ( 'standard' == $loading_mode ) {
+				$filter_class[] = 'without-isotope';
+			}
+			if ( 'grid' === $this->get_att( 'mode' ) ) {
+				$filter_class[] = 'css-grid-filter';
+			}
+
+			if ( ! $this->get_flag( 'show_orderby_filter' ) && ! $this->get_flag( 'show_order_filter' ) ) {
+				$filter_class[] = 'extras-off';
+			}
+
+			$config = presscore_config();
+
+			switch ( $config->get( 'template.posts_filter.style' ) ) {
+				case 'minimal':
+					$filter_class[] = 'filter-bg-decoration';
+					break;
+				case 'material':
+					$filter_class[] = 'filter-underline-decoration';
+					break;
+			}
+
+			$terms = array();
+			if ( $this->get_flag( 'show_categories_filter' ) ) {
+				$terms = $this->get_posts_filter_terms( $query );
+			}
+
+			DT_Blog_Shortcode_HTML::display_posts_filter( $terms, $filter_class );
+
 			/**
 			 * Products posts have a custom lazy loading classes.
 			 * @see DT_Products_Shortcode_HTML::get_post_image
@@ -155,8 +176,6 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 			if ( $query->have_posts() ): while( $query->have_posts() ): $query->the_post();
 
 				do_action('presscore_before_post');
-
-				
 
 				// populate config with current post settings
 				presscore_populate_post_config();
@@ -176,9 +195,11 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 				echo '<div ' . presscore_tpl_masonry_item_wrap_class( $visibility ) . presscore_tpl_masonry_item_wrap_data_attr() . '>';
 				echo '<article ' . $this->post_class( $post_class_array ) . ' >';
 
-						woocommerce_show_product_loop_sale_flash();
-							
-						dt_woocommerce_template_product_desc_under();
+				// Quick fix to prevent errors on page save when YoastSEO is active.
+				if ( ! empty( $GLOBALS['product'] ) ) {
+					woocommerce_show_product_loop_sale_flash();
+					dt_woocommerce_template_product_desc_under();
+				}
 
 				echo '</article>';
 				echo '</div>';
@@ -213,7 +234,6 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 			do_action( 'presscore_after_shortcode_loop', $this->sc_name, $this->atts );
 			remove_filter( 'dt_woocommerce_get_product_preview_icons', 'dt_woocommerce_filter_product_preview_icons' );
             remove_action( 'woocommerce_after_shop_loop_item', 'dt_woocommerce_render_product_add_to_cart_icon', 40 );
-            
 			do_action( 'presscore_after_loop' );
 			do_action( 'dt_wc_loop_end' );
 		}
@@ -261,7 +281,6 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 				$class[] = 'hide-rating';
 			}
 
-			
 			$loading_mode = $this->get_att( 'loading_mode' );
 			if ( 'standard' !== $loading_mode ) {
 				$class[] = 'jquery-filter';
@@ -277,6 +296,9 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 
 			if ( of_get_option( 'woocommerce_hover_image' ) ) {
 				$class[] = 'wc-img-hover';
+			}
+			if ( 'grid' === $this->get_att( 'mode' ) ) {
+				$class[] = 'dt-css-grid-wrap';
 			}
 
 			$class = $this->add_responsiveness_class( $class );
@@ -303,7 +325,7 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 		 */
 		protected function iso_container_class( $class = array() ) {
 			if ( 'grid' === $this->get_att( 'mode' ) ) {
-				$class[] = 'iso-grid';
+				$class[] = 'dt-css-grid';
 			} else {
 				$class[] = 'iso-container';
 			}
@@ -380,6 +402,7 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 		 * Setup theme config for shortcode.
 		 */
 		protected function setup_config() {}
+
 		public function _setup_config() {
 			$config = presscore_config();
 			$config->set( 'load_style', 'default' );
@@ -395,7 +418,7 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
             }
 
 			$config->set( 'layout', $wc_layout );
-			$config->set( 'post.preview.load.effect', 'fade_in' );
+			$config->set( 'post.preview.load.effect', 'none' );
 			$config->set( 'post.preview.width.min', $this->get_att( 'pwb_column_min_width' ) );
 			$config->set( 'template.columns.number', $this->get_att( 'pwb_columns' ) );
 			$config->set( 'woocommerce_shop_template_responsiveness', $this->get_att( 'responsiveness' ) );
@@ -421,6 +444,8 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 
 				$config->set( 'request_display', false );
 			}
+
+			$config->set( 'template.posts_filter.terms.enabled', $this->get_flag( 'show_categories_filter' ) );
 		}
 
 		/**
@@ -453,9 +478,29 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 					$gap_before_pagination = $this->get_att( 'jsm_gap_before_pagination', '' );
 					break;
 			}
+			if ( 'browser_width_based' === $this->get_att( 'responsiveness' ) ) {
+				$bwb_columns = DT_VCResponsiveColumnsParam::decode_columns( $this->get_att( 'bwb_columns' ) );
+				$columns = array(
+					'desktop'  => 'desktop',
+					'v_tablet' => 'v-tablet',
+					'h_tablet' => 'h-tablet',
+					'phone'    => 'phone',
+				);
+
+				foreach ( $columns as $column => $data_att ) {
+					$val = ( isset( $bwb_columns[ $column ] ) ? absint( $bwb_columns[ $column ] ) : '' );
+					$data_atts[] = 'data-' . $data_att . '-columns-num="' . esc_attr( $val ) . '"';
+					
+					$less_vars->add_keyword( $data_att. '-columns-num', esc_attr( $val ) );
+			
+				}
+			};
+			$less_vars->add_pixel_number( 'grid-posts-gap', $this->get_att( 'gap_between_posts' ) );
+			$less_vars->add_pixel_number( 'grid-post-min-width', $this->get_att( 'pwb_column_min_width' ));
 			$less_vars->add_pixel_number( 'shortcode-pagination-gap', $gap_before_pagination );
 			$less_vars->add_keyword( 'shortcode-filter-color', $this->get_att( 'navigation_font_color', '~""' ) );
 			$less_vars->add_keyword( 'shortcode-filter-accent', $this->get_att( 'navigation_accent_color', '~""' ) );
+			$less_vars->add_pixel_number( 'shortcode-filter-gap', $this->get_att( 'gap_below_category_filter', '' ) );
 
 			return $less_vars->get_vars();
 		}
@@ -466,11 +511,13 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 		 * @return string
 		 */
 		protected function get_vc_inline_html() {
-			//$terms_title = _x( 'Display categories', 'vc inline dummy', 'the7mk2' );
 
 			return $this->vc_inline_dummy( array(
-				'class' => 'dt_vc-products_masonry',
-				'title' => _x( 'NEW Products Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
+				'class'  => 'dt_vc-products_masonry',
+				'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_product_masonry_editor_ico.gif', 98, 104 ),
+				'title'  => _x( 'Products Masonry & Grid', 'vc inline dummy', 'the7mk2' ),
+
+				'style' => array( 'height' => 'auto' )
 			) );
 		}
 
@@ -501,27 +548,16 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 					break;
 			}
 
-			$attributes = &$this->atts;
-			//global $woocommerce;
 			$show_products_attd = $this->get_att( 'show_products' );
-			$orderby = '';
-			$meta_query = $tax_query = '';
-			if(!isset($order)): $order = 'desc'; endif;
-			//if(!isset($category)): $category = ''; endif;
-			if(!isset($ids)): $ids = ''; endif;
-			switch ( $attributes['orderby'] ) {
-				case 'date':
-					$orderby = 'date';
-					break;
-				case 'id':
-					$orderby = 'ID';
-					break;
-				case 'author':
-					$orderby = 'author';
-					break;
+			$order = $this->get_att( 'order' );
+			$orderby = $this->get_att( 'orderby' );
+			if ( 'id' === $orderby ) {
+				$orderby = 'ID';
+			} elseif ( 'menu_order' === $orderby ) {
+				$order = 'asc';
 			}
 
-
+			$meta_query = $tax_query = array();
 			if($show_products_attd == "featured_products"){
 				$meta_query  = WC()->query->get_meta_query();
 				$tax_query   = WC()->query->get_tax_query();
@@ -553,16 +589,16 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 				case 'all_products':
 					$meta_query  = WC()->query->get_meta_query();
 					$tax_query   = WC()->query->get_tax_query();
-					if ( ! empty( $attributes['skus'] ) ) {
+					if ( ! empty( $this->atts['skus'] ) ) {
 						$query_args['meta_query'][] = array(
 							'key'     => '_sku',
-							'value'   => array_map( 'trim', explode( ',', $attributes['skus'] ) ),
+							'value'   => array_map( 'trim', explode( ',', $this->atts['skus'] ) ),
 							'compare' => 'IN',
 						);
 					}
 
-					if ( ! empty( $attributes['ids'] ) ) {
-						$query_args['post__in'] = array_map( 'trim', explode( ',', $attributes['ids'] ) );
+					if ( ! empty( $this->atts['ids'] ) ) {
+						$query_args['post__in'] = array_map( 'trim', explode( ',', $this->atts['ids'] ) );
 					}
 					break;
 				case 'sale_products':
@@ -581,8 +617,8 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 					break;
 				case 'categories_products':
 
-					if ( ! empty( $attributes['category_ids'] ) ) {
-						$ids        = array_filter( array_map( 'trim', explode( ',', $attributes['category_ids'] ) ) );
+					if ( ! empty( $this->atts['category_ids'] ) ) {
+						$ids        = array_filter( array_map( 'trim', explode( ',', $this->atts['category_ids'] ) ) );
 						$query_args['tax_query'] = array(
 							array(
 								'taxonomy' 	 => 'product_cat',
@@ -600,26 +636,143 @@ if ( ! class_exists( 'DT_Shortcode_ProductsMasonry', false ) ):
 			}
 			//For standard pagination mode.
 			if ( 'standard' == $pagination_mode ) {
-				//$config = presscore_config();
-				// $query_args['orderby'] = $config->get( 'orderby' );
-				// $query_args['order'] = $config->get( 'order' );
 				$query_args['paged'] = dt_get_paged_var();
 
-				// $request = $config->get( 'request_display' );
-				// if ( $request ) {
-				// 	$query_args['select'] = $request['select'];
-				// 	$terms = get_terms( array(
-				// 		'taxonomy' => 'product_cat',
-				// 		'include' => $request['terms_ids'],
-				// 		'fields' => 'term_id',
-				// 	) );
-				// 	if ( ! is_wp_error( $terms ) ) {
-				// 		$query_args['category'] = array_values( $terms );
-				// 	}
-				// }
+				// Posts filter part.
+				$config = presscore_config();
+				$request = $config->get( 'request_display' );
+				if ( ! empty( $request['terms_ids'] ) ) {
+					if ( ! empty( $query_args['tax_query'] ) ) {
+						$query_args['tax_query']['relation'] = 'AND';
+					} else {
+						$query_args['tax_query'] = array();
+					}
+
+					$query_args['tax_query'][] = array(
+						'taxonomy' => 'product_cat',
+						'field'    => 'term_id',
+						'terms'    => $request['terms_ids'],
+					);
+				}
 			}
 
+			$query_args['tax_query'] = the7_product_visibility_tax_query( $query_args['tax_query'] );
+
 			return $query_args;
+		}
+
+		/**
+		 * Get terms to show in posts filter.
+		 *
+		 * @param $query
+		 *
+		 * @return array|int|WP_Error
+		 */
+		protected function get_posts_filter_terms( $query ) {
+			if ( 'standard' !== $this->get_att( 'loading_mode' ) ) {
+				$post_ids = wp_list_pluck( $query->posts, 'ID' );
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			$show_products = $this->get_att( 'show_products' );
+
+			if ( 'sale_products' === $show_products ) {
+				$post_ids = wc_get_product_ids_on_sale();
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			if ( 'featured_products' === $show_products ) {
+				$posts_query = new WP_Query( array(
+					'post_type'           => 'product',
+					'post_status'         => 'publish',
+					'ignore_sticky_posts' => 1,
+					'fields'              => 'ids',
+					'tax_query'           => WC()->query->get_tax_query( array( array(
+						'taxonomy' => 'product_visibility',
+						'field'    => 'name',
+						'terms'    => 'featured',
+						'operator' => 'IN',
+					) ) ),
+				) );
+
+				$post_ids = $posts_query->posts;
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			if ( 'top_products' === $show_products ) {
+				$posts_query = new WP_Query( array(
+					'post_type'           => 'product',
+					'post_status'         => 'publish',
+					'ignore_sticky_posts' => 1,
+					'fields'              => 'ids',
+					'tax_query'           => WC()->query->get_tax_query(),
+					'meta_query'          => WC()->query->get_meta_query(),
+				) );
+
+				$post_ids = $posts_query->posts;
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			if ( 'best_selling_products' === $show_products ) {
+				$posts_query = new WP_Query( array(
+					'post_type'           => 'product',
+					'post_status'         => 'publish',
+					'ignore_sticky_posts' => 1,
+					'fields'              => 'ids',
+					'meta_key'            => 'total_sales',
+					'tax_query'           => WC()->query->get_tax_query(),
+					'meta_query'          => WC()->query->get_meta_query(),
+				) );
+
+				$post_ids = $posts_query->posts;
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			$show_products_data_map = array(
+				'all_products' => 'ids',
+				'categories_products' => 'category_ids',
+			);
+			$data_key = ( array_key_exists( $show_products, $show_products_data_map ) ? $show_products_data_map[ $show_products ] : '' );
+			$data = $this->get_att( $data_key );
+
+			// If empty - return all categories.
+			if ( empty( $data ) ) {
+				return get_terms( array(
+					'taxonomy'   => 'product_cat',
+					'hide_empty' => true,
+				) );
+			}
+
+			// If posts selected - return corresponded categories.
+			if ( 'all_products' === $show_products ) {
+				$post_ids = presscore_sanitize_explode_string( $data );
+
+				return wp_get_object_terms( $post_ids, 'product_cat', array( 'fields' => 'all_with_object_id' ) );
+			}
+
+			// If categories selected.
+			if ( 'categories_products' === $show_products ) {
+				$get_terms_args = array(
+					'taxonomy'   => 'product_cat',
+					'hide_empty' => true,
+				);
+
+				$categories = presscore_sanitize_explode_string( $data );
+				if ( ! is_numeric( $categories[0] ) ) {
+					$get_terms_args['slug'] = $categories;
+				} else {
+					$get_terms_args['include'] = $categories;
+				}
+
+				return get_terms( $get_terms_args );
+			}
+
+			return array();
 		}
 	}
 

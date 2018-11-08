@@ -328,19 +328,19 @@ if ( ! function_exists( 'presscore_congif_populate_single_portfolio_vars' ) ) :
 
 		// related posts with sidebar
 		if ( 'disabled' != $config->get( 'sidebar_position' ) ) {
-			$config->set( 'post.related_posts.height', of_get_option( 'general-rel_projects_height', 190 ) );
+			$config->set( 'post.related_posts.height', (int) of_get_option( 'general-rel_projects_height', 190 ) );
 
 			$related_posts_width_mode = of_get_option('general-rel_projects_width_style');
 			$config->set( 'post.related_posts.width.mode', $related_posts_width_mode );
-			$config->set( 'post.related_posts.width', 'fixed' == $related_posts_width_mode ? of_get_option( 'general-rel_projects_width' ) : null );
+			$config->set( 'post.related_posts.width', 'fixed' == $related_posts_width_mode ? (int) of_get_option( 'general-rel_projects_width' ) : null );
 
 		// fullwidth related posts
 		} else {
-			$config->set( 'post.related_posts.height', of_get_option( 'general-rel_projects_fullwidth_height', 270 ) );
+			$config->set( 'post.related_posts.height', (int) of_get_option( 'general-rel_projects_fullwidth_height', 270 ) );
 
 			$related_posts_width_mode = of_get_option('general-rel_projects_fullwidth_width_style');
 			$config->set( 'post.related_posts.width.mode', $related_posts_width_mode );
-			$config->set( 'post.related_posts.width', 'fixed' == $related_posts_width_mode ? of_get_option( 'general-rel_projects_fullwidth_width' ) : null );
+			$config->set( 'post.related_posts.width', 'fixed' == $related_posts_width_mode ? (int) of_get_option( 'general-rel_projects_fullwidth_width' ) : null );
 		}
 
 		////////////////////

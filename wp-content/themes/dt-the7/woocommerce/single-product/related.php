@@ -10,10 +10,10 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @see 	    https://docs.woocommerce.com/document/template-structure/
- * @author 		WooThemes
- * @package 	WooCommerce/Templates
- * @version     3.0.0
+ * @see           https://docs.woocommerce.com/document/template-structure/
+ * @author        WooThemes
+ * @package       WooCommerce/Templates
+ * @version       3.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,44 +22,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( $related_products ) : ?>
 
-	<section class="related products">
+    <section class="related products">
 
-		<h2><?php esc_html_e( 'Related products', 'the7mk2' ); ?></h2>
+        <h2><?php esc_html_e( 'Related products', 'the7mk2' ); ?></h2>
 
-		<ul class="related-product">
+        <ul class="related-product cart-btn-below-img">
+
+			<?php presscore_config()->set( 'product.preview.icons.show_cart', true ) ?>
 
 			<?php foreach ( $related_products as $related_product ) : ?>
-				<li>
+                <li>
+					<?php
+					global $product;
 
+					$product = wc_get_product( $related_product->get_id() );
+					if ( $product->is_on_sale() ) :
+						?>
+                        <span class="onsale"><i class="fa fa-percent" aria-hidden="true"></i></span>
 					<?php
-					 	$post_object = get_post( $related_product->get_id() );
-					 	$product = wc_get_product( $related_product->get_id() );
-					 	if ( $product->is_on_sale() ) {
+					endif;
 					?>
-					<span class="onsale"><i class="fa fa-percent" aria-hidden="true"></i></span>
-					<?php
-						}
-					?>
-					<a class="product-thumbnail" href="<?php echo esc_url( $product->get_permalink() ); ?>">
+                    <a class="product-thumbnail" href="<?php echo esc_url( $product->get_permalink() ); ?>">
 						<?php echo $product->get_image(); ?>
-					</a>
-					<div class="product-content">
-						<a class="product-title" href="<?php echo esc_url( $product->get_permalink() ); ?>">
+                    </a>
+                    <div class="product-content">
+                        <a class="product-title" href="<?php echo esc_url( $product->get_permalink() ); ?>">
 							<?php echo $product->get_name(); ?>
-						</a>
-						
-						<span class="price"><?php echo $product->get_price_html(); ?></span>
+                        </a>
 
-						<?php echo wc_get_rating_html( $product->get_average_rating() ); ?>
-					</div>
+                        <span class="price"><?php echo $product->get_price_html(); ?></span>
 
-				</li>
+						<?php
+						echo wc_get_rating_html( $product->get_average_rating() );
+						if(presscore_config()->get( 'product.related.show_cart_btn')){
+							echo '<div class="woo-buttons">' . dt_woocommerce_get_product_add_to_cart_icon() . '</div>';
+						}
+						?>
+                    </div>
+                </li>
 
 			<?php endforeach; ?>
 
-		</ul>
+        </ul>
 
-	</section>
+    </section>
 
 <?php endif;
 

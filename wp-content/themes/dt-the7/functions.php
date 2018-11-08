@@ -1,16 +1,17 @@
 <?php
 /**
  * The7 theme.
- *
- * @since 1.0.0
+ * @package The7
+ * @since   1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Set the content width based on the theme's design and stylesheet.
- *
  * @since 1.0.0
  */
 if ( ! isset( $content_width ) ) {
@@ -19,7 +20,6 @@ if ( ! isset( $content_width ) ) {
 
 /**
  * Initialize theme.
- *
  * @since 1.0.0
  */
 require( trailingslashit( get_template_directory() ) . 'inc/init.php' );

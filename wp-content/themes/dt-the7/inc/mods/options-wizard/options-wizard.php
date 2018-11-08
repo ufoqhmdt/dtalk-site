@@ -1,8 +1,7 @@
 <?php
 /**
  * Options wizard module.
- *
- * @since 3.0.0
+ * @since   3.0.0
  * @package the7
  */
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 
 	class Presscore_Modules_OptionsWizardModule {
+
 		protected static $options_page_id = 'of-options-wizard';
 
 		/**
@@ -34,7 +34,7 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 * Add wizard page specific hooks.
 		 */
 		public static function add_hooks_action() {
-			if ( self::$options_page_id != optionsframework_get_cur_page_id() ) {
+			if ( self::$options_page_id !== optionsframework_get_cur_page_id() ) {
 				return;
 			}
 
@@ -42,10 +42,16 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 			add_filter( 'of_localized_vars', array( __CLASS__, 'of_localized_vars_filter' ) );
 
 			add_filter( 'of_get_default_values', array( __CLASS__, 'override_options_filter' ) );
-			add_filter( 'optionsframework_get_validated_options', array( __CLASS__, 'optionsframework_get_validated_options_filter' ), 10, 2 );
+			add_filter( 'optionsframework_get_validated_options', array(
+				__CLASS__,
+				'optionsframework_get_validated_options_filter',
+			), 10, 2 );
 
 			if ( self::wizard_start_from_scratch() ) {
-				add_filter( ( 'optionsframework_fields_saved_settings-' . self::$options_page_id ), array( __CLASS__, 'optionsframework_fields_saved_settings_filter' ) );
+				add_filter( 'optionsframework_fields_saved_settings-' . self::$options_page_id, array(
+					__CLASS__,
+					'optionsframework_fields_saved_settings_filter',
+				) );
 				add_action( 'optionsframework_after_options', array( __CLASS__, 'wizard_mode_hidden_fields_action' ) );
 				add_action( 'optionsframework_before', array( __CLASS__, 'optionsframework_before_action' ) );
 			} else {
@@ -55,14 +61,14 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		}
 
 		public static function admin_enqueue_scripts_action() {
-			wp_enqueue_script( 'dt-wizard', trailingslashit( PRESSCORE_MODS_URI ) . basename( dirname( __FILE__ ) ) . '/assets/js/wizard.js', array( 'options-custom' ), wp_get_theme()->get( 'Version' ), true );
+			wp_enqueue_script( 'dt-wizard', trailingslashit( PRESSCORE_MODS_URI ) . basename( dirname( __FILE__ ) ) . '/assets/js/wizard.js', array( 'the7-options' ), THE7_VERSION, true );
 
 			$options_is_saved = optionsframework_options_is_saved();
 			$saved_msg = get_settings_errors( 'options-framework' );
 
-			wp_localize_script('dt-wizard', 'dtWizard', array(
+			wp_localize_script( 'dt-wizard', 'dtWizard', array(
 				'showModeSelector' => empty( $saved_msg ) && $options_is_saved,
-			));
+			) );
 		}
 
 		/**
@@ -70,16 +76,18 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 *
 		 * @param  array $clean
 		 * @param  array $input
+		 *
 		 * @return array
 		 */
 		public static function optionsframework_get_validated_options_filter( $clean, $input ) {
 			$header_preset_relation = array(
-				'inline' => 'wizard01',
-				'split' => 'wizard02',
-				'classic' => 'wizard03',
-				'slide_out' => 'wizard04',
-				'side' => 'wizard05',
-				'overlay' => 'wizard06',
+				'inline'    => 'wizard01',
+				'split'     => 'wizard02',
+				'classic'   => 'wizard03',
+				'side'      => 'wizard05',
+				'top_line'  => 'wizard07',
+				'side_line' => 'wizard08',
+				'menu_icon' => 'wizard09',
 			);
 			$header_layout = $input['header-layout'];
 
@@ -95,25 +103,25 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 			// Get preset options.
 			$preset_options = optionsframework_presets_data( $preset_id );
 
-			$preserve = apply_filters( 'optionsframework_validate_preserve_fields', array() );
+			$start_from_scratch = ( isset( $_POST['pcor_wizard_mode'] ) && 'from_scratch' === $_POST['pcor_wizard_mode'] );
 
-			// Ignore preserved options.
-			foreach ( $preserve as $option ) {
-				if ( isset( $preset_options[ $option ] ) ) {
+			if ( ! $start_from_scratch ) {
+				$preserve = apply_filters( 'optionsframework_validate_preserve_fields', array() );
+
+				// Ignore preserved options.
+				foreach ( $preserve as $option ) {
 					unset( $preset_options[ $option ] );
 				}
 			}
 
-			if ( !isset( $preset_options['preset'] ) ) {
+			if ( ! isset( $preset_options['preset'] ) ) {
 				$preset_options['preset'] = $preset_id;
 			}
 
-			$sanitized_input = self::sanitize_options( (array) $input, $preset_options );
+			$sanitized_input = self::sanitize_options( $input, $preset_options );
+			$sanitized_input = self::override_options_filter( array_merge( $preset_options, $sanitized_input ) );
 
-			if ( isset( $_POST['pcor_wizard_mode'] ) && 'from_scratch' === $_POST['pcor_wizard_mode'] ) {
-				$sanitized_input = self::override_options_filter( array_merge( $preset_options, $sanitized_input ) );
-				$sanitized_input = self::sanitize_options( $sanitized_input, $preset_options );
-
+			if ( $start_from_scratch ) {
 				add_filter( 'wp_redirect', array( __CLASS__, 'switch_mode_with_redirect_filter' ) );
 			}
 
@@ -122,7 +130,6 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 
 		/**
 		 * Filter for "wp_redirect". Switch off "from_scratch" wizard mode.
-		 *
 		 * @return string
 		 */
 		public static function switch_mode_with_redirect_filter( $location ) {
@@ -134,16 +141,20 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 */
 		public static function print_wizard_mode_selector_action() {
 			?>
-
-			<div class="of-info-block hide-if-js">
-				<p><?php echo _x( 'Theme Options Wizard works in two modes: it allows to "Customize Existing Design" or "Start From a Scratch".', 'theme-options', 'the7mk2' ); ?></p>
-				<p><?php printf( _x( '<strong>Attention!</strong> If you choose to "Start From a Scratch", Wizard will automatically calculate and overwrite most of your settings! You may want to use <a href="%s">Export/Import Options</a> interface to backup your current theme options state before proceeding.', 'theme-options', 'the7mk2' ), admin_url( 'admin.php?page=of-importexport-menu' ) ); ?></p>
-				<p>
-					<a class="button-secondary" href="<?php echo esc_url( add_query_arg( array( 'page' => self::$options_page_id, 'wizard_mode' => 'from_scratch' ), admin_url( 'admin.php' ) ) ); ?>" onclick="return confirm( '<?php print esc_js( _x( 'Attention! By “Starting From a Scratch", you will reset most of your site appearance settings! Would you like to proceed?', 'theme-options', 'the7mk2' ) ); ?>' );"><?php echo esc_html( _x( 'Start From a Scratch', 'theme-options', 'the7mk2' ) ); ?></a>
-					<input class="button-primary" value="<?php echo esc_attr( _x( 'Customize Existing Design', 'theme-options', 'the7mk2' ) ); ?>" type="button">
-				</p>
-			</div>
-
+            <div class="of-info-block the7-wizard-notice hide-if-js">
+                <p><?php echo _x( 'Theme Options Wizard works in two modes: it allows to "Customize Existing Design" or "Start From a Scratch".', 'theme-options', 'the7mk2' ); ?></p>
+                <p><?php printf( _x( '<strong>Attention!</strong> If you choose to "Start From a Scratch", Wizard will automatically calculate and overwrite most of your settings! You may want to use <a href="%s">Export/Import Options</a> interface to backup your current theme options state before proceeding.', 'theme-options', 'the7mk2' ), admin_url( 'admin.php?page=of-importexport-menu' ) ); ?></p>
+                <p>
+                    <a class="button-secondary" href="<?php echo esc_url( add_query_arg( array(
+						'page'        => self::$options_page_id,
+						'wizard_mode' => 'from_scratch',
+					), admin_url( 'admin.php' ) ) ); ?>"
+                       onclick="return confirm( '<?php print esc_js( _x( 'Attention! By “Starting From a Scratch", you will reset most of your site appearance settings! Would you like to proceed?', 'theme-options', 'the7mk2' ) ); ?>' );"><?php echo esc_html( _x( 'Start From a Scratch', 'theme-options', 'the7mk2' ) ); ?></a>
+                    <input class="button-primary"
+                           value="<?php echo esc_attr( _x( 'Customize Existing Design', 'theme-options', 'the7mk2' ) ); ?>"
+                           type="button">
+                </p>
+            </div>
 			<?php
 		}
 
@@ -159,25 +170,27 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 */
 		public static function optionsframework_before_action() {
 			?>
-			<style type="text/css">
-			#optionsframework-submit .reset-button {display: none;}
-			</style>
+            <style type="text/css">
+                #optionsframework-submit .reset-button {
+                    display: none;
+                }
+            </style>
 			<?php
 		}
 
 		/**
 		 * Checking from_scratch mode.
-		 *
 		 * @return boolean
 		 */
 		public static function wizard_start_from_scratch() {
-			return ( isset( $_GET['wizard_mode'] ) && 'from_scratch' == $_GET['wizard_mode'] );
+			return ( isset( $_GET['wizard_mode'] ) && 'from_scratch' === $_GET['wizard_mode'] );
 		}
 
 		/**
 		 * Populate wizard options with default values.
 		 *
 		 * @param  array $settings
+		 *
 		 * @return array
 		 */
 		public static function optionsframework_fields_saved_settings_filter( $settings ) {
@@ -188,12 +201,14 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 * Add wizard page to theme options menu.
 		 *
 		 * @param array $pages
+		 *
 		 * @return array
 		 */
 		public static function add_options_menu_items_filter( $pages = array() ) {
 			$pages = array_reverse( $pages );
 			$pages[ self::$options_page_id ] = array( 'menu_title' => _x( 'Wizard', 'theme-options', 'the7mk2' ) );
 			$pages = array_reverse( $pages );
+
 			return $pages;
 		}
 
@@ -202,12 +217,14 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 *
 		 * @param  array  $files
 		 * @param  string $page_slug
+		 *
 		 * @return array
 		 */
 		public static function register_options_file_filter( $files = array(), $page_slug = null ) {
 			if ( self::$options_page_id === $page_slug ) {
 				$files[ self::$options_page_id ] = plugin_dir_path( __FILE__ ) . 'options.php';
 			}
+
 			return $files;
 		}
 
@@ -215,176 +232,177 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 * Setup wizard options dependencies.
 		 *
 		 * @param  array $vars
+		 *
 		 * @return array
 		 */
 		public static function of_localized_vars_filter( $vars ) {
 			$vars['blockDependencies'] = array(
 				// Layout.
-				'header-mixed-line-block' => array(
+				'header-mixed-line-block'     => array(
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'slide_out',
+							'value'    => 'slide_out',
 						),
 						array(
-							'field' => 'header-slide_out-layout',
+							'field'    => 'header-slide_out-layout',
 							'operator' => '!=',
-							'value' => 'menu_icon',
-						)
+							'value'    => 'menu_icon',
+						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'overlay',
+							'value'    => 'overlay',
 						),
 						array(
-							'field' => 'header-overlay-layout',
+							'field'    => 'header-overlay-layout',
 							'operator' => '!=',
-							'value' => 'menu_icon',
-						)
-					)
+							'value'    => 'menu_icon',
+						),
+					),
 				),
 
 				// Branding.
-				'branding-menu-icon-block' => array(
+				'branding-menu-icon-block'    => array(
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'slide_out',
+							'value'    => 'slide_out',
 						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'overlay',
+							'value'    => 'overlay',
 						),
 					),
 				),
 				'branding-floating-nav-block' => array(
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'classic',
+							'value'    => 'classic',
 						),
 						array(
-							'field' => 'header-show_floating_navigation',
+							'field'    => 'header-show_floating_navigation',
 							'operator' => '==',
-							'value' => '1',
+							'value'    => '1',
 						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'inline',
+							'value'    => 'inline',
 						),
 						array(
-							'field' => 'header-show_floating_navigation',
+							'field'    => 'header-show_floating_navigation',
 							'operator' => '==',
-							'value' => '1',
+							'value'    => '1',
 						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'split',
+							'value'    => 'split',
 						),
 						array(
-							'field' => 'header-show_floating_navigation',
+							'field'    => 'header-show_floating_navigation',
 							'operator' => '==',
-							'value' => '1',
+							'value'    => '1',
 						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'slide_out',
+							'value'    => 'slide_out',
 						),
 						array(
-							'field' => 'header-slide_out-layout',
+							'field'    => 'header-slide_out-layout',
 							'operator' => '==',
-							'value' => 'top_line',
+							'value'    => 'top_line',
 						),
 						array(
-							'field' => 'header-show_floating_navigation',
+							'field'    => 'header-show_floating_navigation',
 							'operator' => '==',
-							'value' => '1',
+							'value'    => '1',
 						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'overlay',
+							'value'    => 'overlay',
 						),
 						array(
-							'field' => 'header-overlay-layout',
+							'field'    => 'header-overlay-layout',
 							'operator' => '==',
-							'value' => 'top_line',
+							'value'    => 'top_line',
 						),
 						array(
-							'field' => 'header-show_floating_navigation',
+							'field'    => 'header-show_floating_navigation',
 							'operator' => '==',
-							'value' => '1',
+							'value'    => '1',
 						),
-					)
+					),
 				),
 
 				// Floating header
-				'header-floating-nav-block' => array(
+				'header-floating-nav-block'   => array(
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'classic',
-						)
+							'value'    => 'classic',
+						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'inline',
-						)
+							'value'    => 'inline',
+						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'split',
-						)
+							'value'    => 'split',
+						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'slide_out',
+							'value'    => 'slide_out',
 						),
 						array(
-							'field' => 'header-slide_out-layout',
+							'field'    => 'header-slide_out-layout',
 							'operator' => '==',
-							'value' => 'top_line',
-						)
+							'value'    => 'top_line',
+						),
 					),
 					array(
 						array(
-							'field' => 'header-layout',
+							'field'    => 'header-layout',
 							'operator' => '==',
-							'value' => 'overlay',
+							'value'    => 'overlay',
 						),
 						array(
-							'field' => 'header-overlay-layout',
+							'field'    => 'header-overlay-layout',
 							'operator' => '==',
-							'value' => 'top_line',
-						)
-					)
-				)
+							'value'    => 'top_line',
+						),
+					),
+				),
 			);
 
 			return $vars;
@@ -394,27 +412,58 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 * Override saved options.
 		 *
 		 * @param  array $options
+		 *
 		 * @return array
 		 */
 		public static function override_options_filter( $options ) {
 			// Text color.
-			$options['stripes-stripe_1_text_color'] = $options['footer-primary_text_color'];
-			$options['sidebar-primary_text_color'] = $options['general-breadcrumbs_color'] = $options['content-primary_text_color'];
+			$options['general-breadcrumbs_color'] = $options['content-secondary_text_color'];
+			$options['sidebar-primary_text_color'] = $options['content-primary_text_color'];
 
 			// Headers color.
-			$options['stripes-stripe_1_headers_color'] = $options['footer-headers_color'];
-			$options['sidebar-headers_color'] = $options['general-title_color'] = $options['content-headers_color'];
-
-			// Stripe background color.
-			$options['stripes-stripe_1_color'] = $options['footer-bg_color'];
+			$content_headers_color = array(
+				'woocommerce_steps_color',
+				'sidebar-headers_color',
+				'general-title_color',
+			);
+            foreach ( $content_headers_color as $opt_id ) {
+	            $options[ $opt_id ] = $options['content-headers_color'];
+            }
 
 			// Text font family.
-			$options['top_bar-font-family'] = $options['header-menu-submenu-font-family'] = $options['header-mobile-submenu-font-family'] = $options['header-elements-near_menu-font_family'] = $options['header-elements-near_logo-font_family'] = $options['fonts-font_family'];
+			$fonts_font_family = array(
+				'top_bar-font-family',
+				'header-menu-submenu-font-family',
+				'header-mobile-submenu-font-family',
+				'header-elements-near_menu-font_family',
+				'header-elements-near_logo-font_family',
+				'general-breadcrumbs_font_family',
+                'header-mobile-microwidgets-font-family',
+			);
+			foreach ( $fonts_font_family as $opt_id ) {
+				$options[ $opt_id ] = $options['fonts-font_family'];
+			}
 
 			// Headers font family.
-			$options['fonts-h2_font_family'] = $options['fonts-h3_font_family'] = $options['fonts-h4_font_family'] = $options['fonts-h5_font_family'] = $options['fonts-h6_font_family'] = $options['header-menu-font-family'] = $options['header-mobile-menu-font-family'] = $options['buttons-s_font_family'] = $options['buttons-m_font_family'] = $options['buttons-l_font_family'] = $options['fonts-h1_font_family'];
+			$fonts_h1_font_family = array(
+				'general-filter-font-family',
+				'fonts-h2_font_family',
+				'fonts-h3_font_family',
+				'fonts-h4_font_family',
+				'fonts-h5_font_family',
+				'fonts-h6_font_family',
+				'header-menu-font-family',
+				'header-mobile-menu-font-family',
+				'buttons-s_font_family',
+				'buttons-m_font_family',
+				'buttons-l_font_family',
+				'general-font_family',
+			);
+			foreach ( $fonts_h1_font_family as $opt_id ) {
+				$options[ $opt_id ] = $options['fonts-h1_font_family'];
+			}
 
-			// Sidebar style
+			// Sidebar style.
 			switch ( $options['sidebar-visual_style'] ) {
 				case 'with_dividers':
 					$options['sidebar-divider-vertical'] = '1';
@@ -430,73 +479,65 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 					break;
 			}
 
-			$options['bottom_bar-color'] = $options['footer-primary_text_color'];
+			$options['sidebar-bg_color'] = $options['general-content_boxes_bg_color'];
 
 			// Header.
 			$header_layout = $options['header-layout'];
-			switch( $header_layout ) {
-				case 'classic':
-					if ( 'left' == $options['header-classic-logo-position'] ) {
-						$options['header-classic-elements-near_logo_left-padding-right'] = '30';
-					} else {
-						$options['header-classic-elements-near_logo_left-padding-right'] = '0';
-					}
-					break;
-				case 'inline':
-					if ( $options['header-inline-is_fullwidth'] ) {
-						$options['top_bar-paddings-horizontal'] = $options['header-inline-elements-near_menu_right-padding-right'] = $options['header-logo-padding-left'] = $options['header-style-transparent-logo-padding-left'] = $options['header-style-floating-logo-padding-left'] = '30';
-					} else {
-						$options['top_bar-paddings-horizontal'] = $options['header-inline-elements-near_menu_right-padding-right'] = $options['header-logo-padding-left'] = $options['header-style-transparent-logo-padding-left'] = $options['header-style-floating-logo-padding-left'] = '0';
-					}
+			$header_navigation = $options['header_navigation'];
+			$is_mixed_header = in_array( $header_layout, array(
+				'top_line',
+				'side_line',
+				'menu_icon',
+			), true );
 
-					if ( 'left' == $options['header-inline-menu-position'] ) {
-						$options['header-style-floating-logo-padding-right'] = '30';
-					} else {
-						$options['header-style-floating-logo-padding-right'] = '0';
-					}
-					break;
-				case 'split':
-					if ( $options['header-split-is_fullwidth'] ) {
-						$options['top_bar-paddings-horizontal'] = $options['header-split-elements-near_menu_left-padding-left'] = $options['header-split-elements-near_menu_right-padding-right'] = '30';
-					} else {
-						$options['top_bar-paddings-horizontal'] = $options['header-split-elements-near_menu_left-padding-left'] = $options['header-split-elements-near_menu_right-padding-right'] = '0';
-					}
-					break;
-				case 'slide_out':
-				case 'overlay':
-					if ( 'menu_icon' == $options["header-{$header_layout}-layout"] ) {
-						self::populate_indent_options( $options, 'header-menu_icon-margin', '30' );
-						self::populate_indent_options( $options, 'header-style-mixed-logo-padding', '30' );
-					} elseif ( 'top_line' == $options["header-{$header_layout}-layout"] ) {
-						self::populate_indent_options( $options, 'header-menu_icon-margin', array( '0', '30', '0', '30' ) );
-						self::populate_indent_options( $options, 'header-style-mixed-logo-padding', '0' );
-					} elseif ( 'side_line' == $options["header-{$header_layout}-layout"] ) {
-						self::populate_indent_options( $options, 'header-menu_icon-margin', '5' );
-						self::populate_indent_options( $options, 'header-style-mixed-logo-padding', '5' );
-					}
-					$options["header-{$header_layout}-layout-top_line-is_fullwidth"] = '1';
-					break;
+			if ( 'overlay' !== $header_navigation && $is_mixed_header ) {
+				$options['header-slide_out-position'] = ( 'side_line' === $header_layout ? 'left' : 'right' );
+			} elseif ( 'classic' === $header_layout ) {
+				$padding = explode( ' ', $options['header-classic-elements-near_logo_left-padding'] );
+				if ( 'left' === $options['header-classic-logo-position'] ) {
+					$padding[3] = '30px';
+				}
+				$options['header-classic-elements-near_logo_left-padding'] = implode( ' ', $padding );
 			}
 
-			// Fill floating navigation bg color with header bg color.
-			$options['header-floating_navigation-bg-color'] = $options['header-bg-color'];
-
-			// Microwidgets color.
-			$options['header-elements-near_menu-font_color'] = $options['header-elements-near_logo-font_color'] = $options['header-menu-font-color'];
-
-			// Bottom bar color.
-			$options['bottom_bar-bg_color'] = $options['footer-primary_text_color'];
-			$options['bottom_bar-bg_opacity'] = '15';
-
-			// Top bar color.
-			if ( in_array( $options['top_bar-bg-style'], array( 'content_line', 'fullwidth_line' ) ) ) {
-				$options['top_bar-bg-color'] = $options['header-menu-font-color'];
-				$options['top_bar-bg-opacity'] = '15';
+			// Header colors.
+			$header_colors = array(
+				'header-menu_icon-bg-color',
+				'header-menu_icon-hover-bg-color',
+				'header-mobile-menu_icon-bg-color',
+				'header-mobile-header-bg-color',
+				'header-mixed-bg-color',
+				'header-floating_navigation-bg-color',
+			);
+			foreach ( $header_colors as $opt_id ) {
+				$options[ $opt_id ] = $options['header-bg-color'];
 			}
 
-			// Social icons color.
-			$options['header-elements-soc_icons-color'] = $options['header-elements-soc_icons-bg-color'] = $options['top_bar-font-color'];
-			$options['header-elements-soc_icons-bg-opacity'] = '15';
+			// Header menu font color.
+			$header_menu_font_colors = array(
+				'header-menu_icon-color',
+				'header-menu_icon-hover-color',
+				'header-mobile-menu_icon-color',
+				'header-mobile-microwidgets-font-color',
+			);
+			foreach ( $header_menu_font_colors as $opt_id ) {
+				$options[ $opt_id ] = $options['header-menu-font-color'];
+			}
+
+			// Micro widgets.
+			$micro_widgets_font = $options['fonts-font_family'];
+			$micro_widgets_color = $options['header-menu-font-color'];
+
+            $options["header-{$header_layout}-elements-near_menu-font_family"] = $micro_widgets_font;
+			$options["header-{$header_layout}-elements-near_menu-font_color"] = $micro_widgets_color;
+
+			if ( 'classic' === $header_layout ) {
+				$options["header-{$header_layout}-elements-near_logo-font_family"] = $micro_widgets_font;
+				$options["header-{$header_layout}-elements-near_logo-font_color"] = $micro_widgets_color;
+            } elseif ( 'top_line' === $header_layout ) {
+				$options["header-{$header_layout}-elements-in_top_line-font_family"] = $micro_widgets_font;
+				$options["header-{$header_layout}-elements-in_top_line-font_color"] = $micro_widgets_color;
+            }
 
 			return $options;
 		}
@@ -505,12 +546,13 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 		 * Sanitize wizard options.
 		 *
 		 * @param  array $used_options
-		 * @param  array  $defaults
+		 * @param  array $defaults
+		 *
 		 * @return array
 		 */
 		protected static function sanitize_options( $used_options, $defaults = array() ) {
-			// Use all options for sanitazing.
-			$options =& _optionsframework_options();
+			// Use all options for sanitizing.
+			$options =& self::get_wizard_options_definition();
 			$clean = array();
 			foreach ( $options as $option ) {
 				if ( ! isset( $option['id'], $option['type'] ) ) {
@@ -520,12 +562,12 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 				$id = preg_replace( '/(\W!-)/', '', strtolower( $option['id'] ) );
 
 				// Set checkbox to false if it wasn't sent in the $_POST.
-				if ( 'checkbox' == $option['type'] && ! isset( $used_options[ $id ] ) ) {
+				if ( 'checkbox' === $option['type'] && ! isset( $used_options[ $id ] ) ) {
 					$used_options[ $id ] = false;
 				}
 
 				// Set each item in the multicheck to false if it wasn't sent in the $_POST.
-				if ( 'multicheck' == $option['type'] && ! isset( $used_options[ $id ] ) ) {
+				if ( 'multicheck' === $option['type'] && ! isset( $used_options[ $id ] ) ) {
 					foreach ( $option['options'] as $key => $value ) {
 						$used_options[ $id ][ $key ] = false;
 					}
@@ -540,7 +582,7 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 					continue;
 				}
 
-				if ( 'upload' == $option['type'] && is_array( $used_options[ $id ] ) && isset( $used_options[ $id ][1] ) && is_numeric( $used_options[ $id ][1] ) ) {
+				if ( 'upload' === $option['type'] && is_array( $used_options[ $id ] ) && isset( $used_options[ $id ][1] ) && is_numeric( $used_options[ $id ][1] ) ) {
 					$used_options[ $id ] = array_reverse( $used_options[ $id ] );
 				}
 
@@ -551,26 +593,20 @@ if ( ! class_exists( 'Presscore_Modules_OptionsWizardModule', false ) ) :
 					$clean[ $id ] = apply_filters( 'of_sanitize_' . $option['type'], $used_options[ $id ], $option );
 				}
 			}
+
 			return $clean;
 		}
 
 		/**
-		 * This method helps populate indent options.
-		 *
-		 * @param  array &$options
-		 * @param  string $option_base
-		 * @param  string $val
+		 * Return wizard options definition.
 		 * @return array
 		 */
-		protected static function populate_indent_options( &$options, $option_base, $val = '0' ) {
-			if ( ! is_array( $val ) ) {
-				$val = array_fill( 0, 4, $val );
-			}
+		protected static function get_wizard_options_definition() {
+			$options = array();
 
-			$options["{$option_base}-top"] = $val[0];
-			$options["{$option_base}-right"] = $val[1];
-			$options["{$option_base}-bottom"] = $val[2];
-			$options["{$option_base}-left"] = $val[3];
+			include dirname( __FILE__ ) . '/options.php';
+
+			return $options;
 		}
 	}
 

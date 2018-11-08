@@ -55,6 +55,10 @@ if ( ! empty( $equal_height ) ) {
 	$css_classes[] = 'vc_row-o-equal-height';
 }
 
+if ( ! empty( $atts['rtl_reverse'] ) ) {
+	$css_classes[] = 'vc_rtl-columns-reverse';
+}
+
 if ( ! empty( $content_placement ) ) {
 	$flex_row = true;
 	$css_classes[] = 'vc_row-o-content-' . $content_placement;

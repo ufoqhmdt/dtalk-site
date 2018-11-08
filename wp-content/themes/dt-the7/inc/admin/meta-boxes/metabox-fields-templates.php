@@ -308,14 +308,6 @@ Presscore_Meta_Box_Field_Template::add( 'image sizing', array(
 	'divider'	=> 'top'
 ) );
 
-/**
- * @TODO: Remove this in 4.1.0
- */
-// team image sizing
-Presscore_Meta_Box_Field_Template::add( 'team image sizing', Presscore_Meta_Box_Field_Template::get_as_array( 'image sizing', array(
-	'options'	=> Presscore_Meta_Box_Field_Template::get( 'image sizing values' ),
-) ) );
-
 // image proportions
 Presscore_Meta_Box_Field_Template::add( 'image proportions', array(
 	'name'			=> _x( 'Images proportions:', 'backend metabox', 'the7mk2' ),

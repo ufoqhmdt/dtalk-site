@@ -29,6 +29,7 @@ require_once PRESSCORE_HELPERS_DIR . '/template-config.php';
 require_once PRESSCORE_HELPERS_DIR . '/options.php';
 require_once PRESSCORE_HELPERS_DIR . '/menu.php';
 require_once PRESSCORE_HELPERS_DIR . '/logo.php';
+require_once PRESSCORE_HELPERS_DIR . '/image-functions.php';
 
 if ( ! function_exists( 'presscore_get_post_fancy_date' ) ) :
 
@@ -211,15 +212,15 @@ if ( ! function_exists( 'presscore_get_categorizer_sorting_fields' ) ) :
 
 		$html =	'<div class="filter-extras">'
 			.'<div class="filter-by"' . ( $show_orderby ? '' : $display_none ) . '>'
-				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => 'date', 'order' => $order ), $link ) ) . '" class="sort-by-date' . ('date' == $orderby ? $act : '') . '" data-by="date"><i class="fa fa-calendar" aria-hidden="true"></i><span class="filter-popup">' . __( 'Sort by date', 'the7mk2' ) . '</span></a>'
+				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => 'date', 'order' => $order ), $link ) ) . '" class="sort-by-date' . ('date' == $orderby ? $act : '') . '" data-by="date"><i class="far fa-calendar-alt"></i><span class="filter-popup">' . __( 'Sort by date', 'the7mk2' ) . '</span></a>'
 				. '<span class="filter-switch"></span>'
 				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => 'name', 'order' => $order ), $link ) ) . '" class="sort-by-name' . ('name' == $orderby ? $act : '') . '" data-by="name"><i class="fa fa-font" aria-hidden="true"></i><span class="filter-popup">' . __( 'Sort by name', 'the7mk2' ) . '</span></a>'
 			. '</div>'
 
 			. '<div class="filter-sorting"' . ( $show_order ? '' : $display_none ) . '>'
-				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => $orderby, 'order' => 'DESC' ), $link ) ) . '" class="sort-by-desc' . ('desc' == $order ? $act : '') . '" data-sort="desc"><i class="fa fa-sort-amount-desc" aria-hidden="true"></i><span class="filter-popup">' . __( 'Descending', 'the7mk2' ) . '</span></a>'
+				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => $orderby, 'order' => 'DESC' ), $link ) ) . '" class="sort-by-desc' . ('desc' == $order ? $act : '') . '" data-sort="desc"><i class="fas fa-sort-amount-down" aria-hidden="true"></i><span class="filter-popup">' . __( 'Descending', 'the7mk2' ) . '</span></a>'
 				. '<span class="filter-switch"></span>'
-				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => $orderby, 'order' => 'ASC' ), $link ) ) . '" class="sort-by-asc' . ('asc' == $order ? $act : '') . '" data-sort="asc"><i class="fa fa-sort-amount-asc" aria-hidden="true"></i><span class="filter-popup">' . __( 'Ascending', 'the7mk2' ) . '</span></a>'
+				. '<a href="' . esc_url( add_query_arg( array( 'orderby' => $orderby, 'order' => 'ASC' ), $link ) ) . '" class="sort-by-asc' . ('asc' == $order ? $act : '') . '" data-sort="asc"><i class="fas fa-sort-amount-up" aria-hidden="true"></i><span class="filter-popup">' . __( 'Ascending', 'the7mk2' ) . '</span></a>'
 			. '</div>'
 		. '</div>';
 
@@ -306,10 +307,10 @@ if ( ! function_exists( 'presscore_get_category_list' ) ) :
 						$item_class,
 						$term->description,
 						$term->name,
-						esc_attr($term->slug),
-						esc_attr($term->term_id),
+						$term->slug,
+						$term->term_id,
 						$term->count,
-						esc_attr('.category-' . $term->term_id),
+						".category-{$term->term_id}"
 					), $args['item_wrap']
 				);
 			}
@@ -380,7 +381,9 @@ if ( ! function_exists( 'presscore_get_category_list' ) ) :
 				); 
 			}
 
-			$output = '<div class="filter-categories">' . $all . $output . '</div>';
+			$config = presscore_config();
+
+			$output = '<div class="filter-categories" data-default-order="' . esc_attr( strtolower( $config->get( 'order' ) ) ) . '" data-default-orderby="' . esc_attr( strtolower( $config->get( 'orderby' ) ) ) . '">' . $all . $output . '</div>';
 			$output = str_replace( array( '%CLASS%' ), array( $args['class'] ), $output );
 		}
 
@@ -474,8 +477,14 @@ if ( ! function_exists( 'presscore_get_posts_small_list' ) ) :
 
 			$article = '';
 			$article .= '<article class="' . esc_attr( $class ) . '">';
-				$image = ( $options['show_images'] ? dt_get_thumb_img( array_merge($image_args, $attachment_args) ) : '' );
-				$article .= '<div class="wf-td">' . $image . '</div>';
+			
+				$image = '';
+				if ( $options['show_images']  ) {
+				$image = sprintf( '<div class="mini-post-img">%s</div>', dt_get_thumb_img( array_merge( $image_args, $attachment_args ) ) );
+				}
+
+				$article .= $image;
+
 				$article .= '<div class="post-content">';
 					$article .= '<a href="' . $permalink . '">' . apply_filters( 'post_title', $data['title'] ) . '</a>';
 
@@ -538,10 +547,6 @@ if ( ! function_exists( 'presscore_is_content_visible' ) ) :
 
 		$config = presscore_get_config();
 
-		$hide_content_for_3d_slider = 'slideshow' == $config->get('header_title') 
-			&& '3d' == $config->get('slideshow_mode') 
-			&& 'fullscreen-content' == $config->get('slideshow_3d_layout');
-
 		$hide_content_for_photo_scroller_in_album_post = 'photo_scroller' == $config->get( 'post.media.type' ) 
 			&& 'fullscreen' == $config->get( 'post.media.photo_scroller.layout' );
 
@@ -549,7 +554,7 @@ if ( ! function_exists( 'presscore_is_content_visible' ) ) :
 			&& 'photo_scroller' == $config->get('slideshow_mode') 
 			&& 'fullscreen' == $config->get( 'slideshow.photo_scroller.layout' );
 
-		$content_is_visible = !( $hide_content_for_3d_slider || $hide_content_for_photo_scroller_in_album_post || $hide_content_for_photo_scroller_slideshow );
+		$content_is_visible = !( $hide_content_for_photo_scroller_in_album_post || $hide_content_for_photo_scroller_slideshow );
 
 		return apply_filters( 'presscore_is_content_visible', $content_is_visible );
 	}
@@ -629,6 +634,7 @@ if ( ! function_exists( 'presscore_get_attachment_post_data' ) ) :
 		$attachments_data = array();
 
 		foreach ( $media_items as $post_id ) {
+			$post_id = apply_filters( 'wpml_object_id', $post_id, 'attachment', true );
 			$data = array();
 
 			// attachment meta
@@ -641,9 +647,10 @@ if ( ! function_exists( 'presscore_get_attachment_post_data' ) ) :
 			}
 
 			$data['thumbnail'] = wp_get_attachment_image_src( $post_id, 'thumbnail' );
-
 			$data['alt'] = esc_attr( get_post_meta( $post_id, '_wp_attachment_image_alt', true ) );
 
+			$data['caption'] = '';
+			$data['description'] = '';
 			$_post = get_post( $post_id );
 			if ( $_post ) {
 				$data['caption'] = $_post->post_excerpt;
@@ -924,68 +931,41 @@ if ( ! function_exists( 'presscore_get_the_excerpt' ) ) :
 	/**
 	 * Show content with funny details button.
 	 *
+     * @return string
 	 */
 	function presscore_get_the_excerpt() {
-		global $post, $more, $pages;
-		$more = 0;
-		$content = '';
+		global $post;
 
-		if ( ! has_excerpt( $post->ID ) ) {
+		add_filter( 'wp_trim_words', 'the7_hide_details_link_for_small_auto_excerpt', 10, 4 );
+		$excerpt = apply_filters( 'the_excerpt', get_the_excerpt( $post ) );
+		remove_filter( 'wp_trim_words', 'the7_hide_details_link_for_small_auto_excerpt' );
 
-			$excerpt_length = apply_filters('excerpt_length', 55);
-			$content = presscore_get_the_clear_content();
-
-
-			// check for more tag
-			if ( preg_match( '/<!--more(.*?)?-->/', $post->post_content, $matches ) ) {
-				$content .= apply_filters( 'presccore_get_content-more', '' );
-
-				if ( count($pages) > 1 ) {
-					add_filter( 'presscore_post_details_link', 'presscore_return_empty_string', 15 );
-				} else {
-					add_filter( 'presscore_post_details_link', 'presscore_add_more_anchor', 15 );
-				}
-
-			// check content length
-			} elseif ( dt_count_words( $content ) <= $excerpt_length ) {
-				add_filter( 'presscore_post_details_link', 'presscore_return_empty_string', 15 );
-			} else {
-				$content = '';
-			}
-
-		}
-
-		// if we got excerpt or content more than $excerpt_length
-		if ( empty($content) && get_the_excerpt() ) {
-
-			$content = apply_filters( 'the_excerpt', get_the_excerpt() );
-		}
-
-		return $content;
+		return $excerpt;
 	}
 
 endif;
 
-if ( ! function_exists( 'presscore_get_the_clear_content' ) ) :
+if ( ! function_exists( 'the7_hide_details_link_for_small_auto_excerpt' ) ) {
 
 	/**
-	 * Return content passed through these functions:
-	 *	strip_shortcodes( $content );
-	 *	apply_filters( 'the_content', $content );
-	 *	str_replace( ']]>', ']]&gt;', $content );
+     * This filter hide details button on blog template if original text is smaller or equal than trim words limit.
+     *
+	 * @param string $text          The trimmed text.
+	 * @param int    $num_words     The number of words to trim the text to. Default 55.
+	 * @param string $more          An optional string to append to the end of the trimmed text, e.g. &hellip;.
+	 * @param string $original_text The text before it was trimmed.
 	 *
 	 * @return string
 	 */
-	function presscore_get_the_clear_content() {
-		$content = get_the_content( '' );
-		$content = strip_shortcodes( $content );
-		$content = apply_filters( 'the_content', $content );
-		$content = str_replace( ']]>', ']]&gt;', $content );
+	function the7_hide_details_link_for_small_auto_excerpt( $text, $num_words, $more, $original_text ) {
+		if ( $text && $text === wp_strip_all_tags( $original_text ) ) {
+			// Hide details button.
+			add_filter( 'presscore_post_details_link', 'presscore_return_empty_string', 15 );
+		}
 
-		return $content;
+		return $text;
 	}
-
-endif;
+}
 
 if ( ! function_exists( 'presscore_imagee_title_is_hidden' ) ) :
 
@@ -1042,3 +1022,133 @@ if ( ! function_exists( 'presscore_lazy_loading_enabled' ) ) :
 	}
 
 endif;
+
+if ( ! function_exists( 'presscore_theme_color_meta' ) ) :
+
+	/**
+	 * Display "theme-color" meta. Uses accent color.
+	 */
+	function presscore_theme_color_meta() {
+		if ( 'gradient' === of_get_option( 'general-accent_color_mode' ) ) {
+			$color = of_get_option( 'general-accent_bg_color_gradient' );
+			$color = isset( $color[0] ) ? $color[0] : '#ffffff';
+		} else {
+			$color = of_get_option( 'general-accent_bg_color' );
+		}
+
+		printf( '<meta name="theme-color" content="%s"/>', $color );
+	}
+
+endif;
+
+if ( ! function_exists( 'presscore_js_resize_event_hack' ) ):
+
+	/**
+	 * Output js resize event hack that improves performance on mobile.
+     *
+	 * @since 6.2.1
+	 * @uses  of_get_option
+	 */
+	function presscore_js_resize_event_hack() {
+		if ( ! of_get_option( 'advanced-normalize_resize_on_mobile' ) ) {
+			return;
+		}
+		?>
+        <script type="text/javascript">
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                var originalAddEventListener = EventTarget.prototype.addEventListener,
+                    oldWidth = window.innerWidth;
+
+                EventTarget.prototype.addEventListener = function (eventName, eventHandler, useCapture) {
+                    if (eventName === "resize") {
+                        originalAddEventListener.call(this, eventName, function (event) {
+                            if (oldWidth === window.innerWidth) {
+                                return;
+                            }
+                            else if (oldWidth !== window.innerWidth) {
+                                oldWidth = window.innerWidth;
+                            }
+                            if (eventHandler.handleEvent) {
+                                eventHandler.handleEvent.call(this, event);
+                            }
+                            else {
+                                eventHandler.call(this, event);
+                            };
+                        }, useCapture);
+                    }
+                    else {
+                        originalAddEventListener.call(this, eventName, eventHandler, useCapture);
+                    };
+                };
+            };
+        </script>
+		<?php
+	}
+
+endif;
+
+if ( ! function_exists( 'the7_register_style' ) ) {
+
+	/**
+	 * Simple wrap for wp_register_style.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string      $handle
+	 * @param string      $src
+	 * @param array       $deps
+	 * @param bool|string $ver
+	 * @param string      $media
+	 */
+	function the7_register_style( $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
+		$suffix = '.min';
+
+		if ( defined( 'THE7_DEV_ENV' ) && THE7_DEV_ENV && file_exists( str_replace( PRESSCORE_THEME_URI, PRESSCORE_THEME_DIR, "{$src}.css" ) ) ) {
+            $suffix = '';
+        }
+
+		wp_register_style( $handle, "{$src}{$suffix}.css", $deps, $ver ? $ver : THE7_VERSION, $media );
+	}
+
+}
+
+if ( ! function_exists( 'the7_register_script' ) ) {
+
+	/**
+	 * Simple wrap for wp_register_script.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string      $handle
+	 * @param string      $src
+	 * @param array       $deps
+	 * @param bool|string $ver
+	 * @param bool        $in_footer
+	 */
+	function the7_register_script( $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
+		$suffix = '.min';
+
+		if ( defined( 'THE7_DEV_ENV' ) && THE7_DEV_ENV && file_exists( str_replace( PRESSCORE_THEME_URI, PRESSCORE_THEME_DIR, "{$src}.js" ) ) ) {
+			$suffix = '';
+		}
+
+		wp_register_script( $handle, "{$src}{$suffix}.js", $deps, $ver ? $ver : THE7_VERSION, $in_footer );
+	}
+
+}
+
+if ( ! function_exists( 'the7_register_fontawesome_style' ) ) {
+
+	/**
+	 * Register FontAwesome style with dedicated handler and dependencies.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $handle
+	 * @param array  $deps
+	 */
+    function the7_register_fontawesome_style( $handle, $deps = array() ) {
+	    wp_register_style( $handle, get_template_directory_uri() . '/fonts/FontAwesome/css/all.min.css', $deps, THE7_VERSION, 'all' );
+    }
+
+}

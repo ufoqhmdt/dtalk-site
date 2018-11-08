@@ -9,6 +9,11 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+/**
+ * Display fav icon in admin.
+ */
+add_action( 'admin_head', 'the7_site_icon', 9 );
+
 if ( ! function_exists( 'presscore_themeoptions_add_share_buttons' ) ) :
 
 	/**
@@ -42,10 +47,16 @@ function presscore_admin_notice() {
 	global $current_screen;
 
 	if ( optionsframework_get_options_files( $current_screen->parent_base ) && ! apply_filters( 'presscore_less_cache_writable', true ) ) {
-		presscore_admin_notices()->add_notice( 'unable-to-write-css', _x( 'Failed to create customization .CSS file. To improve your site performance, please check whether ".../wp-content/uploads/" folder is created, and its CHMOD is set to 755.', 'admin', 'the7mk2' ), 'updated' );
+		the7_admin_notices()->add( 'unable-to-write-css', 'the7_cannot_write_css_notice', 'updated' );
 	}
 }
 add_action( 'admin_notices', 'presscore_admin_notice' );
+
+function the7_cannot_write_css_notice() {
+    echo '<p>';
+    echo esc_html_x( 'Failed to create customization .CSS file. To improve your site performance, please check whether ".../wp-content/uploads/" folder is created, and its CHMOD is set to 755.', 'admin', 'the7mk2' );
+    echo '</p>';
+}
 
 if ( ! function_exists( 'presscore_less_cache_writable_filter' ) ) :
 
@@ -186,13 +197,27 @@ function dt_get_admin_thumbnail ( $post_id, $max_w = 100, $max_h = 100, $noimage
  * @param integer $post_id
  */
 function dt_admin_thumbnail ( $post_id ) {
-	$default_image = PRESSCORE_THEME_URI . '/images/noimage-thumbnail.jpg';
-	$thumbnail = dt_get_admin_thumbnail( $post_id, 60, 60, $default_image );
+	global $post_type_object;
+
+	$post_type       = $post_type_object->name;
+	$default_img_map = array(
+		'default'         => '/assets/images/post-no-img.gif',
+		'dt_testimonials' => '/assets/images/testimonials-no-img.gif',
+		'dt_team'         => '/assets/images/team-no-img.gif',
+	);
+
+	if ( array_key_exists( $post_type, $default_img_map ) ) {
+		$default_image = $default_img_map[ $post_type ];
+	} else {
+		$default_image = $default_img_map['default'];
+	}
+
+	$thumbnail = dt_get_admin_thumbnail( $post_id, 60, 60, PRESSCORE_ADMIN_URI . $default_image );
 
 	if ( $thumbnail ) {
 
-		echo '<a style="display: inline-block;" href="post.php?post=' . absint( $post_id ) . '&action=edit" title="">
-					<img src="' . esc_url( $thumbnail[0] ) . '" width="' . esc_attr( $thumbnail[1] ) . '" height="' . esc_attr( $thumbnail[2] ) . '" alt="" />
+		echo '<a style="display: inline-block;" href="post.php?post=' . absint( $post_id ) . '&action=edit" title="' . esc_attr_x( 'Post featured image', 'admin', 'the7mk2' ) . '">
+					<img src="' . esc_url( $thumbnail[0] ) . '" width="' . esc_attr( $thumbnail[1] ) . '" height="' . esc_attr( $thumbnail[2] ) . '" alt="' . esc_attr( esc_attr_x( 'Post featured image', 'admin', 'the7mk2' ) ) . '" />
 				</a>';
 	}
 }
@@ -368,13 +393,48 @@ function presscore_display_title_status_for_media( $column_name, $id ) {
 }
 add_action( 'manage_media_custom_column', 'presscore_display_title_status_for_media', 10, 2 );
 
+if ( ! function_exists( 'the7_register_admin_scripts' ) ) {
+
+    function the7_register_admin_scripts() {
+	    $template_uri = PRESSCORE_ADMIN_URI;
+
+	    $register_styles = array(
+		    'the7-admin'         => array(
+			    'src'     => "{$template_uri}/assets/css/admin-style",
+		    ),
+            'the7-meta-box-magic'         => array(
+			    'src'     => "{$template_uri}/assets/css/admin-meta-box-magic",
+		    ),
+	    );
+
+	    foreach ( $register_styles as $name => $props ) {
+		    the7_register_style( $name, $props['src'] );
+	    }
+
+	    $register_scripts = array(
+		    'the7-meta-box-magic' => array(
+			    'src'       => "{$template_uri}/assets/js/admin-meta-box-magic",
+			    'deps'      => array( 'jquery' ),
+			    'in_footer' => true,
+		    ),
+	    );
+
+	    foreach ( $register_scripts as $name => $props ) {
+		    the7_register_script( $name, $props['src'], $props['deps'], THE7_VERSION, $props['in_footer'] );
+	    }
+    }
+
+    add_action( 'admin_enqueue_scripts', 'the7_register_admin_scripts', 0 );
+
+}
+
 if ( ! function_exists( 'presscore_admin_scripts' ) ) :
 
 	/**
 	 * Add metaboxes scripts and styles.
 	 */
 	function presscore_admin_scripts() {
-		wp_enqueue_style( 'dt-admin-style', PRESSCORE_ADMIN_URI . '/assets/admin-style.css', array(), wp_get_theme()->get( 'Version' ) );
+		wp_enqueue_style( 'the7-admin' );
 	}
 
 	add_action( 'admin_enqueue_scripts', 'presscore_admin_scripts' );
@@ -391,23 +451,24 @@ if ( ! function_exists( 'presscore_admin_post_scripts' ) ) :
 			return;
 		}
 
-		wp_enqueue_style( 'dt-mb-magick', PRESSCORE_ADMIN_URI . '/assets/admin_mbox_magick.css' );
+		wp_enqueue_style( 'the7-meta-box-magic' );
+		wp_enqueue_script( 'the7-meta-box-magic' );
 
-		wp_enqueue_script( 'dt-metaboxses-scripts', PRESSCORE_ADMIN_URI . '/assets/custom-metaboxes.js', array('jquery'), false, true );
-		wp_enqueue_script( 'dt-mb-magick', PRESSCORE_ADMIN_URI . '/assets/admin_mbox_magick.js', array('jquery'), false, true );
-
-		// enqueue only for pages
-		if ( in_array( get_post_type(), array( 'page', 'post', 'dt_portfolio' ) ) ) {
-			wp_enqueue_script( 'dt-mb-switcher', PRESSCORE_ADMIN_URI . '/assets/admin_mbox_switcher.js', array('jquery'), false, true );
-		}
-
-		// for proportion ratio metabox field
+		// Proportions slider data.
 		$proportions = presscore_meta_boxes_get_images_proportions();
 		$proportions['length'] = count( $proportions );
-		wp_localize_script( 'dt-metaboxses-scripts', 'rwmbImageRatios', $proportions );
+		wp_localize_script( 'the7-meta-box-magic', 'the7mbImageRatios', $proportions );
+
+		// Localize meta boxes dependencies.
+		global $DT_META_BOXES;
+		$localized_meta_boxes = array();
+		foreach ( $DT_META_BOXES as $meta_box ) {
+			$localized_meta_boxes[ $meta_box['id'] ] = isset($meta_box['only_on'], $meta_box['only_on']['template']) ? (array) $meta_box['only_on']['template'] : array();
+		}
+		wp_localize_script( 'the7-meta-box-magic', 'dtMetaboxes', $localized_meta_boxes );
 	}
 
-	add_action( 'admin_enqueue_scripts', 'presscore_admin_post_scripts', 11 );
+	add_action( 'admin_enqueue_scripts', 'presscore_admin_post_scripts' );
 
 endif;
 
@@ -417,8 +478,7 @@ if ( ! function_exists( 'presscore_admin_widgets_scripts' ) ) :
 	 * Add widgets scripts. Enqueued only for widgets.php.
 	 */
 	function presscore_admin_widgets_scripts( $hook ) {
-
-		if ( 'widgets.php' != $hook ) {
+		if ( 'widgets.php' !== $hook ) {
 			return;
 		}
 
@@ -426,20 +486,22 @@ if ( ! function_exists( 'presscore_admin_widgets_scripts' ) ) :
 			wp_enqueue_media();
 		}
 
-		// enqueue wp colorpicker
+		the7_register_style( 'the7-widgets', PRESSCORE_ADMIN_URI . '/assets/css/admin-widgets' );
+		the7_register_script( 'the7-widgets', PRESSCORE_ADMIN_URI . '/assets/js/admin-widgets', array(
+			'jquery',
+			'wp-color-picker',
+		), false, true );
+
 		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style( 'the7-widgets' );
+		wp_enqueue_script( 'the7-widgets' );
 
-		// presscore stuff
-		wp_enqueue_style( 'dt-admin-widgets', PRESSCORE_ADMIN_URI . '/assets/admin-widgets.css' );
-		wp_enqueue_script( 'dt-admin-widgets', PRESSCORE_ADMIN_URI . '/assets/admin_widgets_page.js', array('jquery', 'wp-color-picker'), false, true );
-
-		wp_localize_script( 'dt-admin-widgets', 'dtWidgtes', array(
+		wp_localize_script( 'the7-widgets', 'dtWidgtes', array(
 			'title'			=> _x( 'Title', 'widget', 'the7mk2' ),
 			'content'		=> _x( 'Content', 'widget', 'the7mk2' ),
 			'percent'		=> _x( 'Percent', 'widget', 'the7mk2' ),
 			'showPercent'	=> _x( 'Show', 'widget', 'the7mk2' ),
 		) );
-
 	}
 
 	add_action( 'admin_enqueue_scripts', 'presscore_admin_widgets_scripts', 15 );
@@ -448,20 +510,38 @@ endif;
 
 if ( ! function_exists( 'presscore_editor_open_images_in_lightbox' ) ) :
 
-	
-
+	/**
+     * Add lightbox attributes to images inserted through editor.
+     *
+	 * @param $html
+	 * @param $id
+	 * @param $caption
+	 * @param $title
+	 * @param $align
+	 * @param $url
+	 * @param $size
+	 * @param $alt
+	 *
+	 * @return mixed
+	 */
 	function presscore_editor_open_images_in_lightbox( $html, $id, $caption, $title, $align, $url, $size, $alt ) {
         $url_extension = pathinfo( $url, PATHINFO_EXTENSION );
         if ( in_array( $url_extension, array( 'jpg', 'jpeg', 'png', 'gif' ) ) ) {
-            list( $img_src, $width, $height ) = image_downsize($id, $size);
-            $count = 0;
-            $anchor_classes = 'dt-pswp-item'; 
-            $atts = ' data-dt-img-description="' . esc_attr( $caption ) . '"';
-            $atts .= sprintf( ' data-large_image_width="%s"', esc_attr( $width ) );
-            $atts .= sprintf( ' data-large_image_height="%s"', esc_attr( $height ) );
-            $html = preg_replace( '/^(<a .*?)class="(\w*?)"(.*?>)(.*?<img.*?\/>.*?)(<\/a>)/', '${1}class="${2} ' . $anchor_classes . '"' . $atts . '${3}${4}${5}', $html, 1, $count );
+            $atts = sprintf( ' data-dt-img-description="%s"', esc_attr( $caption ) );
+	        $image_src = wp_get_attachment_image_src( $id, 'full' );
+	        if ( ! empty( $image_src ) ) {
+		        list( $img_src, $width, $height ) = $image_src;
+		        $atts .= sprintf( ' data-large_image_width="%s"', esc_attr( $width ) );
+		        $atts .= sprintf( ' data-large_image_height="%s"', esc_attr( $height ) );
+            }
+	        $anchor_classes = 'dt-pswp-item';
 
-            if ( ! $count ) {
+	        // <a> tag with class.
+	        $replacements_count = 0;
+	        $html = preg_replace( '/^(<a .*?)class="(\w*?)"(.*?>)(.*?<img.*?\/>.*?)(<\/a>)/', '${1}class="${2} ' . $anchor_classes . '"' . $atts . '${3}${4}${5}', $html, 1, $replacements_count );
+
+	        // <a> tag without class.
+            if ( ! $replacements_count ) {
                 $html = preg_replace( '/^(<a .*?)(.*?>)(.*?<img.*?\/>.*?)(<\/a>)/', '${1}class="' . $anchor_classes . '"' . $atts . ' ${2}${3}${4}', $html );
             }
         }
@@ -576,50 +656,6 @@ if ( presscore_is_dev_env() ) {
 
 }
 
-if ( ! function_exists( 'presscore_admin_remove_wp_site_icon' ) ) :
-
-	/**
-	 * Remove wp_site_icon hook if favicons set in theme options.
-	 * @since 2.3.1
-	 */
-	function presscore_admin_remove_wp_site_icon() {
-		if ( presscore_get_favicon() || presscore_get_device_icons() ) {
-			remove_action( 'admin_head', 'wp_site_icon' );
-		}
-	}
-
-	add_action( 'admin_init', 'presscore_admin_remove_wp_site_icon' );
-
-endif;
-
-add_action( 'admin_head', 'presscore_site_icon' );
-
-if ( ! function_exists( 'presscore_admin_options_blocks_filter' ) ) :
-
-	/**
-	 * Filter options html to hide some blocks.
-	 *
-	 * @since 3.0.0
-	 *
-	 * @param  string $output
-	 * @param  array $value
-	 * @return string
-	 */
-	function presscore_admin_options_blocks_filter( $output, $value ) {
-		if ( isset( $value['id'], $value['type'] ) && ( 'block' == $value['type'] || 'block_begin' == $value['type'] ) ) {
-			if (
-				( 'branding-menu-icon-block' == $value['id'] && ! in_array( of_get_option( 'header-layout' ), array( 'slide_out', 'overlay' ) ) )
-				|| ( 'branding-floating-nav-block' == $value['id'] && ! of_get_option( 'header-show_floating_navigation' ) )
-			) {
-				$output = str_replace( 'class="postbox', 'class="postbox block-disabled', $output );
-			}
-		}
-		return $output;
-	}
-
-	add_filter( 'options-interface-output', 'presscore_admin_options_blocks_filter', 10, 2 );
-
-endif;
 
 if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 
@@ -652,15 +688,62 @@ if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'slide_out',
-					)
+						'value' => 'top_line',
+					),
 				),
 				array(
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'overlay',
-					)
+						'value' => 'side_line',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+				)
+			),
+			
+			'header-overlay-block' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+					array(
+						'field' => 'header_navigation',
+						'operator' => '==',
+						'value' => 'slide_out',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+					array(
+						'field' => 'header_navigation',
+						'operator' => '==',
+						'value' => 'slide_out',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+					
+					array(
+						'field' => 'header_navigation',
+						'operator' => '==',
+						'value' => 'slide_out',
+					),
 				)
 			),
 			'header-mixed-line-block' => array(
@@ -668,16 +751,360 @@ if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'slide_out',
+						'value' => 'top_line',
 					),
 				),
 				array(
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'overlay',
+						'value' => 'side_line',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
 					),
 				)
+			),
+			'header-layout-classic-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'classic',
+					),
+				),
+			),
+			'header-layout-inline-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'inline',
+					),
+				),
+			),
+			'header-layout-split-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'split',
+					),
+				),
+			),
+			'header-layout-side-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side',
+					),
+				),
+			),
+			'header-layout-top_line-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+				),
+			),
+			'header-layout-side_line-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+				),
+			),
+			'header-layout-menu_icon-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+				),
+			),
+			//Navigation block
+			'navigation-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+				)
+			),
+
+			//Microwidgets
+			'classic-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'classic',
+					),
+				),
+			),
+			'classic-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'classic',
+					),
+					array(
+						'field' => 'header-classic-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'inline-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'inline',
+					),
+				),
+			),
+			'inline-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'inline',
+					),
+					array(
+						'field' => 'header-inline-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'split-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'split',
+					),
+				),
+			),
+			'split-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'split',
+					),
+					array(
+						'field' => 'header-split-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'side-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side',
+					),
+				),
+			),
+			'side-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side',
+					),
+					array(
+						'field' => 'header-side-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'top-line-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+				),
+			),
+			'top-line-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+					array(
+						'field' => 'header-top_line-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'side-line-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+				),
+			),
+			'side-line-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+					array(
+						'field' => 'header-side_line-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'menu-icon-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+				),
+			),
+			'menu-icon-microwidgets-settings' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+					array(
+						'field' => 'header-menu_icon-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+			),
+			'top-bar-microwidgets' => array(
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'classic',
+					),
+					array(
+						'field' => 'header-classic-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'inline',
+					),
+					array(
+						'field' => 'header-inline-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'split',
+					),
+
+					array(
+						'field' => 'header-split-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side',
+					),
+					array(
+						'field' => 'header-side-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'top_line',
+					),
+					array(
+						'field' => 'header-top_line-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'side_line',
+					),
+					array(
+						'field' => 'header-side_line-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
+				array(
+					array(
+						'field' => 'header-layout',
+						'operator' => '==',
+						'value' => 'menu_icon',
+					),
+					array(
+						'field' => 'header-menu_icon-show_elements',
+						'operator' => '==',
+						'value' => '1',
+					),
+				),
 			),
 
 			// Menu
@@ -728,7 +1155,7 @@ if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 				)
 			),
 
-			// Submenu
+			
 			'submenu-for-side-headers-block' => array(
 				array(
 					array(
@@ -741,129 +1168,27 @@ if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'slide_out',
-					)
+						'value' => 'top_line',
+					),
 				),
 				array(
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'overlay',
-					)
-				)
-			),
-
-			// Microwidgets
-			'microwidgets-tab' => array(
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'classic',
+						'value' => 'side_line',
 					),
-					array(
-						'field' => 'header-classic-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
 				),
 				array(
 					array(
 						'field' => 'header-layout',
 						'operator' => '==',
-						'value' => 'inline',
-					),
-					array(
-						'field' => 'header-inline-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'split',
-					),
-					array(
-						'field' => 'header-split-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'side',
-					),
-					array(
-						'field' => 'header-side-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'slide_out',
-					),
-					array(
-						'field' => 'header-slide_out-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'overlay',
-					),
-					array(
-						'field' => 'header-overlay-show_elements',
-						'operator' => '!=',
-						'value' => '0',
-					)
-				)
-			),
-			'microwidgets-near-logo-block' => array(
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'classic',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'slide_out',
-					),
-					array(
-						'field' => 'header-slide_out-layout',
-						'operator' => '!=',
 						'value' => 'menu_icon',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'overlay',
 					),
-					array(
-						'field' => 'header-overlay-layout',
-						'operator' => '!=',
-						'value' => 'menu_icon',
-					)
 				)
 			),
 
 			// Floating header
-			'floatingheader-tab' => array(
+			'floating-header-tab' => array(
 				array(
 					array(
 						'field' => 'header-layout',
@@ -885,30 +1210,7 @@ if ( ! function_exists( 'presscore_of_localized_vars_filter' ) ) :
 						'value' => 'split',
 					)
 				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'slide_out',
-					),
-					array(
-						'field' => 'header-slide_out-layout',
-						'operator' => '==',
-						'value' => 'top_line',
-					)
-				),
-				array(
-					array(
-						'field' => 'header-layout',
-						'operator' => '==',
-						'value' => 'overlay',
-					),
-					array(
-						'field' => 'header-overlay-layout',
-						'operator' => '==',
-						'value' => 'top_line',
-					)
-				)
+				
 			),
 			// Woocommerce
 			'isotope-block-settings' => array(
@@ -1074,7 +1376,7 @@ if ( ! function_exists( 'presscore_options_black_list' ) ) :
 			'woocommerce_show_masonry_desc',
 
 			//wpml
-			'wpml_dt-custom_style'
+			'wpml_dt-custom_style',
 		);
 
 		return array_unique( array_merge( $fields, $fields_black_list ) );
@@ -1174,6 +1476,8 @@ if ( ! function_exists( 'presscore_themeoption_preserved_fields' ) ) :
 			'header-elements-text-3',
 			'header-elements-menu-second-header-switch',
 			'header-elements-menu-style',
+			'header-elements-menu-style-first-switch',
+			'header-elements-menu-style-second-switch',
 			'header-elements-soc_icons-second-header-switch',
 			'header-elements-soc_icons',
 			'header-elements-woocommerce_cart-caption',

@@ -1,0 +1,178 @@
+
+@font-face {
+  font-family: 'icomoon-the7-social-icons-16x16';
+  src:  url('fonts/icomoon-the7-social-icons-16x16.eot?esfwnl');
+  src:  url('fonts/icomoon-the7-social-icons-16x16.eot?esfwnl#iefix') format('embedded-opentype'),
+    url('fonts/icomoon-the7-social-icons-16x16.ttf?esfwnl') format('truetype'),
+    url('fonts/icomoon-the7-social-icons-16x16.woff?esfwnl') format('woff'),
+    url('fonts/icomoon-the7-social-icons-16x16.svg?esfwnl#icomoon-the7-social-icons-16x16') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="soc-font-"], [class*=" soc-font-"], i[class^="dt-icon-"], i[class*=" dt-icon-"] {
+  position: relative;
+  z-index: 2;
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon-the7-social-icons-16x16' !important;
+  font-size: 16px;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 26px;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.dt-icons-selector i[class^="dt-icon-"]:before,
+.dt-icons-selector i[class*=" dt-icon-"]:before {
+   font-family: 'icomoon-the7-social-icons-16x16' !important;
+}
+.snapchat .soc-font-icon:before,
+.dt-icon-snapchat:before {
+  content: "\e923";
+}
+.px-500 .soc-font-icon:before,
+.dt-icon-px-500:before {
+  content: "\e900";
+}
+.behance .soc-font-icon:before,
+.dt-icon-behance:before {
+  content: "\e901";
+}
+.blogger .soc-font-icon:before,
+.dt-icon-blogger:before {
+  content: "\e902";
+}
+.delicious .soc-font-icon:before,
+.dt-icon-delicious:before {
+  content: "\e903";
+}
+.devian .soc-font-icon:before,
+.dt-icon-devian:before {
+  content: "\e904";
+}
+.dribbble .soc-font-icon:before,
+.dt-icon-dribbble:before {
+  content: "\e905";
+}
+.facebook .soc-font-icon:before,
+.dt-icon-facebook:before {
+  content: "\e906";
+}
+.flickr .soc-font-icon:before,
+.dt-icon-flickr:before {
+  content: "\e907";
+}
+.foursquare .soc-font-icon:before,
+.dt-icon-foursquare:before {
+  content: "\e908";
+}
+.github .soc-font-icon:before,
+.dt-icon-github:before {
+  content: "\e909";
+}
+.google .soc-font-icon:before,
+.dt-icon-google:before {
+  content: "\e90a";
+}
+.instagram .soc-font-icon:before,
+.dt-icon-instagram:before {
+  content: "\e90b";
+}
+.lastfm .soc-font-icon:before,
+.dt-icon-lastfm:before {
+  content: "\e90c";
+}
+.linkedin .soc-font-icon:before,
+.dt-icon-linkedin:before {
+  content: "\e90d";
+}
+.mail .soc-font-icon:before,
+.dt-icon-mail:before {
+  content: "\e90e";
+}
+.odnoklassniki .soc-font-icon:before,
+.dt-icon-odnoklassniki:before {
+  content: "\e90f";
+}
+.pinterest .soc-font-icon:before,
+.dt-icon-pinterest:before {
+  content: "\e910";
+}
+.reddit .soc-font-icon:before,
+.dt-icon-reddit:before {
+  content: "\e911";
+}
+.research-gate .soc-font-icon:before,
+.dt-icon-research-gate:before {
+  content: "\e912";
+}
+.rss .soc-font-icon:before,
+.dt-icon-rss:before {
+  content: "\e913";
+}
+.skype .soc-font-icon:before,
+.dt-icon-skype:before {
+  content: "\e914";
+}
+.soundcloud .soc-font-icon:before,
+.dt-icon-soundcloud:before {
+  content: "\e915";
+}
+.stumbleupon .soc-font-icon:before,
+.dt-icon-stumbleupon:before {
+  content: "\e916";
+}
+.tripedvisor .soc-font-icon:before,
+.dt-icon-tripedvisor:before {
+  content: "\e917";
+}
+.tumbler .soc-font-icon:before,
+.dt-icon-tumbler:before {
+  content: "\e918";
+}
+.twitter .soc-font-icon:before,
+.dt-icon-twitter:before {
+  content: "\e919";
+}
+.viber .soc-font-icon:before,
+.dt-icon-viber:before {
+  content: "\e91a";
+}
+.vimeo .soc-font-icon:before,
+.dt-icon-vimeo:before {
+  content: "\e91b";
+}
+.vk .soc-font-icon:before,
+.dt-icon-vk:before {
+  content: "\e91c";
+}
+.website .soc-font-icon:before,
+.dt-icon-website:before {
+  content: "\e91d";
+}
+.weibo .soc-font-icon:before,
+.dt-icon-weibo:before {
+  content: "\e91e";
+}
+.whatsapp .soc-font-icon:before,
+.dt-icon-whatsapp:before {
+  content: "\e91f";
+}
+.xing .soc-font-icon:before,
+.dt-icon-xing:before {
+  content: "\e920";
+}
+.yelp .soc-font-icon:before,
+.dt-icon-yelp:before {
+  content: "\e921";
+}
+.you-tube .soc-font-icon:before,
+.dt-icon-you-tube:before {
+  content: "\e922";
+}
+

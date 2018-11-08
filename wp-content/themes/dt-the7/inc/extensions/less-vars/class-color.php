@@ -11,16 +11,24 @@ if ( ! class_exists( 'Presscore_Lib_LessVars_Color' ) ) :
 
 		public function __construct( $color = null ) {
 			$this->color = null;
-			$this->opacity = 100;
+			$this->opacity = 1;
 
 			if ( $color ) {
-				$this->color = $this->create_color( $color );
+				$this->color = $this->create_color( (string) $color );
+			}
+
+			if ( is_object( $this->color ) ) {
+				$this->opacity( $this->color->getOpacity() );
 			}
 		}
 
 		public function opacity( $value ) {
 			$this->opacity = $this->sanitize_opacity( $value );
 			return $this;
+		}
+
+		public function get_opacity() {
+			return $this->opacity;
 		}
 
 		public function set_default( $value ) {

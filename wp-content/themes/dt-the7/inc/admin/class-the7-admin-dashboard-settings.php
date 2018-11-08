@@ -11,7 +11,19 @@ if ( ! class_exists( 'The7_Admin_Dashboard_Settings', false ) ) {
 		const SETTINGS_ID = 'the7_dashboard_settings';
 
 		static $settings = array(
-			'rows'          => array(
+			'db-auto-update' => array(
+				'type' => 'checkbox',
+				'std'  => true,
+			),
+			'fontawesome-4-compatibility' => array(
+				'type' => 'checkbox',
+				'std'  => true,
+			),
+			'options-in-sidebar'  => array(
+				'type' => 'checkbox',
+				'std'  => false,
+			),
+			'rows'                => array(
 				'type' => 'checkbox',
 				'std'  => false,
 			),
@@ -19,55 +31,51 @@ if ( ! class_exists( 'The7_Admin_Dashboard_Settings', false ) ) {
 				'type' => 'checkbox',
 				'std'  => false,
 			),
-			'portfolio-layout' => array(
+			'portfolio-layout'    => array(
 				'type' => 'checkbox',
 				'std'  => false,
 			),
-			'icons-bar'        => array(
+			'icons-bar'           => array(
 				'type' => 'checkbox',
 				'std'  => false,
 			),
-			'silence-plugins'  => array(
+			'portfolio'           => array(
 				'type' => 'checkbox',
 				'std'  => true,
 			),
-			'portfolio'        => array(
-				'type' => 'checkbox',
-				'std'  => true,
-			),
-			'portfolio-slug'   => array(
+			'portfolio-slug'      => array(
 				'type' => 'text',
 				'std'  => 'project',
 			),
-			'testimonials'     => array(
+			'testimonials'        => array(
 				'type' => 'checkbox',
 				'std'  => true,
 			),
-			'team'             => array(
+			'team'                => array(
 				'type' => 'checkbox',
 				'std'  => true,
 			),
-			'team-slug'        => array(
+			'team-slug'           => array(
 				'type' => 'text',
 				'std'  => 'dt_team',
 			),
-			'logos'            => array(
+			'logos'               => array(
 				'type' => 'checkbox',
 				'std'  => false,
 			),
-			'benefits'         => array(
+			'benefits'            => array(
 				'type' => 'checkbox',
 				'std'  => false,
 			),
-			'albums'           => array(
+			'albums'              => array(
 				'type' => 'checkbox',
 				'std'  => true,
 			),
-			'albums-slug'      => array(
+			'albums-slug'         => array(
 				'type' => 'text',
 				'std'  => 'dt_gallery',
 			),
-			'slideshow'        => array(
+			'slideshow'           => array(
 				'type' => 'checkbox',
 				'std'  => true,
 			),

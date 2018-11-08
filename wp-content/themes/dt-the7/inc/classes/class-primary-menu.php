@@ -9,6 +9,59 @@
 // File Security Check
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+add_filter( 'presscore_pre_nav_menu', 'the7_maybe_return_menu_from_cache', 20, 2 );
+
+/**
+ * Return menu cache key based on $args.
+ *
+ * @since 6.4.0
+ * @param array $args
+ *
+ * @return string
+ */
+function the7_get_menu_cache_key( $args ) {
+	$args['walker'] = get_class( $args['walker'] );
+	$key = md5( wp_json_encode( $args ) );
+
+	return 'the7_menu_cache-' . $key;
+}
+
+/**
+ * Retrieve menu ache.
+ *
+ * @since 6.4.0
+ * @param string|null $menu_html
+ * @param array $args
+ *
+ * @return string|null
+ */
+function the7_maybe_return_menu_from_cache( $menu_html, $args ) {
+	if ( $menu_html ) {
+		return $menu_html;
+	}
+
+	$cached_menu = wp_cache_get( the7_get_menu_cache_key( $args ), 'the7-tmp' );
+	if ( $cached_menu ) {
+		return $cached_menu;
+	}
+
+	return $menu_html;
+}
+
+if ( ! function_exists( 'presscore_disable_posts_meta_cache_warming' ) ) {
+
+	/**
+	 * Disable post meta cache update for $wp_query.
+	 * Intended to be used with 'pre_get_posts' action.
+	 *
+	 * @since 6.1.1
+	 * @param WP_Query $wp_query
+	 */
+	function presscore_disable_posts_meta_cache_warming( $wp_query ) {
+		$wp_query->query_vars['update_post_meta_cache'] = false;
+	}
+}
+
 if ( ! function_exists( 'presscore_nav_menu' ) ) :
 
 	function presscore_nav_menu( $args = array() ) {
@@ -29,6 +82,10 @@ if ( ! function_exists( 'presscore_nav_menu' ) ) :
 		) );
 		$args = apply_filters( 'presscore_nav_menu_args', $args );
 
+		if ( empty( $args['walker'] ) ) {
+			$args['walker'] = new Presscore_Primary_Nav_Menu_Walker();
+		}
+
 		$nav_menu = apply_filters( 'presscore_pre_nav_menu', null, $args );
 
 		if ( null !== $nav_menu ) {
@@ -40,11 +97,22 @@ if ( ! function_exists( 'presscore_nav_menu' ) ) :
 			return $nav_menu;
 		}
 
-		if ( empty( $args['walker'] ) ) {
-			$args['walker'] = new Presscore_Primary_Nav_Menu_Walker();
-		}
+		$_args = $args;
+		$_args['echo'] = false;
 
-		return wp_nav_menu( $args );
+		// Try to resolve high memory consumption.
+		add_action( 'pre_get_posts', 'presscore_disable_posts_meta_cache_warming' );
+		$html = wp_nav_menu( $_args );
+		remove_action( 'pre_get_posts', 'presscore_disable_posts_meta_cache_warming' );
+
+		$cache_key = the7_get_menu_cache_key( $args );
+		wp_cache_add( $cache_key, $html, 'the7-tmp' );
+
+		if ( $args['echo'] ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 
 endif;
@@ -213,6 +281,7 @@ if ( ! class_exists( 'Presscore_Primary_Nav_Menu_Walker', false ) ) :
 			$output .= $el_before . '<li class="' . implode( ' ', array_filter( $classes ) ) . '">';
 
 			$title = apply_filters( 'the_title', $item->title, $item->ID );
+			$title = apply_filters( 'nav_menu_item_title', $title, $item, $args, $depth );
 			$description = ( $item->description ? '<span class="subtitle-text">' . esc_html( $item->description ) . '</span>' : '' );
 
 			$menu_item = $link_before . '<span class="menu-item-text"><span class="menu-text">' . $title . '</span>' . $description . '</span>' . $link_after;

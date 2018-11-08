@@ -95,7 +95,7 @@ if ( ! function_exists( 'presscore_mod_albums_single_post_photoscroller' ) ) :
 			'inactive_opacity' => $config->get( 'post.media.photo_scroller.inactive.opacity' ),
 			'show_overlay' => $config->get( 'post.media.photo_scroller.overlay.enabled' )
 		);
-		$photo_scroller = new Presscore_PhotoScroller( $media_items, $args );
+		$photo_scroller = new The7pt_Photo_Scroller( $media_items, $args );
 
 		if ( $photo_scroller->have_slides() ) {
 

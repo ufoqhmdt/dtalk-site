@@ -4,7 +4,7 @@ jQuery( document ).ready( function( $ )
 
 	function add_cloned_fields( $input )
 	{
-		var $clone_last = $input.find( '.rwmb-clone:last' ),
+		var $clone_last = $input.find( '.the7-mb-clone:last' ),
 			$clone = $clone_last.clone(),
 			$input, name;
 	
@@ -34,8 +34,8 @@ jQuery( document ).ready( function( $ )
 	$( '.add-clone' ).on( 'click', function( e )
 	{
 		e.stopPropagation();
-		var $input = $( this ).parents( '.rwmb-input' ),
-			$clone_group = $( this ).parents( '.rwmb-field' ).attr( "clone-group" );
+		var $input = $( this ).parents( '.the7-mb-input' ),
+			$clone_group = $( this ).parents( '.the7-mb-field' ).attr( "clone-group" );
 
 		// If the field is part of a clone group, get all fields in that
 		// group and itterate over them
@@ -46,7 +46,7 @@ jQuery( document ).ready( function( $ )
 			var $metabox = $( this ).parents( '.inside' );
 			var $clone_group_list = $metabox.find( 'div[clone-group="' + $clone_group + '"]' );
 
-			$.each( $clone_group_list.find( '.rwmb-input' ),
+			$.each( $clone_group_list.find( '.the7-mb-input' ),
 				function( key, value )
 				{
 					add_cloned_fields( $( value ) );
@@ -61,14 +61,14 @@ jQuery( document ).ready( function( $ )
 	} );
 
 	// Remove clones
-	$( '.rwmb-input' ).on( 'click', '.remove-clone', function()
+	$( '.the7-mb-input' ).on( 'click', '.remove-clone', function()
 	{
 		var $this = $( this ),
-			$input = $this.parents( '.rwmb-input' ),
-			$clone_group = $( this ).parents( '.rwmb-field' ).attr( 'clone-group' );
+			$input = $this.parents( '.the7-mb-input' ),
+			$clone_group = $( this ).parents( '.the7-mb-field' ).attr( 'clone-group' );
 
 		// Remove clone only if there're 2 or more of them
-		if ( $input.find( '.rwmb-clone' ).length <= 1 )
+		if ( $input.find( '.the7-mb-clone' ).length <= 1 )
 			return false;
 
 		if ( $clone_group )
@@ -79,10 +79,10 @@ jQuery( document ).ready( function( $ )
 			var $clone_group_list = $metabox.find( 'div[clone-group="' + $clone_group + '"]' );
 			var $index = $this.parent().index();
 
-			$.each( $clone_group_list.find( '.rwmb-input' ),
+			$.each( $clone_group_list.find( '.the7-mb-input' ),
 				function( key, value )
 				{
-					$( value ).children( '.rwmb-clone' ).eq( $index ).remove();
+					$( value ).children( '.the7-mb-clone' ).eq( $index ).remove();
 
 					// Toggle remove buttons
 					toggle_remove_buttons( $( value ) );
@@ -110,7 +110,7 @@ jQuery( document ).ready( function( $ )
 	{
 		var $button;
 		if ( !$el )
-			$el = $( '.rwmb-field' );
+			$el = $( '.the7-mb-field' );
 		$el.each( function()
 		{
 			$button = $( this ).find( '.remove-clone' );

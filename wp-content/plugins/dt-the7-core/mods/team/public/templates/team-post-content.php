@@ -30,7 +30,11 @@ if ( $position ) {
 
 $title = get_the_title();
 if ( $title ) {
-	$title = '<div class="team-author-name">' . $title . '</div>';
+	if('post' == $config->get( 'post.open_as' )  ){
+		$title = '<div class="team-author-name"><a href=" '.get_permalink().' ">' . $title . '</a></div>';
+	}else{
+		$title = '<div class="team-author-name">' . $title . '</div>';
+	}
 
 } else {
 	$title = '';
@@ -51,12 +55,7 @@ if ( $author_block ) {
 ////////////////////
 
 if ( $config->get( 'show_excerpts' ) ) {
-
-	if ( 'post' == $config->get( 'post.open_as' ) ) {
-		$content = apply_filters( 'the_excerpt', get_the_excerpt() );
-	} else {
-		$content = apply_filters( 'the_content', get_the_content() );
-	}
+	$content = apply_filters( 'the_excerpt', get_the_excerpt() );
 
 	if ( $content ) {
 		echo '<div class="team-content">' . $content . '</div>';

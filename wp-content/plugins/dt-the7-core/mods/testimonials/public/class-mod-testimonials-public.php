@@ -18,8 +18,15 @@ class Presscore_Mod_Testimonials_Public {
 		return $response;
 	}
 
+
 	public function register_shortcodes() {
 		foreach ( array( 'testimonials' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
+		foreach ( array( 'testimonials-carousel' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
+		foreach ( array( 'testimonials-masonry' ) as $shortcode_name ) {
 			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
 		}
 	}
@@ -58,4 +65,13 @@ class Presscore_Mod_Testimonials_Public {
 
 		return $page_title;
 	}
+
+	public function filter_masonry_wrap_taxonomy( $taxonomy, $post_type ) {
+		if ( 'dt_testimonials' === $post_type ) {
+			$taxonomy = 'dt_testimonials_category';
+		}
+
+		return $taxonomy;
+	}
+
 }

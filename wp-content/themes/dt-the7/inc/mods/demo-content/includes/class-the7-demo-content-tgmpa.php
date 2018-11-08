@@ -27,18 +27,23 @@ class The7_Demo_Content_TGMPA implements The7_Demo_Content_Plugins_Checker_Inter
 	 * @return boolean
 	 */
 	public function is_plugins_active( $plugins = array() ) {
-		global $tgmpa;
+		global $the7_tgmpa;
+
+		if ( ! $the7_tgmpa && class_exists( 'Presscore_Modules_TGMPAModule' ) ) {
+			Presscore_Modules_TGMPAModule::init_the7_tgmpa();
+			Presscore_Modules_TGMPAModule::register_plugins_action();
+		}
 
 		$this->inactive_plugins = $this->plugins_to_install = array();
 
 		if ( $plugins ) {
 			foreach ( $plugins as $plugin_slug ) {
-				if ( ! $tgmpa->is_plugin_installed( $plugin_slug ) ) {
+				if ( ! $the7_tgmpa->is_plugin_installed( $plugin_slug ) ) {
 					$this->plugins_to_install[ $plugin_slug ] = $this->get_plugin_name( $plugin_slug );
 					continue;
 				}
 
-				if ( ! $tgmpa->is_plugin_active( $plugin_slug ) ) {
+				if ( ! $the7_tgmpa->is_plugin_active( $plugin_slug ) ) {
 					$this->inactive_plugins[ $plugin_slug ] = $this->get_plugin_name( $plugin_slug );
 				}
 			}
@@ -70,13 +75,13 @@ class The7_Demo_Content_TGMPA implements The7_Demo_Content_Plugins_Checker_Inter
 	 * @return string
 	 */
 	public function get_install_plugins_page_link() {
-		global $tgmpa;
+		global $the7_tgmpa;
 
-		if ( $tgmpa->is_tgmpa_complete() ) {
+		if ( $the7_tgmpa->is_tgmpa_complete() ) {
 			return '';
 		}
 
-		return $tgmpa->get_bulk_action_link();
+		return $the7_tgmpa->get_bulk_action_link();
 	}
 
 	/**
@@ -86,21 +91,21 @@ class The7_Demo_Content_TGMPA implements The7_Demo_Content_Plugins_Checker_Inter
 	 * @return string
 	 */
 	public function get_plugin_name( $slug ) {
-		global $tgmpa;
+		global $the7_tgmpa;
 
-		if ( isset( $tgmpa->plugins[ $slug ] ) ) {
-			return $tgmpa->plugins[ $slug ]['name'];
+		if ( isset( $the7_tgmpa->plugins[ $slug ] ) ) {
+			return $the7_tgmpa->plugins[ $slug ]['name'];
 		}
 
 		return $slug;
 	}
 
 	/**
-	 * Checks if $tgmpa global is not empty.
+	 * Checks if $the7_tgmpa global is not empty.
 	 * 
 	 * @return boolean
 	 */
 	public static function is_tgmpa_active() {
-		return ( ! empty( $GLOBALS['tgmpa'] ) && is_a( $GLOBALS['tgmpa'], 'The7_TGMPA' ) );
+		return ( ! empty( $GLOBALS['the7_tgmpa'] ) && is_a( $GLOBALS['the7_tgmpa'], 'The7_TGMPA' ) );
 	}
 }

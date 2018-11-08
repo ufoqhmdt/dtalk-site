@@ -36,17 +36,35 @@ if ( ! function_exists( 'presscore_display_related_projects' ) ) :
 					'terms' => $terms
 				) );
 
+				$data_columns = array();
+				$opt_columns = (array) of_get_option( 'portfolio-rel_projects_columns' );
+				if ( $opt_columns ) {
+					$option_to_data_map = array(
+						'wide_desktop' => 'wide-col-num',
+						'desktop'      => 'col-num',
+						'laptop'       => 'laptop-col',
+						'h_tablet'     => 'h-tablet-columns-num',
+						'v_tablet'     => 'v-tablet-columns-num',
+						'phone'        => 'phone-columns-num',
+					);
+
+					foreach ( $option_to_data_map as $opt => $dat ) {
+						if ( array_key_exists( $opt, $opt_columns ) ) {
+							$data_columns[ $dat ] = $opt_columns[ $opt ];
+						}
+					}
+				}
+
 				$portfolio_scroller = new Presscore_Portfolio_Posts_Scroller();
 				$portfolio_scroller->setup( $posts, array(
-					'class' => 'related-projects slider-wrapper',
-					'width' => $config->get( 'post.related_posts.width' ),
-					'height' => $config->get( 'post.related_posts.height' ),
+					'class' => 'related-projects slider-wrapper owl-carousel dt-owl-carousel-init arrows-bg-on arrows-hover-bg-on',
+					'columns' => $data_columns,
+					'proportions' => of_get_option( 'portfolio-rel_projects_proportions' ),
 					'show_title' => $config->get( 'post.related_posts.show.title' ),
 					'show_excerpt' => $config->get( 'post.related_posts.show.description' ),
 					'appearance' => 'under_image',
-					'padding' => 30,
-					'max_width' => 80,
-					'bg_under_projects' => false,
+					'padding' => 50,
+					'bg_under_projects' => 'disabled',
 					'content_aligment' => 'center',
 					'hover_animation' => 'fade',
 					'hover_bg_color' => 'accent',
@@ -204,12 +222,9 @@ if ( ! function_exists( 'presscore_get_project_rollover_zoom_icon' ) ) :
 	 * @return string
 	 */
 	function presscore_get_project_rollover_zoom_icon( $args = array() ) {
-
 		$default_args = array(
-
 			// can be 'single', 'gallery' or 'first'
 			'popup' => 'single',
-
 			'class' => '',
 			'attachment_id' => 0
 		);
@@ -250,28 +265,25 @@ if ( ! function_exists( 'presscore_get_project_rollover_zoom_icon' ) ) :
 					break;
 			}
 
+			$attachment_description = get_post_field( 'post_content', $attachment_id );
+			$data_attr = sprintf( 'data-dt-img-description="%s"', esc_attr( $attachment_description ) );
 			$attachment_video_src = get_post_meta( $attachment_id, 'dt-video-url', true );
 			if ( $attachment_video_src ) {
 				$link_class[] = 'pswp-video';
 				$link_src = $attachment_video_src;
-
 			} else {
 				$attachment_src = wp_get_attachment_image_src( $attachment_id, 'full' );
-
-				//$link_class[] = 'mfp-image';
 				$link_src = $attachment_src[0];
-
+				$data_attr .= sprintf( ' data-large_image_width="%s" data-large_image_height="%s"', intval( $attachment_src[1] ), intval( $attachment_src[2] ) );
 			}
 
-			$attachment_description = get_post_field( 'post_content', $attachment_id );
-
 			$rollover_icon = sprintf(
-				'<a href="%s" class="%s" title="%s" data-large_image_width="' . $attachment_src[1] . '" data-large_image_height = "' . $attachment_src[2]. '" data-dt-img-description="%s">%s</a>',
+				'<a href="%s" class="%s" title="%s" %s>%s</a>',
 				esc_url( $link_src ),
 				esc_attr( implode( ' ', $link_class ) ),
 				esc_attr( $attachment_title ),
-				esc_attr( $attachment_description ),
-				__('Zoom', 'dt-the7-core')
+				$data_attr,
+				__( 'Zoom', 'dt-the7-core' )
 			);
 
 		}
@@ -377,6 +389,9 @@ if ( ! function_exists( 'presscore_project_get_preview_content' ) ) :
 			$html .= sprintf( '<h3 class="entry-title"><a href="%s" title="%s" rel="bookmark">%s</a></h3>', get_permalink(), the_title_attribute( 'echo=0' ), $title );
 		}
 
+		// post meta
+		$html .= presscore_get_posted_on();
+
 		// description
 		if ( $config->get( 'show_excerpts' ) ) {
 			$html .= apply_filters( 'the_excerpt', get_the_excerpt() );
@@ -386,9 +401,6 @@ if ( ! function_exists( 'presscore_project_get_preview_content' ) ) :
 		if ( $config->get( 'post.preview.buttons.details.enabled' ) ) {
 			$html .= '<p>' . presscore_post_details_link() . '</p>';
 		}
-
-		// post meta
-		$html .= presscore_get_posted_on();
 
 		// edit link
 		if ( $html ) {

@@ -9,7 +9,7 @@ return array(
 	'class' => '',
 	'icon' => 'icon-wpb-vc-round-chart',
 	'category' => __( 'Content', 'js_composer' ),
-	'description' => __( 'Pie and Doughnat charts', 'js_composer' ),
+	'description' => __( 'Pie and Doughnut charts', 'js_composer' ),
 	'params' => array(
 		array(
 			'type' => 'textfield',
@@ -150,7 +150,7 @@ return array(
 			'description' => __( 'Select animation style.', 'js_composer' ),
 			'param_name' => 'animation',
 			'value' => getVcShared( 'animation styles' ),
-			'std' => 'easeinOutCubic',
+			'std' => 'easeInOutCubic',
 		),
 		vc_map_add_css_animation(),
 		array(

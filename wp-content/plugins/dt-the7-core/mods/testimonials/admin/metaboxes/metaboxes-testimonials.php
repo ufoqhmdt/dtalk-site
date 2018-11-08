@@ -134,12 +134,15 @@ $DT_META_BOXES[] = array(
 
 		// Position
 		array(
-			'name'	=> _x( 'Position:', 'backend metabox', 'dt-the7-core' ),
-			'id'	=> "{$prefix}position",
-			'type'	=> 'textarea',
-			'std'	=> '',
+			'name'                 => _x( 'Position:', 'backend metabox', 'dt-the7-core' ),
+			'id'                   => "{$prefix}position",
+			'type'                 => 'textarea',
+			'std'                  => '',
+			'exclude_from_presets' => true,
 		),
 
+		// TODO: Remove it in the future. To enable just uncomment.
+/*
 		// Link
 		array(
 			'name'		=> _x( 'Link:', 'backend metabox', 'dt-the7-core' ),
@@ -148,6 +151,6 @@ $DT_META_BOXES[] = array(
 			'std'		=> '',
 			'divider'	=> 'top'
 		),
-
+*/
 	),
 );

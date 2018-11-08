@@ -786,6 +786,7 @@ class WP_Import extends WP_Importer {
 					if ( ! $post_exists || ! comment_exists( $comment['comment_author'], $comment['comment_date'] ) ) {
 						if ( isset( $inserted_comments[$comment['comment_parent']] ) )
 							$comment['comment_parent'] = $inserted_comments[$comment['comment_parent']];
+						$comment = wp_slash( $comment );
 						$comment = wp_filter_comment( $comment );
 						$inserted_comments[$key] = wp_insert_comment( $comment );
 						do_action( 'wp_import_insert_comment', $inserted_comments[$key], $comment, $comment_post_ID, $post );
@@ -881,7 +882,7 @@ class WP_Import extends WP_Importer {
 		}
 
 		foreach ( $item['postmeta'] as $meta )
-			$$meta['key'] = $meta['value'];
+			${$meta['key']} = $meta['value'];
 
 		if ( 'taxonomy' == $_menu_item_type && isset( $this->processed_terms[intval($_menu_item_object_id)] ) ) {
 			$_menu_item_object_id = $this->processed_terms[intval($_menu_item_object_id)];
@@ -1123,7 +1124,6 @@ class WP_Import extends WP_Importer {
 	// Display import page title
 	function header() {
 		echo '<div class="wrap">';
-		screen_icon();
 		echo '<h2>' . __( 'Import WordPress', 'wordpress-importer' ) . '</h2>';
 
 		$updates = get_plugin_updates();

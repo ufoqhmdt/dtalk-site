@@ -8,20 +8,23 @@
  * E.g., it puts together the home page when no home.php file exists.
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
- * @package presscore
- * @since presscore 0.1
+ * @package The7
+ * @since 1.0.0
  */
 
 // File Security Check
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-$config = Presscore_Config::get_instance();
+$config = presscore_config();
 $config->set( 'template', 'blog' );
 $config->set( 'layout', 'list' );
 $config->set( 'template.layout.type', 'list' );
 $config->set( 'post.preview.media.width', 30 );
 
-get_header(); ?>
+get_header();
+?>
 
 			<!-- Content -->
 			<div id="content" class="content" role="main">
@@ -30,9 +33,9 @@ get_header(); ?>
 
 					<div class="articles-list">
 
-						<?php do_action( 'presscore_before_loop' ); ?>
+						<?php do_action( 'presscore_before_loop' ) ?>
 
-						<?php update_post_thumbnail_cache(); ?>
+						<?php update_post_thumbnail_cache() ?>
 
 						<?php while ( have_posts() ) : the_post(); ?>
 
@@ -43,22 +46,22 @@ get_header(); ?>
 							presscore_get_template_part( 'theme', 'blog/list/blog-list-post' );
 							?>
 
-						<?php endwhile; ?>
+						<?php endwhile ?>
 
-						<?php do_action( 'presscore_after_loop' ); ?>
+						<?php do_action( 'presscore_after_loop' ) ?>
 
 					</div>
 
-					<?php dt_paginator(); ?>
+					<?php dt_paginator() ?>
 
 				<?php else : ?>
 
-					<?php get_template_part( 'no-results', 'blog' ); ?>
+					<?php get_template_part( 'no-results', 'blog' ) ?>
 
-				<?php endif; ?>
+				<?php endif ?>
 
 			</div><!-- #content -->
 
-			<?php do_action('presscore_after_content'); ?>
+			<?php do_action( 'presscore_after_content' ) ?>
 
-<?php get_footer(); ?>
+<?php get_footer() ?>

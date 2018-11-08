@@ -265,13 +265,13 @@ function optionsframework_menu_items() {
 	return Presscore_Options_Menu_Items_Composition::create_from_array( $menu_config );
 }
 
-function optionsframework_get_options_files( $page_slug = null ) {
+function optionsframework_get_options_files( $page_slug = false ) {
 	$files_list = include trailingslashit( PRESSCORE_ADMIN_DIR ) . 'theme-options-files.php';
 	$files_list = presscore_assure_is_array( $files_list );
 
 	$files_list = apply_filters( 'presscore_options_files_list', $files_list, $page_slug );
 
-	if ( $page_slug ) {
+	if ( $page_slug !== false ) {
 		return isset( $files_list[ $page_slug ] ) ? array( $page_slug => $files_list[ $page_slug ] ) : array();
 	}
 
@@ -354,6 +354,7 @@ function presscore_options_add_debug_info() {
 
 	echo '<button class="show-debug-info button hide-if-js">toggle debug info</button>';
 
-	wp_enqueue_script( 'of-debug-info', OPTIONS_FRAMEWORK_URL . 'js/debug-scripts.js', array( 'jquery' ), false, true );
+	the7_register_script( 'the7-options-debug', PRESSCORE_ADMIN_URI . '/assets/js/options-debug', array( 'jquery' ), false, true );
+	wp_enqueue_script( 'the7-options-debug' );
 }
 add_action( 'optionsframework_before', 'presscore_options_add_debug_info' );

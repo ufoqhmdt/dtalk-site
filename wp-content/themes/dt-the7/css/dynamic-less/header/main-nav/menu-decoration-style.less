@@ -41,7 +41,6 @@
 }
 
 	.bg-outline-decoration > li > a,
-	.animate-click-decoration > li > a .rippleAnimate,
 	.main-nav > li > a .animate-wrap,
 	.hover-line-decoration > li:not(.act) > a:hover .decoration-line,
 	.hover-line-decoration > li.dt-hovered:not(.act) > a .decoration-line,
@@ -67,12 +66,6 @@
 			height: @menu-decoration-line-size;
 			background-color: @menu-active-line-decor-color;
 			.background-gradient (@startColor: @menu-active-line-decor-color, @endColor: @menu-active-line-decor-color-2);
-		}
-	}
-	.animate-click-decoration > li > a .rippleAnimate {
-		.top-header & {
-			background-color: @menu-click-decor-bg-color;
-			.background-gradient (@startColor: @menu-click-decor-bg-color, @endColor: @menu-click-decor-bg-color-2);
 		}
 	}
 

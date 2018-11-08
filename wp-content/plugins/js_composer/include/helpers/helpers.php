@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer helpers functions
+ * WPBakery WPBakery Page Builder helpers functions
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  *
  */
 
@@ -200,6 +200,7 @@ function wpb_translateColumnWidthToFractional( $width ) {
  * @return bool|string
  */
 function wpb_translateColumnWidthToSpan( $width ) {
+	$output = $width;
 	preg_match( '/(\d+)\/(\d+)/', $width, $matches );
 
 	if ( ! empty( $matches ) ) {
@@ -208,12 +209,15 @@ function wpb_translateColumnWidthToSpan( $width ) {
 		if ( $part_x > 0 && $part_y > 0 ) {
 			$value = ceil( $part_x / $part_y * 12 );
 			if ( $value > 0 && $value <= 12 ) {
-				$width = 'vc_col-sm-' . $value;
+				$output = 'vc_col-sm-' . $value;
 			}
 		}
 	}
+	if ( preg_match( '/\d+\/5$/', $width ) ) {
+		$output = 'vc_col-sm-' . $width;
+	}
 
-	return $width;
+	return apply_filters( 'vc_translate_column_width_class', $output, $width );
 }
 
 /**
@@ -485,17 +489,14 @@ if ( ! function_exists( 'wpb_resize' ) ) {
 
 if ( ! function_exists( 'wpb_debug' ) ) {
 	/**
-	 * Returns bool if wpb_debug is provided in url - set visual composer debug mode.
+	 * Returns bool if wpb_debug is provided in url - set WPBakery Page Builder debug mode.
 	 * Used for example in shortcodes (end block comment for example)
 	 * @since 4.2
+	 * @deprecated 5.5 - use xdebug for debugging.
 	 * @return bool
 	 */
 	function wpb_debug() {
-		if ( ( isset( $_GET['wpb_debug'] ) && 'true' === $_GET['wpb_debug'] ) || ( isset( $_GET['vc_debug'] ) && 'true' === $_GET['vc_debug'] ) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 }
 
@@ -701,6 +702,12 @@ $vc_row_layouts = array(
 		'mask' => '424',
 		'title' => '1/6 + 1/6 + 1/6 + 1/2',
 		'icon_class' => '1-6_1-6_1-6_1-2',
+	),
+	array(
+		'cells' => '15_15_15_15_15',
+		'mask' => '530',
+		'title' => '1/5 + 1/5 + 1/5 + 1/5 + 1/5',
+		'icon_class' => 'l_15_15_15_15_15',
 	),
 );
 

@@ -22,6 +22,12 @@ class Presscore_Mod_Portfolio_Public {
 		foreach ( array( 'portfolio', 'portfolio-jgrid', 'portfolio-slider' ) as $shortcode_name ) {
 			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
 		}
+		foreach ( array( 'portfolio-masonry' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
+		foreach ( array( 'portfolio-carousel' ) as $shortcode_name ) {
+			include_once plugin_dir_path( __FILE__ ) . "shortcodes/{$shortcode_name}/{$shortcode_name}.php";
+		}
 	}
 
 	public function load_shortcodes_vc_bridge() {
@@ -68,6 +74,10 @@ class Presscore_Mod_Portfolio_Public {
 	}
 
 	public function archive_page_id( $page_id ) {
+		if ( $page_id ) {
+			return $page_id;
+		}
+
 		if ( is_tax( 'dt_portfolio_category' ) || is_post_type_archive( 'dt_portfolio' ) ) {
 			$page_id = of_get_option( 'template_page_id_portfolio_category', null );
 		}

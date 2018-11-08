@@ -65,6 +65,10 @@ if ( ! empty( $atts['gap'] ) ) {
 	$css_classes[] = 'vc_column-gap-' . $atts['gap'];
 }
 
+if ( ! empty( $atts['rtl_reverse'] ) ) {
+	$css_classes[] = 'vc_rtl-columns-reverse';
+}
+
 $wrapper_attributes = array();
 // build attributes for wrapper
 if ( ! empty( $el_id ) ) {

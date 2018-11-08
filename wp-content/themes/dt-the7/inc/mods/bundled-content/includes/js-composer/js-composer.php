@@ -52,25 +52,19 @@ class The7_jsComposer extends BundledContent {
 	}
 
 	private function disableComposerNotification() {
-		if ( function_exists( 'vc_manager' ) ) {
-			$isActivated = $this->isActivatedPlugin();
-			$isActivateByTheme = $this->isActivatedByTheme();
-			if ( dt_is_plugins_silenced() ) {
-				if ( ! $isActivated && ! $isActivateByTheme ) {
-					// Hide activation message.
-					add_action( 'vc_before_init', array( __CLASS__, 'vc_set_as_theme' ) );
+		if ( ! function_exists( 'vc_manager' ) ) {
+			return;
+		}
 
-					// Show design tabs.
-					add_filter( 'vc_settings_page_show_design_tabs', '__return_true' );
+		if ( version_compare( WPB_VC_VERSION, '5.5.4', '>' ) ) {
+			return;
+		}
 
-					// Disable updater.
-					vc_manager()->disableUpdater();
-				}
-			}
-			if ( ! $isActivated && $isActivateByTheme ) {
-					// Disable updater.
-					vc_manager()->disableUpdater();
-			}
+		$isActivated       = $this->isActivatedPlugin();
+		$isActivateByTheme = $this->isActivatedByTheme();
+		if ( ! $isActivated && $isActivateByTheme ) {
+			// Disable updater.
+			vc_manager()->disableUpdater();
 		}
 	}
 

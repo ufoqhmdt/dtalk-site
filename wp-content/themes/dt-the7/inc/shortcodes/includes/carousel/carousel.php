@@ -31,6 +31,7 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 
 			$this->default_atts = array(
 				'slide_to_scroll' => 'single',
+				'slides_on_wide_desk' => '4',
 				'slides_on_desk' => '3',
 				'slides_on_lapt' => '3',
 				'slides_on_h_tabs' => '3',
@@ -50,10 +51,12 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 				'arrow_border_radius' => '500px',
 				'arrow_border_width' => '0',
 				'arrow_icon_color' => '#ffffff',
+				'arrow_icon_border' => 'y',
 				'arrow_border_color' => '',
 				'arrows_bg_show' => 'y',
 				'arrow_bg_color' => '',
 				'arrow_icon_color_hover' => 'rgba(255,255,255,0.75)',
+				'arrow_icon_border_hover' => 'y',
 				'arrow_border_color_hover' => '',
 				'arrows_bg_hover_show' => 'y',
 				'arrow_bg_color_hover' => '',
@@ -66,8 +69,8 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 				'l_arrow_v_offset' => '0',
 				'l_arrow_h_offset' => '-43px',
 				'arrow_responsiveness' => 'reposition-arrows',
-				'hide_arrows_mobile_switch_width' => '768px',
-				'reposition_arrows_mobile_switch_width' => '768px',
+				'hide_arrows_mobile_switch_width' => '778px',
+				'reposition_arrows_mobile_switch_width' => '778px',
 				'l_arrows_mobile_h_position' => '10px',
 				'r_arrows_mobile_h_position' => '10px',
 				'show_bullets' => 'n',
@@ -94,22 +97,18 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 		 * Do shortcode here.
 		 */
 		protected function do_shortcode( $atts, $content = '' ) {
-			$attributes = &$this->atts;
-
-		
-			echo '<div ' . $this->get_container_html_class( array( 'owl-carousel carousel-shortcode' ) ) . ' ' . $this->get_container_data_atts() . '>';
+			echo '<div ' . $this->get_container_html_class( array( 'owl-carousel carousel-shortcode dt-owl-carousel-call' ) ) . ' ' . $this->get_container_data_atts() . '>';
 				echo do_shortcode($content);
 			echo '</div>';
 		}
 		
 		protected function get_container_html_class( $class = array() ) {
-			$attributes = &$this->atts;
 			$el_class = $this->atts['el_class'];
 
 			// Unique class.
 			$class[] = $this->get_unique_class();
 
-			switch ( $attributes['bullets_style'] ) {
+			switch ( $this->atts['bullets_style'] ) {
 				case 'scale-up':
 					$class[] = 'bullets-scale-up';
 					break;
@@ -129,7 +128,7 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 					$class[] = 'bullets-etefu';
 					break;
 			};
-			switch ( $attributes['arrow_responsiveness'] ) {
+			switch ( $this->atts['arrow_responsiveness'] ) {
 				case 'hide-arrows':
 					$class[] = 'hide-arrows';
 					break;
@@ -142,6 +141,15 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 				$class[] = 'arrows-bg-on';
 			}else{
 				$class[] = 'arrows-bg-off';
+			};
+			if($this->atts['arrow_icon_border'] === 'y'){
+				$class[] = 'dt-arrow-border-on';
+			}
+			if($this->atts['arrow_icon_border_hover'] === 'y'){
+				$class[] = 'dt-arrow-hover-border-on';
+			}
+			if ( $this->get_att( 'arrow_bg_color' ) === $this->get_att( 'arrow_bg_color_hover' ) ) {
+				$class[] = 'disable-arrows-hover-bg';
 			};
 
 			if($this->atts['arrows_bg_hover_show'] === 'y'){
@@ -161,6 +169,7 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 			$data_atts = array(
 				'scroll-mode' => ($this->atts['slide_to_scroll'] == "all") ? 'page' : '1',
 				'col-num' => $this->atts['slides_on_desk'],
+				'wide-col-num' => $this->atts['slides_on_wide_desk'],
 				'laptop-col' => $this->atts['slides_on_lapt'],
 				'h-tablet-columns-num' => $this->atts['slides_on_h_tabs'],
 				'v-tablet-columns-num' => $this->atts['slides_on_v_tabs'],
@@ -230,7 +239,7 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 			$less_vars->add_pixel_number( 'l-arrow-v-position', $this->get_att( 'l_arrow_v_offset' ) );
 			$less_vars->add_pixel_number( 'l-arrow-h-position', $this->get_att( 'l_arrow_h_offset' ) );
 			$less_vars->add_pixel_number( 'hide-arrows-switch', $this->get_att( 'hide_arrows_mobile_switch_width' ) );
-	$less_vars->add_pixel_number( 'reposition-arrows-switch', $this->get_att( 'reposition_arrows_mobile_switch_width' ) );
+			$less_vars->add_pixel_number( 'reposition-arrows-switch', $this->get_att( 'reposition_arrows_mobile_switch_width' ) );
 			$less_vars->add_pixel_number( 'arrow-left-h-position-mobile', $this->get_att( 'l_arrows_mobile_h_position' ) );
 			$less_vars->add_pixel_number( 'arrow-right-h-position-mobile', $this->get_att( 'r_arrows_mobile_h_position' ) );
 
@@ -259,12 +268,14 @@ if ( ! class_exists( 'DT_Shortcode_Carousel', false ) ) {
 		 *
 		 * @return string
 		 */
-		protected function get_vc_inline_html() {
-
-			return $this->vc_inline_dummy( array(
-				'class' => 'dt_carousel',
-				'title' => _x( 'Carousel', 'vc inline dummy', 'the7mk2' ),
-			) );
+		protected function get_vc_inline_html($content = '') {
+			// return $this->vc_inline_dummy( array(
+			// 	'class'  => 'dt_carousel',
+			// 	'img' => array( PRESSCORE_SHORTCODES_URI . '/images/vc_carousel_editor_ico.gif', 131, 104 ),
+			// 	'title'  => _x( 'Carousel', 'vc inline dummy', 'the7mk2' ),
+			// 	'style' => array( 'height' => 'auto' )
+			// ) );
+			return $content;
 		}
 
 	}

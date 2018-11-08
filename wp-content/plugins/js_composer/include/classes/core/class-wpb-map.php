@@ -4,17 +4,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPBakery Visual Composer Main manager.
+ * WPBakery WPBakery Page Builder Main manager.
  *
- * @package WPBakeryVisualComposer
+ * @package WPBakeryPageBuilder
  * @since   4.2
  */
 class WPBMap {
-
+	protected static $scope = 'default';
 	/**
 	 * @var array
 	 */
 	protected static $sc = array();
+	protected static $scopes = array(
+		'default' => array(),
+	);
 	protected static $removedElements = array();
 
 	/**
@@ -66,6 +69,9 @@ class WPBMap {
 	 * @var bool
 	 */
 	protected static $init_elements = array();
+	protected static $init_elements_scoped = array(
+		'default' => array(),
+	);
 
 	/**
 	 * Set init status fro WPMap.
@@ -120,6 +126,13 @@ class WPBMap {
 	 * @return bool
 	 */
 	public static function exists( $tag ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			if ( isset( self::$scopes[ $currentScope ], self::$scopes[ $currentScope ][ $tag ] ) ) {
+				return true;
+			}
+		}
+
 		return (boolean) isset( self::$sc[ $tag ] );
 	}
 
@@ -157,6 +170,7 @@ class WPBMap {
 				vc_mapper()->addActivity( 'mapper', 'map', array(
 					'tag' => $tag,
 					'attributes' => $attributes,
+					'scope' => self::getScope(),
 				) );
 
 				return true;
@@ -169,7 +183,18 @@ class WPBMap {
 		} elseif ( empty( $attributes['base'] ) ) {
 			trigger_error( sprintf( __( 'Wrong base for shortcode:%s. Base required', 'js_composer' ), $tag ) );
 		} else {
-			self::$sc[ $tag ] = $attributes;
+			if ( self::getScope() !== 'default' ) {
+				if ( ! isset( self::$scopes[ self::getScope() ] ) ) {
+					self::$scopes[ self::getScope() ] = array();
+				}
+				self::$scopes[ self::getScope() ][ $tag ] = $attributes;
+			} else {
+				self::$sc[ $tag ] = $attributes;
+			}
+			// Unset cache class object in case if re-map called
+			if ( Vc_Shortcodes_Manager::getInstance()->isShortcodeClassInitialized( $tag ) ) {
+				Vc_Shortcodes_Manager::getInstance()->unsetElementClass( $tag );
+			}
 
 			return true;
 		}
@@ -199,13 +224,28 @@ class WPBMap {
 		if ( in_array( $tag, self::$removedElements ) ) {
 			return false;
 		}
-		self::$sc[ $tag ] = $attributes;
-		self::$sc[ $tag ]['base'] = $tag;
-		if ( is_string( $settings_file ) ) {
-			self::$sc[ $tag ]['__vc_settings_file'] = $settings_file;
-		}
-		if ( ! is_null( $settings_function ) ) {
-			self::$sc[ $tag ]['__vc_settings_function'] = $settings_function;
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			if ( ! isset( self::$scopes[ $currentScope ] ) ) {
+				self::$scopes[ $currentScope ] = array();
+			}
+			self::$scopes[ $currentScope ][ $tag ] = $attributes;
+			self::$scopes[ $currentScope ][ $tag ]['base'] = $tag;
+			if ( is_string( $settings_file ) ) {
+				self::$scopes[ $currentScope ][ $tag ]['__vc_settings_file'] = $settings_file;
+			}
+			if ( ! is_null( $settings_function ) ) {
+				self::$scopes[ $currentScope ][ $tag ]['__vc_settings_function'] = $settings_function;
+			}
+		} else {
+			self::$sc[ $tag ] = $attributes;
+			self::$sc[ $tag ]['base'] = $tag;
+			if ( is_string( $settings_file ) ) {
+				self::$sc[ $tag ]['__vc_settings_file'] = $settings_file;
+			}
+			if ( ! is_null( $settings_function ) ) {
+				self::$sc[ $tag ]['__vc_settings_function'] = $settings_function;
+			}
 		}
 
 		return true;
@@ -363,13 +403,7 @@ class WPBMap {
 	 * @return array|null null @since 4.4.3
 	 */
 	public static function getShortCode( $tag ) {
-		if ( isset( self::$sc[ $tag ] ) && is_array( self::$sc[ $tag ] ) ) {
-			$shortcode = self::setElementSettings( $tag );
-		} else {
-			$shortcode = null;
-		}
-
-		return $shortcode;
+		return self::setElementSettings( $tag );
 	}
 
 	/**
@@ -442,6 +476,15 @@ class WPBMap {
 	 * @return bool
 	 */
 	public static function dropParam( $name, $attribute_name ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			//throw new Exception( 'WPBMap::dropParam can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::dropParam( $name, $attribute_name );
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		if ( ! isset( self::$init_elements[ $name ] ) ) {
 			vc_mapper()->addElementActivity( $name, 'drop_param', array(
 				'name' => $name,
@@ -475,21 +518,31 @@ class WPBMap {
 	 * @return bool| array
 	 */
 	public static function getParam( $tag, $param_name ) {
-		if ( ! isset( self::$sc[ $tag ] ) ) {
+		$currentScope = self::getScope();
+		$element = false;
+		if ( 'default' !== $currentScope ) {
+			if ( isset( self::$scopes[ $currentScope ][ $tag ], self::$scopes[ $currentScope ][ $tag ] ) ) {
+				$element = self::$scopes[ $currentScope ][ $tag ];
+			}
+		}
+		if ( ! $element && isset( self::$sc[ $tag ] ) ) {
+			$element = self::$sc[ $tag ];
+		}
+		if ( ! $element ) {
 			return trigger_error( sprintf( __( 'Wrong name for shortcode:%s. Name required', 'js_composer' ), $tag ) );
 		}
 
-		if ( isset( self::$sc[ $tag ]['__vc_settings_function'] ) || isset( self::$sc[ $tag ]['__vc_settings_file'] ) ) {
-			self::setElementSettings( $tag );
+		if ( isset( $element['__vc_settings_function'] ) || isset( $element['__vc_settings_file'] ) ) {
+			$element = self::setElementSettings( $tag );
 		}
 
-		if ( ! isset( self::$sc[ $tag ]['params'] ) ) {
+		if ( ! isset( $element['params'] ) ) {
 			return false;
 		}
 
-		foreach ( self::$sc[ $tag ]['params'] as $index => $param ) {
+		foreach ( $element['params'] as $index => $param ) {
 			if ( $param['param_name'] == $param_name ) {
-				return self::$sc[ $tag ]['params'][ $index ];
+				return $element['params'][ $index ];
 			}
 		}
 
@@ -507,6 +560,15 @@ class WPBMap {
 	 * @return bool - true if added, false if scheduled/rejected
 	 */
 	public static function addParam( $name, $attribute = array() ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			// throw new Exception( 'WPBMap::addParam can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::addParam( $name, $attribute );
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		if ( ! isset( self::$init_elements[ $name ] ) ) {
 			vc_mapper()->addElementActivity( $name, 'add_param', array(
 				'name' => $name,
@@ -554,6 +616,15 @@ class WPBMap {
 	 * @return bool
 	 */
 	public static function mutateParam( $name, $attribute = array() ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			// throw new Exception( 'WPBMap::mutateParam can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::mutateParam( $name, $attribute );
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		if ( ! isset( self::$init_elements[ $name ] ) ) {
 			vc_mapper()->addElementActivity( $name, 'mutate_param', array(
 				'name' => $name,
@@ -598,6 +669,15 @@ class WPBMap {
 	 * @return bool
 	 */
 	public static function dropShortcode( $name ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			// throw new Exception( 'WPBMap::dropShortcode can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::dropShortcode( $name );
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		self::$removedElements[] = $name;
 		if ( ! isset( self::$init_elements[ $name ] ) ) {
 			vc_mapper()->addElementActivity( $name, 'drop_shortcode', array(
@@ -611,6 +691,15 @@ class WPBMap {
 	}
 
 	public static function dropAllShortcodes() {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			// throw new Exception( 'WPBMap::dropAllShortcodes can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::dropAllShortcodes();
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		if ( ! self::$is_init ) {
 			vc_mapper()->addActivity( '*', 'drop_all_shortcodes', array() );
 
@@ -639,6 +728,15 @@ class WPBMap {
 	 * @return array|bool
 	 */
 	public static function modify( $name, $setting_name, $value = '' ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			// throw new Exception( 'WPBMap::modify can be called only in default scope' );
+			self::setScope( 'default' );
+			$res = self::modify( $name, $setting_name, $value );
+			self::setScope( $currentScope );
+
+			return $res;
+		}
 		if ( ! isset( self::$init_elements[ $name ] ) ) {
 			vc_mapper()->addElementActivity( $name, 'modify', array(
 				'name' => $name,
@@ -753,6 +851,26 @@ class WPBMap {
 	 * @return array|null
 	 */
 	public static function setElementSettings( $tag ) {
+		$currentScope = self::getScope();
+		if ( 'default' !== $currentScope ) {
+			if ( isset( self::$scopes[ $currentScope ], self::$scopes[ $currentScope ][ $tag ] ) && ! in_array( $tag, self::$removedElements ) ) {
+				if ( isset( self::$init_elements_scoped[ $currentScope ], self::$init_elements_scoped[ $currentScope ][ $tag ] ) && ! empty( self::$init_elements_scoped[ $currentScope ][ $tag ] ) ) {
+					return self::$scopes[ $currentScope ][ $tag ];
+				}
+
+				$settings = self::$scopes[ $currentScope ][ $tag ];
+				if ( isset( $settings['__vc_settings_function'] ) ) {
+					self::$scopes[ $currentScope ][ $tag ] = call_user_func( $settings['__vc_settings_function'], $tag );
+				} elseif ( isset( $settings['__vc_settings_file'] ) ) {
+					self::$scopes[ $currentScope ][ $tag ] = include $settings['__vc_settings_file'];
+				}
+				self::$scopes[ $currentScope ][ $tag ]['base'] = $tag;
+				self::$init_elements_scoped[ $currentScope ][ $tag ] = true;
+				vc_mapper()->callElementActivities( $tag );
+
+				return self::$scopes[ $currentScope ][ $tag ];
+			}
+		}
 		if ( ! isset( self::$sc[ $tag ] ) || in_array( $tag, self::$removedElements ) ) {
 			return null;
 		}
@@ -783,5 +901,30 @@ class WPBMap {
 				add_shortcode( $tag, 'vc_do_shortcode' );
 			}
 		}
+
+		// Map also custom scopes
+		foreach ( self::$scopes as $scopeName => $scopeElements ) {
+			foreach ( $scopeElements as $tag => $settings ) {
+				if ( ! in_array( $tag, self::$removedElements ) && ! shortcode_exists( $tag ) ) {
+					add_shortcode( $tag, 'vc_do_shortcode' );
+				}
+			}
+		}
+	}
+
+	public static function setScope( $scope = 'default' ) {
+		if ( ! isset( self::$scopes[ $scope ] ) ) {
+			self::$scopes[ $scope ] = array();
+			self::$init_elements_scoped[ $scope ] = array();
+		}
+		self::$scope = $scope;
+	}
+
+	public static function resetScope() {
+		self::$scope = 'default';
+	}
+
+	public static function getScope() {
+		return self::$scope;
 	}
 }

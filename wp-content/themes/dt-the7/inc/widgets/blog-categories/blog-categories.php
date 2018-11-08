@@ -117,7 +117,7 @@ class Presscore_Inc_Widgets_BlogCategories extends WP_Widget {
 		</p>
 
 		<p>
-			<strong><?php _ex('Category:', 'widget', 'the7mk2'); ?></strong><br />
+			<strong><?php _ex('Category:', 'admin', 'the7mk2'); ?></strong><br />
             <?php if( !is_wp_error($terms) ): ?>
 
 	            <div class="dt-widget-switcher">

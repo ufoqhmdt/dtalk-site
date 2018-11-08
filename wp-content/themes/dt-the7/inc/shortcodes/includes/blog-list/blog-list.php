@@ -54,6 +54,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 				'category'                       => '',
 				'tags'                           => '',
 				'posts'                          => '',
+				'posts_offset'                   => 0,
 				'layout'                         => 'classic',
 				'cl_image_width'                 => '50%',
 				'cl_dividers'                    => 'n',
@@ -99,7 +100,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 				'fancy_categories_font_color'    => '',
 				'fancy_categories_bg_color'      => '',
 				'post_content_paddings'          => '25px 30px 30px 30px',
-				'post_title_font_style'          => '',
+				'post_title_font_style'          => ':bold:',
 				'post_title_font_size'           => '',
 				'post_title_line_height'         => '',
 				'post_title_bottom_margin'       => '5px',
@@ -137,18 +138,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 		 * Do shortcode here.
 		 */
 		protected function do_shortcode( $atts, $content = '' ) {
-			// Loop query.
-			$post_type = $this->get_att( 'post_type' );
-			if ( 'posts' === $post_type ) {
-				$query = $this->get_posts_by_post_type( 'post', $this->get_att( 'posts' ) );
-			} elseif ( 'tags' === $post_type ) {
-				$query = $this->get_posts_by_taxonomy( 'post', 'post_tag', $this->get_att( 'tags' ) );
-			} else {
-				$category_terms = presscore_sanitize_explode_string( $this->get_att( 'category' ) );
-				$category_field = ( is_numeric( $category_terms[0] ) ? 'term_id' : 'slug' );
-
-				$query = $this->get_posts_by_taxonomy( 'post', 'category', $category_terms, $category_field );
-			}
+			$query = $this->get_loop_query();
 
 			$loading_mode = $this->get_att( 'loading_mode' );
 
@@ -213,6 +203,8 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 			 */
 			presscore_remove_lazy_load_attrs();
 
+			presscore_remove_posts_masonry_wrap();
+
 			// Start loop.
 			if ( $query->have_posts() ): while( $query->have_posts() ): $query->the_post();
 
@@ -251,12 +243,41 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 
 				$post_media = '';
 				if ( has_post_thumbnail() ) {
+					$layout_image_width_map = array(
+						'classic' => $this->get_att( 'cl_image_width' ),
+						'centered' => '100%',
+						'bottom_overlap' => '100%',
+						'side_overlap' => $this->get_att( 'si_image_width' ),
+					);
+					$layout = $this->get_att( 'layout' );
+					$image_width = ( array_key_exists( $layout, $layout_image_width_map ) ? $layout_image_width_map[ $layout ] : '100%' );
+					$image_paddings = $this->sanitize_paddings( $this->get_att( 'image_paddings' ) );
+
+					$image_width_config = new The7_Image_List_Width_Calculator_Config( array(
+						'content_width' => of_get_option( 'general-content_width' ),
+						'side_padding' => of_get_option( 'general-side_content_paddings' ),
+						'mobile_side_padding' => of_get_option( 'general-mobile_side_content_paddings' ),
+						'side_padding_switch' => of_get_option( 'general-switch_content_paddings' ),
+						'sidebar_enabled' => ( 'disabled' !== $config->get( 'sidebar_position' ) ),
+						'sidebar_on_mobile' => ( ! $config->get( 'sidebar_hide_on_mobile' ) ),
+						'sidebar_width' => of_get_option( 'sidebar-width' ),
+						'sidebar_gap' => of_get_option( 'sidebar-distance_to_content' ),
+						'sidebar_switch' => of_get_option( 'sidebar-responsiveness' ),
+						'image_is_wide' => ( 'wide' === $config->get( 'post.preview.width' ) && ! $config->get( 'all_the_same_width' ) ),
+					    'image_width' => $image_width,
+						'mobile_switch' => $this->get_att( 'mobile_switch_width' ),
+					    'right_padding' => $image_paddings[1],
+					    'left_padding' => $image_paddings[3],
+					) );
+					$image_width_calc = new The7_Image_List_Width_Calculator( $image_width_config );
+
 					// Post media.
 					$thumb_args = apply_filters( 'dt_post_thumbnail_args', array(
 						'img_id' => get_post_thumbnail_id(),
 						'class'  => 'post-thumbnail-rollover',
 						'href'   => get_permalink(),
 						'wrap'   => '<a %HREF% %CLASS% %CUSTOM%><img %IMG_CLASS% %SRC% %ALT% %IMG_TITLE% %SIZE% /></a>',
+						'options' => $image_width_calc->calculate_options(),
 						'echo'   => false,
 					) );
 
@@ -326,12 +347,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 				$excerpt = apply_filters( 'the_content', get_the_content( '' ) );
 			} else {
 				$length = absint( $this->atts['excerpt_words_limit'] );
-				$excerpt = get_the_excerpt();
-
-				// VC excerpt fix.
-				if ( function_exists( 'vc_manager' ) ) {
-					$excerpt = vc_manager()->vc()->excerptFilter( $excerpt );
-				}
+				$excerpt = apply_filters( 'the7_shortcodeaware_excerpt', get_the_excerpt() );
 
 				if ( $length ) {
 					$excerpt = wp_trim_words( $excerpt, $length );
@@ -651,15 +667,7 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 		 * @return string
 		 */
 		protected function get_vc_inline_html() {
-			$terms_title = _x( 'Display categories', 'vc inline dummy', 'the7mk2' );
-
-			return $this->vc_inline_dummy( array(
-				'class' => 'dt_vc-blog_list',
-				'title' => _x( 'Blog List', 'vc inline dummy', 'the7mk2' ),
-				'fields' => array(
-					$terms_title => presscore_get_terms_list_by_slug( array( 'slugs' => $this->atts['category'], 'taxonomy' => 'category' ) ),
-				),
-			) );
+			return false;
 		}
 
 		protected function get_posts_filter_terms( $query ) {
@@ -733,6 +741,69 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 			}
 		}
 
+		/**
+		 * @return array|WP_Query
+		 */
+		protected function get_loop_query() {
+			$query = apply_filters( 'the7_shortcode_query', null, $this->sc_name, $this->atts );
+			if ( is_a( $query, 'WP_Query' ) ) {
+				return $query;
+			}
+
+			add_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			add_filter( 'found_posts', array( $this, 'fix_pagination' ), 1, 2 );
+
+			$post_type = $this->get_att( 'post_type' );
+			if ( 'posts' === $post_type ) {
+				$query = $this->get_posts_by_post_type( 'post', $this->get_att( 'posts' ) );
+			} elseif ( 'tags' === $post_type ) {
+				$query = $this->get_posts_by_taxonomy( 'post', 'post_tag', $this->get_att( 'tags' ) );
+			} else {
+				$category_terms = presscore_sanitize_explode_string( $this->get_att( 'category' ) );
+				$category_field = ( is_numeric( $category_terms[0] ) ? 'term_id' : 'slug' );
+
+				$query = $this->get_posts_by_taxonomy( 'post', 'category', $category_terms, $category_field );
+			}
+
+			remove_action( 'pre_get_posts', array( $this, 'add_offset' ), 1 );
+			remove_filter( 'found_posts', array( $this, 'fix_pagination' ), 1 );
+
+			return $query;
+		}
+
+		/**
+		 * Add offset to the posts query.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param WP_Query $query
+		 */
+		public function add_offset( &$query ) {
+			$offset  = (int) $this->get_att( 'posts_offset' );
+			$ppp     = (int) $query->query_vars['posts_per_page'];
+			$current = (int) $query->query_vars['paged'];
+
+			if ( $query->is_paged ) {
+				$page_offset = $offset + ( $ppp * ( $current - 1 ) );
+				$query->set( 'offset', $page_offset );
+			} else {
+				$query->set( 'offset', $offset );
+			}
+		}
+
+		/**
+		 * Fix pagination accordingly with posts offset.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param int $found_posts
+		 *
+		 * @return int
+		 */
+		public function fix_pagination( $found_posts ) {
+			return $found_posts - (int) $this->get_att( 'posts_offset' );
+		}
+
 		protected function get_posts_by_post_type( $post_type, $post_ids = array() ) {
 			$pagination_mode = $this->get_att( 'loading_mode' );
 			$posts_per_page = $this->get_posts_per_page( $pagination_mode );
@@ -782,13 +853,14 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 		}
 
 		protected function get_posts_per_page( $pagination_mode ) {
-			$posts_per_page = - 1;
+			$max_posts_per_page = 99999;
 			switch ( $pagination_mode ) {
 				case 'disabled':
 					$posts_per_page = $this->get_att( 'dis_posts_total' );
 					break;
 				case 'standard':
 					$posts_per_page = $this->get_att( 'st_posts_per_page' );
+					$posts_per_page = $posts_per_page ? $posts_per_page : get_option( 'posts_per_page' );
 					break;
 				case 'js_pagination':
 					$posts_per_page = $this->get_att( 'jsp_posts_total' );
@@ -799,6 +871,13 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 				case 'js_lazy_loading':
 					$posts_per_page = $this->get_att( 'jsl_posts_total' );
 					break;
+				default:
+					return $max_posts_per_page;
+			}
+
+			$posts_per_page = (int) $posts_per_page;
+			if ( $posts_per_page === -1 ) {
+				return $max_posts_per_page;
 			}
 
 			return $posts_per_page;
@@ -858,6 +937,18 @@ if ( ! class_exists( 'DT_Shortcode_BlogList', false ) ):
 			}
 
 			return new WP_Query( $query_args );
+		}
+
+		protected function sanitize_paddings( $padding ) {
+			if ( ! is_array( $padding ) ) {
+				$padding = explode( ' ', $padding );
+			}
+
+			for ( $i = 0; $i < 4;  $i++ ) {
+				$padding[ $i ] = ( isset( $padding[ $i ] ) ? $padding[ $i ] : '0' );
+			}
+
+			return array_slice( $padding, 0, 4 );
 		}
 	}
 

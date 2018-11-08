@@ -2,9 +2,9 @@
 // Prevent loading this file directly
 defined( 'ABSPATH' ) || exit;
 
-if ( !class_exists( 'RWMB_Select_Field' ) )
+if ( !class_exists( 'THE7_RWMB_Select_Field' ) )
 {
-	class RWMB_Select_Field
+	class THE7_RWMB_Select_Field
 	{
 		/**
 		 * Enqueue scripts and styles
@@ -13,7 +13,7 @@ if ( !class_exists( 'RWMB_Select_Field' ) )
 		 */
 		static function admin_enqueue_scripts()
 		{
-			wp_enqueue_style( 'rwmb-select', RWMB_CSS_URL . 'select.css', array(), RWMB_VER );
+			wp_enqueue_style( 'the7-mb-select', THE7_RWMB_CSS_URL . 'select.css', array(), THE7_RWMB_VER );
 		}
 
 		/**
@@ -28,7 +28,7 @@ if ( !class_exists( 'RWMB_Select_Field' ) )
 		static function html( $html, $meta, $field )
 		{
 			$html = sprintf(
-				'<select class="rwmb-select" name="%s" id="%s" size="%s"%s>',
+				'<select class="the7-mb-select" name="%s" id="%s" size="%s"%s>',
 				$field['field_name'],
 				$field['id'],
 				$field['size'],
@@ -85,7 +85,7 @@ if ( !class_exists( 'RWMB_Select_Field' ) )
 		{
 			if ( !$field['clone'] )
 			{
-				RW_Meta_Box::save( $new, $old, $post_id, $field );
+				The7_RW_Meta_Box::save( $new, $old, $post_id, $field );
 				return;
 			}
 

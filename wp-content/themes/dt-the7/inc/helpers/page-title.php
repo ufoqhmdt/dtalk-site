@@ -40,7 +40,10 @@ if ( ! function_exists( 'presscore_get_page_title' ) ) :
 
 		$title = '';
 
-		if ( is_page() || is_single() ) {
+		if ( is_home() && ! is_front_page() ) {
+			$title = single_post_title( '', false );
+
+		} elseif ( is_page() || is_single() ) {
 			$title = get_the_title();
 
 		} else if ( is_search() ) {
@@ -211,7 +214,7 @@ if ( ! function_exists( 'presscore_get_page_title_breadcrumbs' ) ) :
 		}
 
 		$default_args = array(
-			'beforeBreadcrumbs' => '<div class="wf-td">',
+			'beforeBreadcrumbs' => '<div class="page-title-breadcrumbs">',
 			'afterBreadcrumbs' => '</div>',
 			'listAttr' => ' class="' . $breadcrumbs_class . '"'
 		);

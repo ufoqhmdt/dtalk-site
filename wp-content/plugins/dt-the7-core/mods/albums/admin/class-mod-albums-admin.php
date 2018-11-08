@@ -86,7 +86,8 @@ class Presscore_Mod_Albums_Admin {
 		if ( array_key_exists( 'of-blog-and-portfolio-menu', $options ) ) {
 			$options['of-albums-mod-injected-options'] = plugin_dir_path( __FILE__ ) . 'options/options-albums.php';
 			$options['of-albums-mod-injected-slug-options'] = plugin_dir_path( __FILE__ ) . 'options/options-slug-albums.php';
-		} else if ( function_exists( 'presscore_module_archive_get_menu_slug' ) && array_key_exists( presscore_module_archive_get_menu_slug(), $options ) ) {
+		}
+		if ( function_exists( 'presscore_module_archive_get_menu_slug' ) && array_key_exists( presscore_module_archive_get_menu_slug(), $options ) ) {
 			$options['of-albums-mod-injected-archive-options'] = plugin_dir_path( __FILE__ ) . 'options/options-archive-albums.php';
 		}
 		return $options;

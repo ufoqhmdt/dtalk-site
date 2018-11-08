@@ -3,23 +3,30 @@
 
 /* # Background color: custom
 ================================================== */
+
+ @project-bg-hover-opacity=70;
+
 .rollover i,
 .post-rollover i,
 .rollover-video i,
-.enable-bg-rollover .post-thumbnail-rollover:after {
-	background-color: fade(@rollover-bg-color, @plain-hover-opacity);
-	.background-fade-gradient (@startColor: @rollover-bg-color, @endColor: @rollover-bg-color-2, @opacity: @plain-hover-opacity);
+.enable-bg-rollover .post-thumbnail-rollover:after,
+.enable-bg-rollover .gallery-rollover,
+.enable-bg-rollover.hover-scale figure:after {
+	background-color: @rollover-bg-color;
+	.background-gradient (@startColor: @rollover-bg-color, @endColor: @rollover-bg-color-2);
 }
-
 .hover-style-two:not(.effect-layla):not(.effect-bubba):not(.effect-sarah) .rollover-content,
 .buttons-on-img .rollover-content,
 .albums .rollover-thumbnails-on i,
 .dt-albums-shortcode .rollover-thumbnails-on i,
 .rollover-buttons-on i,
 .hover-scale .rollover-project:after,
-.hover-style-two.content-align-bottom .rollover-project:after {
-	background-color: fade(@project-rollover-bg-color, @project-bg-hover-opacity);
-	.background-fade-gradient (@startColor: @project-rollover-bg-color, @endColor: @project-rollover-bg-color-2, @opacity: @project-bg-hover-opacity);
+.hover-style-two.content-align-bottom .rollover-project:after,
+.portfolio-shortcode.enable-bg-rollover .post-thumbnail-rollover:after,
+.albums-shortcode.enable-bg-rollover .post-thumbnail-rollover:after,
+.enable-bg-rollover.hover-scale article:after {
+	background-color: @project-rollover-bg-color;
+	.background-gradient (@startColor: @project-rollover-bg-color, @endColor: @project-rollover-bg-color-2);
 }
 .rollover-project {
 	.effect-bubba &,
@@ -44,7 +51,6 @@
 /* # Background color: dark
 ================================================== */
 @percent-to-num: (unit(@bg-hover-opacity) / 100);
-@percent-to-num-plain: (unit(@plain-hover-opacity) / 100);
 .hover-color-static:not(.effect-layla):not(.effect-bubba):not(.effect-sarah) .rollover-content,
 .accent-gradient .hover-color-static:not(.effect-layla):not(.effect-bubba):not(.effect-sarah) .rollover-content,
 .hover-color-static.hover-scale .rollover-project:after,
@@ -85,6 +91,34 @@
 .rollover-thumbnails span:first-child i {
 	.accent-bg-mixin;
 }
+.gallery-zoom-ico {
+	.gallery-shortcode & {
+		& span {
+			color: @accent-bg-color;
+		}
+		border-color: @accent-bg-color;
+		.dt-icon-bg-on& {
+			background-color: @accent-bg-color;
+			.accent-gradient & {
+				.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+			}
+		}
+	}
+}
+.album-zoom-ico {
+	.albums-shortcode & {
+		& span {
+			color: @accent-bg-color;
+		}
+		border-color: @accent-bg-color;
+		.dt-icon-bg-on& {
+			background-color: @accent-bg-color;
+			.accent-gradient & {
+				.background-gradient (@startColor: @accent-bg-color, @endColor: @accent-bg-color-2);
+			}
+		}
+	}
+}
 
 .rollover-content {
 	line-height: @base-line-height;
@@ -100,5 +134,4 @@
 .portfolio-categories a *,
 .portfolio-categories span {
 	color: @secondary-text-color;
-	-webkit-text-fill-color: @secondary-text-color;
 }
